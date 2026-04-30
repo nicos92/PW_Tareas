@@ -247,7 +247,6 @@ E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.AssemblyInfoInputs.cache
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.AssemblyInfo.cs
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.csproj.CoreCompileInputs.cache
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.MvcApplicationPartsAssemblyInfo.cache
-E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.sourcelink.json
 E:\blazor\tareas\tareas\obj\Debug\net8.0\rjimswa.dswa.cache.json
 E:\blazor\tareas\tareas\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 E:\blazor\tareas\tareas\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json

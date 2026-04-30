@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TareasBlazor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0bedf62bfe565312e25909ba5d75c6e91be9184")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac0ca41706695229b3ce3982167a13cae1fb8a05")]
 [assembly: System.Reflection.AssemblyProductAttribute("TareasBlazor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TareasBlazor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

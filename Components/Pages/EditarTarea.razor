@@ -51,7 +51,7 @@ else
 
         <div class="mb-3">
             <label class="form-label">Suba una imagen:</label>
-            <InputFile OnChange="CargarArchivo" accept="image/*" class="form-control" />
+            <InputFile OnChange="CargarArchivo" accept="image/*" class="form-control" @key="inputFileKey" />
             <ValidationMessage For="()=> tareaModel.Imagen"></ValidationMessage>
             @if (archivoCargado is not null)
             {
@@ -60,8 +60,23 @@ else
                     {
                         <p>El archivo de imagen tiene que pesar menos de un mega</p>                    
                     }
+                    @if (!tamanoExcedido)
+                    {
+                        <div class="container-fluid">
+                            <div class="">
+                                <img src="@imagenBase64" alt="Vista previa" style="width: 300px"/>
+                            </div>
+                        </div>
+                    }
                     <p class="mb-1">Archivo: @archivoCargado.Name</p>
                     <p class="mb-0">Tamaño: @FormatoTamano(archivoCargado.Size)</p>
+                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" @onclick="LimpiarImagen">Limpiar imagen</button>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(tareaModel.Imagen))
+            {
+                <div class="mt-2">
+                    <img src="@tareaModel.Imagen" alt="Imagen actual" style="width: 300px"/>
                 </div>
             }
         </div>
@@ -87,7 +102,9 @@ else
     private bool HayErrores => tamanoExcedido;
     private string TipoAlerta => tamanoExcedido ? "alert-danger" : "alert-success";
     private IBrowserFile? archivoCargado;
+    private string? imagenBase64;
     private bool tamanoExcedido;
+    private int inputFileKey;
     private const long maxFileSize = 1024 * 1024;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -100,10 +117,21 @@ else
         }
     }
 
-    private void CargarArchivo(InputFileChangeEventArgs e)
+    private async Task CargarArchivo(InputFileChangeEventArgs e)
     {
         archivoCargado = e.File;
         tamanoExcedido = archivoCargado.Size > maxFileSize;
+        imagenBase64 = null;
+
+        if (!tamanoExcedido)
+        {
+            using var stream = archivoCargado.OpenReadStream(maxFileSize);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            imagenBase64 = $"data:{archivoCargado.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+        }
+
+        StateHasChanged();
     }
     
     private async Task ValidSubmit()
@@ -126,6 +154,15 @@ else
     {
         NavigationManager.NavigateTo("/listaDeTareas");
     }
+
+    private void LimpiarImagen()
+    {
+        archivoCargado = null;
+        imagenBase64 = null;
+        tamanoExcedido = false;
+        inputFileKey++;
+        tareaModel!.Imagen = string.Empty;
+    }
     
     private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
     {
@@ -133,7 +170,7 @@ else
         var extension = Path.GetExtension(archivo.Name);
         var fileName = trustedFileName + extension;
         
-        var uploadsFolder = Path.Combine(Environment.ContentRootPath, "uploads");
+        var uploadsFolder = Path.Combine(Environment.WebRootPath, "uploads");
         Directory.CreateDirectory(uploadsFolder);
         
         var filePath = Path.Combine(uploadsFolder, fileName);
