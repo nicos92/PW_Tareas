@@ -52,7 +52,12 @@
 					<h3 class="fs-2 text-body-emphasis"><b>Titulo:</b> @tarea.Titulo</h3>
 					<p class="text-muted"><b>Descripción: </b> @tarea.Descripcion</p>
 					<p class="text-muted"><b>Prioridad: </b> <span class="badge @PrioridadHelper.GetClase(tarea.Prioridad)">@tarea.Prioridad</span></p>
-					<p class="text-muted"><b>Url imagen:</b> @tarea.Imagen</p>
+					@if (!string.IsNullOrEmpty(tarea.Imagen))
+					{
+						<div class="mt-2">
+							<img src="@tarea.Imagen" alt="Imagen de la tarea" style="width: 300px" class="img-thumbnail"/>
+						</div>
+					}
 					<p class="text-muted"><b>Vencimiento:</b> @tarea.FechaVencimiento</p>
 				</div>
 			</div>
