@@ -1,0 +1,12 @@
+<div class="card text-white @BackgroundClass">
+    <div class="card-body">
+        <h5 class="card-title">@Title</h5>
+        <p class="card-text display-4">@Value</p>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public int Value { get; set; }
+    [Parameter] public string BackgroundClass { get; set; } = "bg-primary";
+}

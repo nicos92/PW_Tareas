@@ -1,0 +1,212 @@
+@page "/listaDeTareas"
+@rendermode InteractiveServer
+@using TareasBlazor.Infraestructure.Interfaces
+@using TareasBlazor.Infraestructure.Repositories
+@using TareasBlazor.Models
+@using TareasBlazor.Shared
+
+@implements IDisposable
+
+
+<PageTitle>Lista de Tareas</PageTitle>
+<Breadcrum></Breadcrum>
+<h1>Lista de Tareas</h1>
+<div class="card shadow-sm">
+	<div class="card-header">
+		<h5 class="mb-0">Lista de tareas</h5>
+	</div>
+	<div class="card-body">
+		
+		<button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea"><i class="bi bi-plus-circle"></i> Nueva Tarea</button>
+
+		<div class="mb-3">
+			<label class="form-label">Filtrar por prioridad:</label>
+			<select class="form-select" @onchange="SeleccionarPrioridad">
+				<option value="">Todas</option>
+				<option value="Baja">Baja</option>
+				<option value="Media">Media</option>
+				<option value="Alta">Alta</option>
+			</select>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Filtrar por estado:</label>
+			<select class="form-select" @onchange="SeleccionarCompletada">
+				<option value="">Todas</option>
+				<option value="true">Completadas</option>
+				<option value="false">Pendientes</option>
+			</select>
+		</div>
+
+		<p class="text-muted small mb-2">Tareas mostradas: @TareasFiltradas.Count()</p>
+
+		@if (!TareasFiltradas.Any())
+		{
+			<p class="text-muted mb-0">No hay tareas. Añade una arriba.</p>
+		}
+		else
+		{
+			<div class="list-group">
+				@foreach (var tarea in TareasFiltradas)
+				{
+					<TareaItem @key="tarea.IdPublic"
+							   Tarea="tarea"
+							   OnVer="VerTarea"
+							   OnCompletar="CompletarTarea"
+							   OnEliminar="EliminarTarea"
+							   OnEditar="IniciarEdicion">
+						<ChildContent>
+							<span class="badge @(tarea.Completada ? "bg-success" : "bg-secondary")">
+								#@tarea.IdPublic
+							</span>
+						</ChildContent>
+					</TareaItem>
+				}
+			</div>
+		}
+	</div>
+</div>
+
+@if (_showDeleteModal)
+{
+	<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Confirmar eliminación</h5>
+					<button type="button" class="btn-close" @onclick="CancelarEliminar"></button>
+				</div>
+				<div class="modal-body">
+					<p>¿Estás seguro de que deseas eliminar la tarea <strong>@_tareaAEliminar?.Titulo</strong>?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" @onclick="CancelarEliminar">Cancelar</button>
+					<button type="button" class="btn btn-danger" @onclick="ConfirmarEliminar">Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+@code {
+	private string _nuevoTitulo = string.Empty;
+	private string _prioridadSeleccionada = string.Empty;
+	private string _completadaSeleccionada = string.Empty;
+
+	[Inject]
+	private NavigationManager NavigationManager { get; set; } = default!;
+	[Inject]
+	private TareaState tareaState { get; set; } = default!;
+
+	public IReadOnlyList<TareaModel> TareasFiltradas
+	{
+		get
+		{
+			IEnumerable<TareaModel> tareas = tareaState.Tareas;
+
+			if (!string.IsNullOrEmpty(_prioridadSeleccionada))
+				tareas = tareaState.FiltrarPorPrioridad(_prioridadSeleccionada);
+
+			if (bool.TryParse(_completadaSeleccionada, out var completada))
+				tareas = tareas.Where(t => t.Completada == completada);
+
+			return tareas.ToList().AsReadOnly();
+		}
+	}
+
+	protected override void OnInitialized()
+	{
+		tareaState.OnChange += StateHasChanged;
+	}
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		tareaState.OnChange += StateHasChanged;
+		await tareaState.Inicializar();
+	}
+
+	private void SeleccionarPrioridad(ChangeEventArgs e)
+	{
+		_prioridadSeleccionada = e.Value?.ToString() ?? string.Empty;
+		StateHasChanged();
+	}
+
+	private void SeleccionarCompletada(ChangeEventArgs e)
+	{
+		_completadaSeleccionada = e.Value?.ToString() ?? string.Empty;
+		StateHasChanged();
+	}
+	
+	private async Task AgregarTarea()
+	{
+		if (string.IsNullOrWhiteSpace(_nuevoTitulo))
+			return;
+
+		await tareaState.AgregarTarea(new TareaModel
+		{
+			IdPublic = Guid.NewGuid().ToString(),
+			Titulo = _nuevoTitulo
+		});
+
+		_nuevoTitulo = "";
+	}
+
+	private async Task TeclaNuevaTarea(KeyboardEventArgs e)
+	{
+		if (e.Key == "Enter")
+			await AgregarTarea();
+	}
+
+	private void VerTarea(TareaModel tarea)
+	{
+
+		string url = $"/listaDeTareas/tarea/{tarea.IdPublic}";
+		NavigationManager.NavigateTo(url);
+	}
+
+	private async Task CompletarTarea(TareaModel tarea)
+	{
+		await tareaState.Toggle(tarea.IdPublic);
+	}
+
+	private bool _showDeleteModal = false;
+	private TareaModel? _tareaAEliminar;
+
+	private void EliminarTarea(TareaModel tarea)
+	{
+		_tareaAEliminar = tarea;
+		_showDeleteModal = true;
+	}
+
+	private async Task ConfirmarEliminar()
+	{
+		if (_tareaAEliminar is not null)
+		{
+			await tareaState.EliminarTarea(_tareaAEliminar.IdPublic);
+			_tareaAEliminar = null;
+		}
+		_showDeleteModal = false;
+	}
+
+	private void CancelarEliminar()
+	{
+		_tareaAEliminar = null;
+		_showDeleteModal = false;
+	}
+
+	private void IniciarEdicion(string id)
+	{
+		NavigationManager.NavigateTo($"/listaDeTareas/editarTarea/{id}");
+	}
+
+	private void NuevaTarea()
+	{
+		NavigationManager.NavigateTo("/listaDeTareas/nuevaTarea");
+	}
+
+
+	public void Dispose()
+	{
+		tareaState.OnChange -= StateHasChanged;
+	}
+
+}

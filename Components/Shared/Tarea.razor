@@ -1,0 +1,73 @@
+@page "/listaDeTareas/tarea/{id}"
+@using TareasBlazor.Helpers
+@using TareasBlazor.Infraestructure.Interfaces
+@using TareasBlazor.Infraestructure.Repositories
+@using TareasBlazor.Models
+@rendermode InteractiveServer
+<PageTitle>Tarea</PageTitle>
+<Breadcrum></Breadcrum>
+<h3>Ver Tarea</h3>
+<div class="container px-4 py-5" id="featured-3">
+	<div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+		<div class="feature col">
+			@if (isLoading)
+			{
+				<h3 class="fs-2 text-body-emphasis">Cargando...</h3>
+			}
+			else
+			{
+				@DetalleTarea()
+			}
+			<a href="/listaDeTareas" class="icon-link">
+				Volver
+				<svg class="bi" aria-hidden="true"><use xlink:href="#chevron-right"></use></svg>
+			</a>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public string id { get; set; } = string.Empty;
+	[Inject]
+	private ITareaRepository tareaRepository { get; set; } = default!;
+	private bool isLoading = true;
+	private TareaModel? tarea { get; set; }
+
+	private RenderFragment DetalleTarea() => tarea != null
+		? TareaEncontrada()
+		: TareaNoEncontrada();
+
+	private RenderFragment TareaEncontrada() => __builder =>
+	{
+		if (tarea != null)
+		{
+
+			<div class="card">
+				<div class="card-body">
+					<span class="badge @(tarea.Completada ? "bg-success" : "bg-secondary")">
+						@(tarea.Completada ? "Completada" : "Pendiente")
+					</span>
+					<p class="text-muted"><b>Id: </b>@tarea.IdPublic</p>
+					<h3 class="fs-2 text-body-emphasis"><b>Titulo:</b> @tarea.Titulo</h3>
+					<p class="text-muted"><b>Descripción: </b> @tarea.Descripcion</p>
+					<p class="text-muted"><b>Prioridad: </b> <span class="badge @PrioridadHelper.GetClase(tarea.Prioridad)">@tarea.Prioridad</span></p>
+					<p class="text-muted"><b>Url imagen:</b> @tarea.Imagen</p>
+					<p class="text-muted"><b>Vencimiento:</b> @tarea.FechaVencimiento</p>
+				</div>
+			</div>
+		}
+	};
+
+	private RenderFragment TareaNoEncontrada() => __builder =>
+	{
+		<h3 class="fs-2 text-body-emphasis text-danger">Tarea no encontrada</h3>
+	};
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		tarea = await tareaRepository.GetTareaByIdAsync(id);
+		isLoading = false;
+		StateHasChanged();
+	}
+}

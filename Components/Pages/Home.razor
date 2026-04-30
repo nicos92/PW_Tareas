@@ -1,0 +1,45 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@implements IDisposable
+
+
+<PageTitle>Home</PageTitle>
+<Breadcrum/>
+
+<h1>Hello, world!</h1>
+
+<p class="lead">Welcome to your new app.</p>
+
+<div class="row mb-4">
+	<div class="col-md-4">
+		<StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="bg-primary" />
+	</div>
+	<div class="col-md-4">
+		<StatsCard Title="Completadas" Value="@tareaState.Tareas.Count(t => t.Completada)" BackgroundClass="bg-success" />
+	</div>
+	<div class="col-md-4">
+		<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-warning" />
+	</div>
+</div>
+
+
+@code {
+    [Inject]
+    private TareaState tareaState { get; set; } = default!;
+
+    private bool isLoading = true;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+            tareaState.OnChange += StateHasChanged;
+
+            await tareaState.Inicializar();
+    }
+
+    public void Dispose()
+    {
+        tareaState.OnChange -= StateHasChanged;
+    }
+
+}
