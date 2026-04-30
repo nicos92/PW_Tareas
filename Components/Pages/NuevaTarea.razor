@@ -68,6 +68,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary" disabled="@(context.GetValidationMessages().Any() || tamanoExcedido)">Guardar</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
 
@@ -139,5 +140,10 @@
             counter++;
         }
         return $"{number:n1} {suffixes[counter]}";
+    }
+    
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/listaDeTareas");
     }
 }
