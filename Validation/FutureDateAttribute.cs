@@ -8,7 +8,7 @@ namespace TareasBlazor.Validation
         /// <summary>
         /// If true, uses UTC time for comparison; otherwise uses local time.
         /// </summary>
-        public bool UseUtc { get; set; } = true;
+        public bool UseUtc { get; set; } = false;
 
         public FutureDateAttribute()
         {
