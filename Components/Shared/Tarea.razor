@@ -30,7 +30,7 @@
 	[Parameter]
 	public string id { get; set; } = string.Empty;
 	[Inject]
-	private ITareaRepository tareaRepository { get; set; } = default!;
+	private TareaState tareaState { get; set; } = default!;
 	private bool isLoading = true;
 	private TareaModel? tarea { get; set; }
 
@@ -71,7 +71,7 @@
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		tarea = await tareaRepository.GetTareaByIdAsync(id);
+		tarea = tareaState.GetTareaById(id);
 		isLoading = false;
 		StateHasChanged();
 	}

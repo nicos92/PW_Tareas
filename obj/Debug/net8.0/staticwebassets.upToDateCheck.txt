@@ -3,7 +3,7 @@ wwwroot\bootstrap\bootstrap.min.css
 wwwroot\bootstrap\bootstrap.min.css.map
 wwwroot\favicon.png
 wwwroot\js\tareas.js
-wwwroot\uploads\yu2hk3m2.pme.jpg
+wwwroot\uploads\czvhc0rx.e01.ico
 wwwroot\uploads\hotfvkrp.wve.jpg
 wwwroot\uploads\xd1nlea3.etv.jpg
-wwwroot\uploads\czvhc0rx.e01.ico
+wwwroot\uploads\yu2hk3m2.pme.jpg
