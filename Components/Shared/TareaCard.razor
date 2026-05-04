@@ -1,22 +1,30 @@
 @using TareasBlazor.Helpers
 @using TareasBlazor.Models
 
-<div class="card">
-    <div class="card-body">
-        <span class="badge @(Tarea.Completada ? "bg-success" : "bg-secondary")">
+<div class="card shadow-sm border-0 h-100">
+    <div class="card-header d-flex justify-content-between align-items-center @(Tarea.Completada ? "bg-success-subtle border-success-subtle" : "bg-secondary-subtle border-secondary-subtle")">
+        <h4 class="card-title mb-0 text-body-emphasis">@Tarea.Titulo</h4>
+        <span class="badge @(Tarea.Completada ? "bg-success" : "bg-secondary") rounded-pill">
             @(Tarea.Completada ? "Completada" : "Pendiente")
         </span>
-        <p class="text-muted"><b>Id: </b>@Tarea.IdPublic</p>
-        <h3 class="fs-2 text-body-emphasis"><b>Titulo:</b> @Tarea.Titulo</h3>
-        <p class="text-muted"><b>Descripción: </b> @Tarea.Descripcion</p>
-        <p class="text-muted"><b>Prioridad: </b> <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad)">@Tarea.Prioridad</span></p>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small mb-3"><i class="bi bi-hash"></i> ID: <code>@Tarea.IdPublic</code></p>
+        <p class="card-text lh-base">@Tarea.Descripcion</p>
         @if (!string.IsNullOrEmpty(Tarea.Imagen))
         {
-            <div class="mt-2">
-                <img src="@Tarea.Imagen" alt="Imagen de la tarea" style="width: 300px" class="img-thumbnail"/>
+            <div class="text-center my-3">
+                <img src="@Tarea.Imagen" alt="Imagen de la tarea" class="img-fluid rounded shadow-sm" style="max-width: 100%; max-height: 250px; object-fit: cover;"/>
             </div>
         }
-        <p class="text-muted"><b>Vencimiento:</b> @Tarea.FechaVencimiento</p>
+    </div>
+    <div class="card-footer bg-transparent border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad) rounded-pill">
+            Prioridad: @Tarea.Prioridad
+        </span>
+        <span class="text-muted small">
+            Vence: @Tarea.FechaVencimiento?.ToString("dd MMM yyyy")
+        </span>
     </div>
 </div>
 
