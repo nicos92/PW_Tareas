@@ -1,0 +1,42 @@
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Filtrar por prioridad:</label>
+        <select class="form-select" value="@PrioridadSeleccionada" @onchange="OnPrioridadChangedHandler">
+            <option value="">Todas</option>
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Filtrar por estado:</label>
+        <select class="form-select" value="@EstadoSeleccionado" @onchange="OnEstadoChangedHandler">
+            <option value="">Todas</option>
+            <option value="Completadas">Completadas</option>
+            <option value="Pendientes">Pendientes</option>
+        </select>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <span class="text-muted">Mostrando: @TotalTareas tarea@(TotalTareas != 1 ? "s" : "")</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string PrioridadSeleccionada { get; set; } = string.Empty;
+    [Parameter] public string EstadoSeleccionado { get; set; } = string.Empty;
+    [Parameter] public int TotalTareas { get; set; }
+    [Parameter] public EventCallback<string> OnPrioridadChanged { get; set; }
+    [Parameter] public EventCallback<string> OnEstadoChanged { get; set; }
+
+    private async Task OnPrioridadChangedHandler(ChangeEventArgs e)
+    {
+        PrioridadSeleccionada = e.Value?.ToString() ?? string.Empty;
+        await OnPrioridadChanged.InvokeAsync(PrioridadSeleccionada);
+    }
+
+    private async Task OnEstadoChangedHandler(ChangeEventArgs e)
+    {
+        EstadoSeleccionado = e.Value?.ToString() ?? string.Empty;
+        await OnEstadoChanged.InvokeAsync(EstadoSeleccionado);
+    }
+}

@@ -259,10 +259,10 @@ E:\blazor\tareas\tareas\obj\Debug\net8.0\staticwebassets.build.json.cache
 E:\blazor\tareas\tareas\obj\Debug\net8.0\staticwebassets.development.json
 E:\blazor\tareas\tareas\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 E:\blazor\tareas\tareas\obj\Debug\net8.0\swae.build.ex.cache
-E:\blazor\tareas\tareas\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBl.C0A8B136.Up2Date
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.dll
 E:\blazor\tareas\tareas\obj\Debug\net8.0\refint\TareasBlazor.dll
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.pdb
 E:\blazor\tareas\tareas\obj\Debug\net8.0\TareasBlazor.genruntimeconfig.cache
 E:\blazor\tareas\tareas\obj\Debug\net8.0\ref\TareasBlazor.dll
+E:\blazor\tareas\tareas\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

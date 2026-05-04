@@ -13,79 +13,13 @@
 }
 else
 {
-    <EditForm Model="tareaModel" OnValidSubmit="ValidSubmit" class="container">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+    <TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+        <ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
 
-        <div class="mb-3">
-            <label class="form-label">Titulo:</label>
-            <InputText @bind-Value="tareaModel.Titulo" class="form-control" />
-            <ValidationMessage For="() => tareaModel.Titulo" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Descripcion:</label>
-            <InputTextArea @bind-Value="tareaModel.Descripcion" class="form-control" />
-            <ValidationMessage For="() => tareaModel.Descripcion" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-check-label">Completada:</label>
-            <InputCheckbox @bind-Value="tareaModel.Completada" class="form-check-input" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Fecha de Vencimiento:</label>
-            <InputDate @bind-Value="tareaModel.FechaVencimiento" class="form-control" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Prioridad:</label>
-            <InputSelect @bind-Value="tareaModel.Prioridad" class="form-select">
-                @foreach (var prioridad in Enum.GetValues<Prioridad>())
-                {
-                    <option value="@prioridad">@prioridad</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Suba una imagen:</label>
-            <InputFile OnChange="CargarArchivo" accept="image/*" class="form-control" @key="inputFileKey" />
-            <ValidationMessage For="()=> tareaModel.Imagen"></ValidationMessage>
-            @if (archivoCargado is not null)
-            {
-                <div class="alert @TipoAlerta mt-2">
-                    @if (tamanoExcedido)
-                    {
-                        <p>El archivo de imagen tiene que pesar menos de un mega</p>                    
-                    }
-                    @if (!tamanoExcedido)
-                    {
-                        <div class="container-fluid">
-                            <div class="">
-                                <img src="@imagenBase64" alt="Vista previa" style="width: 300px"/>
-                            </div>
-                        </div>
-                    }
-                    <p class="mb-1">Archivo: @archivoCargado.Name</p>
-                    <p class="mb-0">Tamaño: @FormatoTamano(archivoCargado.Size)</p>
-                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" @onclick="LimpiarImagen">Limpiar imagen</button>
-                </div>
-            }
-            else if (!string.IsNullOrEmpty(tareaModel.Imagen))
-            {
-                <div class="mt-2">
-                    <img src="@tareaModel.Imagen" alt="Imagen actual" style="width: 300px"/>
-                </div>
-            }
-        </div>
-
-        <button type="submit" class="btn btn-primary" disabled="@(context.GetValidationMessages().Any() || tamanoExcedido)">Guardar</button>
+        <button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
         <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
-    </EditForm>
+    </TareaForm>
 }
-
 
 @code {
     [Parameter]
@@ -99,13 +33,8 @@ else
     private IWebHostEnvironment Environment { get; set; } = default!;
 
     private TareaModel? tareaModel;
-    private bool HayErrores => tamanoExcedido;
-    private string TipoAlerta => tamanoExcedido ? "alert-danger" : "alert-success";
-    private IBrowserFile? archivoCargado;
-    private string? imagenBase64;
-    private bool tamanoExcedido;
-    private int inputFileKey;
-    private const long maxFileSize = 1024 * 1024;
+    private TareaForm? tareaForm;
+    private ImageUploader? imageUploader;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -117,33 +46,31 @@ else
         }
     }
 
-    private async Task CargarArchivo(InputFileChangeEventArgs e)
+    private async Task OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
     {
-        archivoCargado = e.File;
-        tamanoExcedido = archivoCargado.Size > maxFileSize;
-        imagenBase64 = null;
-
-        if (!tamanoExcedido)
+        if (args.LimpiarImagenExistente && tareaModel is not null)
         {
-            using var stream = archivoCargado.OpenReadStream(maxFileSize);
-            using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-            imagenBase64 = $"data:{archivoCargado.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+            tareaModel.Imagen = string.Empty;
         }
-
-        StateHasChanged();
     }
     
     private async Task ValidSubmit()
     {
-        if (tamanoExcedido || tareaModel is null)
+        if (imageUploader?.TamanoExcedido == true || tareaModel is null)
         {
             return;
         }
+
+        var imagenAnterior = tareaModel.Imagen;
         
-        if (archivoCargado is not null)
+        if (imageUploader!.Archivo is not null)
         {
-            tareaModel.Imagen = await GuardarArchivoAsync(archivoCargado);
+            if (!string.IsNullOrEmpty(imagenAnterior))
+            {
+                EliminarArchivo(imagenAnterior);
+            }
+            
+            tareaModel.Imagen = await GuardarArchivoAsync(imageUploader.Archivo);
         }
         
         await TareaState.ActualizarTarea(tareaModel);
@@ -153,15 +80,6 @@ else
     private void Cancelar()
     {
         NavigationManager.NavigateTo("/listaDeTareas");
-    }
-
-    private void LimpiarImagen()
-    {
-        archivoCargado = null;
-        imagenBase64 = null;
-        tamanoExcedido = false;
-        inputFileKey++;
-        tareaModel!.Imagen = string.Empty;
     }
     
     private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
@@ -176,21 +94,19 @@ else
         var filePath = Path.Combine(uploadsFolder, fileName);
         
         await using FileStream fs = new(filePath, FileMode.Create);
-        await archivo.OpenReadStream(maxFileSize).CopyToAsync(fs);
+        await archivo.OpenReadStream(1024 * 1024).CopyToAsync(fs);
         
         return $"/uploads/{fileName}";
     }
-    
-    private string FormatoTamano(long bytes)
+
+    private void EliminarArchivo(string rutaRelativa)
     {
-        string[] suffixes = { "B", "KB", "MB", "GB" };
-        int counter = 0;
-        decimal number = bytes;
-        while (Math.Round(number / 1024) >= 1)
+        if (string.IsNullOrEmpty(rutaRelativa)) return;
+        
+        var fullPath = Path.Combine(Environment.WebRootPath, rutaRelativa.TrimStart('/'));
+        if (File.Exists(fullPath))
         {
-            number /= 1024;
-            counter++;
+            File.Delete(fullPath);
         }
-        return $"{number:n1} {suffixes[counter]}";
     }
 }

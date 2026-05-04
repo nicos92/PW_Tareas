@@ -1,7 +1,6 @@
 @inject NavigationManager NavigationManager
-@inject ITareaRepository TareaRepository
+@inject TareasBlazor.Shared.TareaState TareaState
 @implements IDisposable
-@using TareasBlazor.Infraestructure.Interfaces
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -89,7 +88,7 @@
 
             if (isGuid)
             {
-                var tarea = await TareaRepository.GetTareaByIdAsync(segment);
+                var tarea = TareaState.GetTareaById(segment);
                 name = tarea?.Titulo ?? segment;
             }
 

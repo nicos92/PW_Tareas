@@ -26,10 +26,6 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/blazor/tareas/tareas/Components/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [E:/blazor/tareas/tareas/Components/Pages/EditarTarea.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFZGl0YXJUYXJlYS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -46,16 +42,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xOdWV2YVRhcmVhLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/blazor/tareas/tareas/Components/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [E:/blazor/tareas/tareas/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/blazor/tareas/tareas/Components/Shared/Breadcrum.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcQnJlYWRjcnVtLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/blazor/tareas/tareas/Components/Shared/ConfirmDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcQ29uZmlybURpYWxvZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/blazor/tareas/tareas/Components/Shared/FilterBar.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcRmlsdGVyQmFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/blazor/tareas/tareas/Components/Shared/ImageUploader.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcSW1hZ2VVcGxvYWRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/blazor/tareas/tareas/Components/Shared/ListaTareas.razor]
@@ -68,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/blazor/tareas/tareas/Components/Shared/Tarea.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcVGFyZWEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/blazor/tareas/tareas/Components/Shared/TareaForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcVGFyZWFGb3JtLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/blazor/tareas/tareas/Components/Shared/TareaItem.razor]

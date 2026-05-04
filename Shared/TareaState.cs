@@ -1,9 +1,10 @@
 using TareasBlazor.Infraestructure.Interfaces;
 using TareasBlazor.Models;
+using System.IO;
 
 namespace TareasBlazor.Shared
 {
-    public class TareaState(ITareaRepository _repo)
+    public class TareaState(IWebHostEnvironment _env, ITareaRepository _repo)
     {
         private readonly List<TareaModel> _tareas = [];
         private bool _inicializado = false;
@@ -35,9 +36,26 @@ namespace TareasBlazor.Shared
 
         public async Task EliminarTarea(string id)
         {
+            var tarea = _tareas.FirstOrDefault(t => t.IdPublic == id);
+            if (tarea is not null && !string.IsNullOrEmpty(tarea.Imagen))
+            {
+                EliminarArchivo(tarea.Imagen);
+            }
+
             _tareas.RemoveAll(t => t.IdPublic == id);
             await _repo.DeleteTareaByIdAsync(id);
             NotificarCambio();
+        }
+
+        private void EliminarArchivo(string rutaRelativa)
+        {
+            if (string.IsNullOrEmpty(rutaRelativa)) return;
+            
+            var fullPath = Path.Combine(_env.WebRootPath, rutaRelativa.TrimStart('/'));
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
         }
 
         public async Task Toggle(string id)
