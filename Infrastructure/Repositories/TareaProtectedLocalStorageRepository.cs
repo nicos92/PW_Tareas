@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.Security.Cryptography;
 using TareasBlazor.Infraestructure.Interfaces;
 using TareasBlazor.Models;
 
@@ -16,8 +17,16 @@ namespace TareasBlazor.Infraestructure.Repositories
 
         public async Task<List<TareaModel>> GetTareasAsync()
         {
-            var result = await _protectedLocalStorage.GetAsync<List<TareaModel>>(StorageKey);
-            return result.Success ? result.Value ?? [] : [];
+            try
+            {
+                var result = await _protectedLocalStorage.GetAsync<List<TareaModel>>(StorageKey);
+                return result.Success ? result.Value ?? [] : [];
+            }
+            catch (CryptographicException)
+            {
+                await _protectedLocalStorage.DeleteAsync(StorageKey);
+                return [];
+            }
         }
 
         public async Task AddTareaAsync(TareaModel tarea)
