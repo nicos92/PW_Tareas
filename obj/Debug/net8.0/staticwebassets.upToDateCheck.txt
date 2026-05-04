@@ -3,8 +3,3 @@ wwwroot\bootstrap\bootstrap.min.css
 wwwroot\bootstrap\bootstrap.min.css.map
 wwwroot\favicon.png
 wwwroot\js\tareas.js
-wwwroot\uploads\hjcnf3jm.zqv.jpg
-wwwroot\uploads\hotfvkrp.wve.jpg
-wwwroot\uploads\w2z2ow4a.z0f.jpg
-wwwroot\uploads\xd1nlea3.etv.jpg
-wwwroot\uploads\yu2hk3m2.pme.jpg

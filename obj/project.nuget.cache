@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yjYmBXOz5vY=",
+  "dgSpecHash": "ms9YIgESNbg=",
   "success": true,
-  "projectFilePath": "E:\\blazor\\tareas\\tareas\\TareasBlazor.csproj",
+  "projectFilePath": "E:\\PW_Tareas\\PW_Tareas\\TareasBlazor.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nicos\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\nicos\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",

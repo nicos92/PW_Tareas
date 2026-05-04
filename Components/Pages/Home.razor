@@ -11,13 +11,13 @@
 <p class="lead">Welcome to your new app.</p>
 
 <div class="row mb-4">
-	<div class="col-md-4">
+	<div class="col-md-4 p-1">
 		<StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="bg-primary" />
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-4 p-1">
 		<StatsCard Title="Completadas" Value="@tareaState.Tareas.Count(t => t.Completada)" BackgroundClass="bg-success" />
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-4 p-1">
 		<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-warning" />
 	</div>
 </div>
