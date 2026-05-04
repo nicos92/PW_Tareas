@@ -13,12 +13,19 @@
 }
 else
 {
+    <div class="card shadow-sm col-xl-6 col-lg-8 col-md-12">
+        <div class="card-header">
+            <h5 class="mb-0">Editar tarea</h5>
+        </div>
+        <div class="card-body">
     <TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
         <ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
 
         <button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
         <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
     </TareaForm>
+        </div>
+    </div>
 }
 
 @code {

@@ -5,66 +5,72 @@
 <PageTitle>Nueva Tarea</PageTitle>
 <Breadcrum></Breadcrum>
 <h3>Nueva Tarea</h3>
+<div class="card shadow-sm col-xl-6 col-lg-8 col-md-12">
+	<div class="card-header">
+		<h5 class="mb-0">Editar tarea</h5>
+	</div>
+	<div class="card-body">
+		<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+			<ImageUploader OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
 
-<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
-    <ImageUploader OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
-
-    <button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
-    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
-</TareaForm>
+			<button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
+			<button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+		</TareaForm>
+	</div>
+</div>
 
 @code {
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject]
-    private IWebHostEnvironment Environment { get; set; } = default!;
-    [Inject]
+	[Inject]
+	private NavigationManager NavigationManager { get; set; } = default!;
+	[Inject]
+	private IWebHostEnvironment Environment { get; set; } = default!;
+	[Inject]
 	private TareaState tareaState { get; set; } = default!;
-    private TareaModel tareaModel = new();
-    private TareaForm? tareaForm;
-    private ImageUploader? imageUploader;
+	private TareaModel tareaModel = new();
+	private TareaForm? tareaForm;
+	private ImageUploader? imageUploader;
 
-    private async Task OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
-    {
-    }
+	private async Task OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
+	{
+	}
     
-    private async Task ValidSubmit()
-    {
-        if (imageUploader?.TamanoExcedido == true)
-        {
-            return;
-        }
+	private async Task ValidSubmit()
+	{
+		if (imageUploader?.TamanoExcedido == true)
+		{
+			return;
+		}
         
-        tareaModel.IdPublic = Guid.NewGuid().ToString();
+		tareaModel.IdPublic = Guid.NewGuid().ToString();
         
-        if (imageUploader?.Archivo is not null)
-        {
-            tareaModel.Imagen = await GuardarArchivoAsync(imageUploader.Archivo);
-        }
+		if (imageUploader?.Archivo is not null)
+		{
+			tareaModel.Imagen = await GuardarArchivoAsync(imageUploader.Archivo);
+		}
         
-        await tareaState.AgregarTarea(tareaModel);
-        NavigationManager.NavigateTo("/listaDeTareas");
-    }
+		await tareaState.AgregarTarea(tareaModel);
+		NavigationManager.NavigateTo("/listaDeTareas");
+	}
     
-    private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
-    {
-        var trustedFileName = Path.GetRandomFileName();
-        var extension = Path.GetExtension(archivo.Name);
-        var fileName = trustedFileName + extension;
+	private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
+	{
+		var trustedFileName = Path.GetRandomFileName();
+		var extension = Path.GetExtension(archivo.Name);
+		var fileName = trustedFileName + extension;
         
-        var uploadsFolder = Path.Combine(Environment.WebRootPath, "uploads");
-        Directory.CreateDirectory(uploadsFolder);
+		var uploadsFolder = Path.Combine(Environment.WebRootPath, "uploads");
+		Directory.CreateDirectory(uploadsFolder);
         
-        var filePath = Path.Combine(uploadsFolder, fileName);
+		var filePath = Path.Combine(uploadsFolder, fileName);
         
-        await using FileStream fs = new(filePath, FileMode.Create);
-        await archivo.OpenReadStream(1024 * 1024).CopyToAsync(fs);
+		await using FileStream fs = new(filePath, FileMode.Create);
+		await archivo.OpenReadStream(1024 * 1024).CopyToAsync(fs);
         
-        return $"/uploads/{fileName}";
-    }
+		return $"/uploads/{fileName}";
+	}
     
-    private void Cancelar()
-    {
-        NavigationManager.NavigateTo("/listaDeTareas");
-    }
+	private void Cancelar()
+	{
+		NavigationManager.NavigateTo("/listaDeTareas");
+	}
 }
