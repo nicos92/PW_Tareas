@@ -1,0 +1,26 @@
+@using TareasBlazor.Helpers
+@using TareasBlazor.Models
+
+<div class="card">
+    <div class="card-body">
+        <span class="badge @(Tarea.Completada ? "bg-success" : "bg-secondary")">
+            @(Tarea.Completada ? "Completada" : "Pendiente")
+        </span>
+        <p class="text-muted"><b>Id: </b>@Tarea.IdPublic</p>
+        <h3 class="fs-2 text-body-emphasis"><b>Titulo:</b> @Tarea.Titulo</h3>
+        <p class="text-muted"><b>Descripción: </b> @Tarea.Descripcion</p>
+        <p class="text-muted"><b>Prioridad: </b> <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad)">@Tarea.Prioridad</span></p>
+        @if (!string.IsNullOrEmpty(Tarea.Imagen))
+        {
+            <div class="mt-2">
+                <img src="@Tarea.Imagen" alt="Imagen de la tarea" style="width: 300px" class="img-thumbnail"/>
+            </div>
+        }
+        <p class="text-muted"><b>Vencimiento:</b> @Tarea.FechaVencimiento</p>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public TareaModel Tarea { get; set; } = default!;
+}
