@@ -4,13 +4,15 @@
 
     <div class="mb-3">
         <label class="form-label">Título:</label>
-        <InputText @attributes="_attributesTitulo" @bind-Value="Model.Titulo" />
+        <input @bind-Value="Model.Titulo" @bind-Value:event="oninput" class="form-control" maxlength="50" />
+        <span class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">@(Model.Titulo?.Length ?? 0)/50</span>
         <ValidationMessage For="() => Model.Titulo" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Descripción:</label>
-        <InputTextArea @attributes="_attributesDescripcion" @bind-Value="Model.Descripcion" />
+        <textarea @bind-Value="Model.Descripcion" @bind-Value:event="oninput" class="form-control" maxlength="200"></textarea>
+        <span class="char-counter @((Model.Descripcion?.Length ?? 0) > 180 ? "text-danger" : "text-muted")">@(Model.Descripcion?.Length ?? 0)/200</span>
         <ValidationMessage For="() => Model.Descripcion" />
     </div>
 
@@ -45,15 +47,4 @@
     private EditForm? _editForm;
 
     public bool HasValidationErrors => _editForm?.EditContext?.GetValidationMessages().Any() ?? true;
-
-    private readonly Dictionary<string, object> _attributesTitulo = new()
-    {
-        { "class", "form-control" },
-        { "maxlength", "50" }
-    };
-    private readonly Dictionary<string, object> _attributesDescripcion = new()
-    {
-        { "class", "form-control" },
-        { "maxlength", "200" }
-    };
 }
