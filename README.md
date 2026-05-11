@@ -67,6 +67,14 @@ Para cambiar el almacenamiento, modificar la línea en `Program.cs`:
 builder.Services.AddScoped<ITareaRepository, TuRepositoryElegido>();
 ```
 
+## Publicación
+
+```bash
+dotnet publish TareasBlazor.csproj -c Release -o ./publish
+```
+
+Esto genera la aplicación compilada en la carpeta `./publish` lista para desplegar en IIS, Docker, Azure App Services, etc.
+
 ## Paquetes NuGet
 
 Paquetes Entity Framework Core instalados:
