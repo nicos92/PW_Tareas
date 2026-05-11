@@ -10,7 +10,7 @@
 		<h5 class="mb-0">Nueva tarea</h5>
 	</div>
 	<div class="card-body">
-		<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+		<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm" aria-label="Formulario de nueva tarea">
 			<ImageUploader OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
 
 			<button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>

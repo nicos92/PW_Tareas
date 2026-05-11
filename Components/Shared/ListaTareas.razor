@@ -8,13 +8,13 @@
 <PageTitle>Lista de Tareas</PageTitle>
 <Breadcrum></Breadcrum>
 <h1>Lista de Tareas</h1>
-<section class="card shadow-sm col-xl-6 col-lg-8 col-md-12">
+<section class="card shadow-sm col-xl-6 col-lg-8 col-md-12" aria-label="Sección hidden lista de tareas">
 	<div class="card-header">
 		<h5 class="mb-0">Lista de tareas</h5>
 	</div>
 	<div class="card-body">
 		
-		<button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea"><i class="bi bi-plus-circle"></i> Nueva Tarea</button>
+		<button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea" aria-label="Botón para abrir formulario de nueva tarea"><i class="bi bi-plus-circle"></i> Nueva Tarea</button>
 
 		<FilterBar PrioridadSeleccionada="_prioridadSeleccionada"
 				   EstadoSeleccionado="_completadaSeleccionada"

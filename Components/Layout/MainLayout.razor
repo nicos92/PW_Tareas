@@ -1,16 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <aside class="sidebar">
+<div class="page" aria-label="Pagina principal">
+    <aside class="sidebar" aria-label="Barra de nevagación lateral">
         <NavMenu />
     </aside>
 
-    <main>
+    <main aria-label="Contenido principal">
         
 
-        <article class="content px-4">
+        <section class="content px-4" >
             @Body
-        </article>
+        </section>
     </main>
 </div>
 
