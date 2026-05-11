@@ -1,7 +1,7 @@
 @using TareasBlazor.Helpers
 @using TareasBlazor.Models
 
-<div class="card shadow-sm border-0 col-sm-12">
+<article class="card shadow-sm border-0 col-sm-12">
     <div class="card-header d-flex justify-content-between align-items-center @(Tarea.Completada ? "bg-success-subtle border-success-subtle" : "bg-secondary-subtle border-secondary-subtle")">
         <h4 class="card-title mb-0 text-body-emphasis">@Tarea.Titulo</h4>
         <span class="badge @(Tarea.Completada ? "bg-success" : "bg-secondary") rounded-pill">
@@ -29,7 +29,7 @@
             Vence: @Tarea.FechaVencimiento?.ToString("dd MMM yyyy")
         </span>
     </div>
-</div>
+</article>
 
 @code {
     [Parameter, EditorRequired]

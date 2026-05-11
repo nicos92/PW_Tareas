@@ -10,24 +10,24 @@
 
 <p class="lead">Welcome to your new app.</p>
 
-<div class="card shadow-sm col">
+<section class="card shadow-sm col">
 	<div class="card-header">
 		<h5 class="mb-0">Estadisticas</h5>
 	</div>
-	<div class="card-body">
-		<div class="row mb-4">
-			<div class="col-md-4 p-1">
+	<sec class="card-body">
+		<ul class="row mb-4">
+			<li class="col-md-4 p-1">
 				<StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="bg-primary" />
-			</div>
-			<div class="col-md-4 p-1">
+			</li>
+			<li class="col-md-4 p-1">
 				<StatsCard Title="Completadas" Value="@tareaState.Tareas.Count(t => t.Completada)" BackgroundClass="bg-success" />
-			</div>
-			<div class="col-md-4 p-1">
+			</li>
+			<li class="col-md-4 p-1">
 				<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-warning" />
-			</div>
-		</div>
-	</div>
-</div>
+			</li>
+		</ul>
+	</sec>
+</section>
 
 
 @code {

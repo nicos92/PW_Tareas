@@ -2,7 +2,7 @@
 @using TareasBlazor.Models
 @using System.Threading.Tasks
 
-<div class="list-group-item d-flex flex-column gap-2 @(Tarea.Completada ? "list-group-item-secondary" : "")">
+<article class="list-group-item d-flex flex-column gap-2 @(Tarea.Completada ? "list-group-item-secondary" : "")">
     <div class="d-flex align-items-center gap-2 flex-wrap w-100">
         <input type="checkbox"
                class="form-check-input flex-shrink-0"
@@ -37,7 +37,7 @@
             </button>
         </div>
     </div>
-</div>
+</article>
 
 @code {
     [Parameter, EditorRequired]
