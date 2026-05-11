@@ -16,7 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=tareas.db"));
 
 // Registrar repositorio (elegir una implementación)
-builder.Services.AddScoped<ITareaRepository, TareaProtectedLocalStorageRepository>();
+builder.Services.AddScoped<ITareaRepository, TareaSqliteRepository>();
 
 // Registrar estado de tareas
 builder.Services.AddScoped<TareaState>();

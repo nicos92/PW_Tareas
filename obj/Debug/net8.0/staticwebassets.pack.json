@@ -1,27 +1,27 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\zed\\source\\repos\\nicos92\\TareasBlazor\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\TareasBlazor.bundle.scp.css",
+      "Id": "D:\\Users\\n.sandoval\\Documents\\blazor\\PW_Tareas\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\TareasBlazor.bundle.scp.css",
       "PackagePath": "staticwebassets\\TareasBlazor.bundle.scp.css"
     },
     {
-      "Id": "C:\\Users\\zed\\source\\repos\\nicos92\\TareasBlazor\\wwwroot\\app.css",
+      "Id": "D:\\Users\\n.sandoval\\Documents\\blazor\\PW_Tareas\\wwwroot\\app.css",
       "PackagePath": "staticwebassets\\app.css"
     },
     {
-      "Id": "C:\\Users\\zed\\source\\repos\\nicos92\\TareasBlazor\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Id": "D:\\Users\\n.sandoval\\Documents\\blazor\\PW_Tareas\\wwwroot\\bootstrap\\bootstrap.min.css",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Id": "C:\\Users\\zed\\source\\repos\\nicos92\\TareasBlazor\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Id": "D:\\Users\\n.sandoval\\Documents\\blazor\\PW_Tareas\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Id": "C:\\Users\\zed\\source\\repos\\nicos92\\TareasBlazor\\wwwroot\\favicon.png",
+      "Id": "D:\\Users\\n.sandoval\\Documents\\blazor\\PW_Tareas\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {
-      "Id": "C:\\Users\\zed\\source\\repos\\nicos92\\TareasBlazor\\wwwroot\\js\\tareas.js",
+      "Id": "D:\\Users\\n.sandoval\\Documents\\blazor\\PW_Tareas\\wwwroot\\js\\tareas.js",
       "PackagePath": "staticwebassets\\js\\tareas.js"
     },
     {

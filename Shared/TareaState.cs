@@ -19,7 +19,7 @@ namespace TareasBlazor.Shared
             var tareas = await _repo.GetTareasAsync();
 
             _tareas.Clear();
-            _tareas.AddRange(tareas);
+            _tareas.AddRange([.. tareas.OrderByDescending(t => t.Id)]);
 
             _inicializado = true;
 
@@ -50,7 +50,7 @@ namespace TareasBlazor.Shared
         private void EliminarArchivo(string rutaRelativa)
         {
             if (string.IsNullOrEmpty(rutaRelativa)) return;
-            
+
             var fullPath = Path.Combine(_env.WebRootPath, rutaRelativa.TrimStart('/'));
             if (File.Exists(fullPath))
             {

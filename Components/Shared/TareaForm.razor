@@ -4,13 +4,13 @@
 
     <div class="mb-3">
         <label class="form-label">Título:</label>
-        <InputText @bind-Value="Model.Titulo" class="form-control" />
+        <InputText @attributes="_attributesTitulo" @bind-Value="Model.Titulo" />
         <ValidationMessage For="() => Model.Titulo" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Descripción:</label>
-        <InputTextArea @bind-Value="Model.Descripcion" class="form-control" />
+        <InputTextArea @attributes="_attributesDescripcion" @bind-Value="Model.Descripcion" />
         <ValidationMessage For="() => Model.Descripcion" />
     </div>
 
@@ -45,4 +45,15 @@
     private EditForm? _editForm;
 
     public bool HasValidationErrors => _editForm?.EditContext?.GetValidationMessages().Any() ?? true;
+
+    private readonly Dictionary<string, object> _attributesTitulo = new()
+    {
+        { "class", "form-control" },
+        { "maxlength", "50" }
+    };
+    private readonly Dictionary<string, object> _attributesDescripcion = new()
+    {
+        { "class", "form-control" },
+        { "maxlength", "200" }
+    };
 }
