@@ -30,7 +30,8 @@ La aplicación estará disponible en `https://localhost:7245` o `http://localhos
 ```
 Components/
   Pages/        # Páginas de la aplicación (Home, NuevaTarea, EditarTarea, ListaTareas)
-  Shared/       # Componentes reutilizables (TareaForm, ImageUploader, FilterBar, ConfirmDialog, etc.)
+  Shared/       # Componentes reutilizables
+  (TareaForm, ImageUploader, FilterBar, ConfirmDialog, etc.)
   Layout/       # Layouts principales (MainLayout, NavMenu)
 Models/         # Modelos de datos (TareaModel)
 Infrastructure/ # Repositorios, interfaces, base de datos
@@ -65,6 +66,15 @@ Para cambiar el almacenamiento, modificar la línea en `Program.cs`:
 ```csharp
 builder.Services.AddScoped<ITareaRepository, TuRepositoryElegido>();
 ```
+
+## Paquetes NuGet
+
+Paquetes Entity Framework Core instalados:
+
+| Paquete | Versión |
+|---|---|
+| `Microsoft.EntityFrameworkCore.Sqlite` | 8.0.26 |
+| `Microsoft.EntityFrameworkCore.Design` | 8.0.26 |
 
 ## Validaciones
 
