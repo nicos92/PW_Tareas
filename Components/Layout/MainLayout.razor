@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page" aria-label="Pagina principal">
-    <aside class="sidebar" aria-label="Barra de nevagación lateral">
+    <aside class="sidebar" aria-label="Barra de navegación lateral">
         <NavMenu />
     </aside>
 
@@ -14,8 +14,8 @@
     </main>
 </div>
 
-<div id="blazor-error-ui">
+<div id="blazor-error-ui" role="alert" aria-live="polite">
     An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+    <a href="" class="reload" aria-label="Recargar página">Reload</a>
+    <a class="dismiss" aria-label="Descartar error">🗙</a>
 </div>

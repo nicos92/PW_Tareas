@@ -1,9 +1,9 @@
-<div class="mb-3" aria-label="Botón para subir imagen">
-    <label class="form-label">Suba una imagen:</label>
-    <InputFile OnChange="CargarArchivo" accept="image/*" class="form-control" @key="inputFileKey" />
+<div class="mb-3" aria-label="Sección para subir imagen">
+    <label class="form-label" for="file-upload">Suba una imagen:</label>
+    <InputFile id="file-upload" OnChange="CargarArchivo" accept="image/*" class="form-control" @key="inputFileKey" aria-describedby="file-help-text" />
     @if (archivoCargado is not null)
     {
-        <div class="alert @TipoAlerta mt-2">
+        <div class="alert @TipoAlerta mt-2" role="status" aria-live="polite">
             @if (tamanoExcedido)
             {
                 <p>El archivo de imagen tiene que pesar menos de @FormatoTamano(MaxFileSize)</p>
@@ -12,7 +12,7 @@
             {
                 <div class="container-fluid">
                     <div class="">
-                        <img src="@imagenBase64" alt="Vista previa" style="width: 300px"/>
+                        <img src="@imagenBase64" alt="Vista previa de @archivoCargado.Name" style="width: 300px"/>
                     </div>
                 </div>
             }
@@ -24,12 +24,13 @@
     else if (!string.IsNullOrEmpty(CurrentImagen))
     {
         <div class="mt-2">
-            <img src="@CurrentImagen" alt="Imagen actual" style="width: 300px"/>
+            <img src="@CurrentImagen" alt="Imagen actual de la tarea" style="width: 300px"/>
             <div>
                 <button type="button" class="btn btn-sm btn-outline-danger mt-2" @onclick="Limpiar">Eliminar imagen actual</button>
             </div>
         </div>
     }
+    <span id="file-help-text" class="visually-hidden">Formatos de imagen aceptados. Tamaño máximo @FormatoTamano(MaxFileSize).</span>
 </div>
 
 @code {

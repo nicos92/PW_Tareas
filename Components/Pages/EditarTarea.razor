@@ -9,15 +9,15 @@
 
 @if (tareaModel is null)
 {
-	<p>Cargando...</p>
+	<p aria-live="polite">Cargando...</p>
 }
 else
 {
-	<section class="card shadow-sm col-xl-6 col-lg-8 col-md-12" aria-label="Sección para editar una tarea">
+	<section class="card shadow-sm col-12" aria-label="Formulario de edición de tarea" aria-describedby="editar-heading">
 		<div class="card-header">
-			<h5 class="mb-0">Editar tarea</h5>
+			<h5 class="mb-0" id="editar-heading">Editar tarea</h5>
 		</div>
-		<div class="card-body">
+		<div class="card-body" aria-live="polite">
 			<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
 				<ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
 

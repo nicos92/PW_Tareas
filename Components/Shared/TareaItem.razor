@@ -7,7 +7,8 @@
         <input type="checkbox"
                class="form-check-input flex-shrink-0"
                checked="@Tarea.Completada"
-               @onchange="Completar" />
+               @onchange="Completar"
+               aria-label="Marcar tarea '@Tarea.Titulo' como @(Tarea.Completada ? "pendiente" : "completada")" />
         <span class="@(Tarea.Completada ? "text-decoration-line-through text-muted flex-grow-1" : "flex-grow-1")">
             @Tarea.Titulo
             <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad) ms-1">@Tarea.Prioridad</span>
@@ -21,19 +22,22 @@
         <div class="d-flex gap-1 ms-auto flex-shrink-0">
             <button type="button"
                     class="btn btn-success"
-                    @onclick="Ver">
-                <i class="bi bi-eye"></i>
+                    @onclick="Ver"
+                    aria-label="Ver detalle de '@Tarea.Titulo'">
+                <i class="bi bi-eye" aria-hidden="true"></i>
             </button>
 
             <button type="button"
                     class="btn btn-sm btn-outline-primary"
-                    @onclick="Editar">
-                <i class="bi bi-pencil"></i>
+                    @onclick="Editar"
+                    aria-label="Editar tarea '@Tarea.Titulo'">
+                <i class="bi bi-pencil" aria-hidden="true"></i>
             </button>
             <button type="button"
                     class="btn btn-sm btn-outline-danger"
-                    @onclick="Eliminar">
-                <i class="bi bi-trash"></i>
+                    @onclick="Eliminar"
+                    aria-label="Eliminar tarea '@Tarea.Titulo'">
+                <i class="bi bi-trash" aria-hidden="true"></i>
             </button>
         </div>
     </div>

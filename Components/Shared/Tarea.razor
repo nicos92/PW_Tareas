@@ -11,13 +11,13 @@
 		<div class="feature col">
 			@if (isLoading)
 			{
-				<h3 class="fs-2 text-body-emphasis">Cargando...</h3>
+				<h3 class="fs-2 text-body-emphasis" aria-live="polite">Cargando...</h3>
 			}
 			else
 			{
 				@DetalleTarea()
 			}
-			<a href="/listaDeTareas" class="icon-link">
+			<a href="/listaDeTareas" class="icon-link" aria-label="Volver a la lista de tareas">
 				Volver
 				<svg class="bi" aria-hidden="true"><use xlink:href="#chevron-right"></use></svg>
 			</a>

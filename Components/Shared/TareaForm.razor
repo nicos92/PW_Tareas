@@ -1,6 +1,6 @@
-<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="container" @ref="_editForm">
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="container" @ref="_editForm" aria-label="Formulario de tarea">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary aria-live="polite" />
 
     <div class="mb-3">
         <label class="form-label">Título:</label>

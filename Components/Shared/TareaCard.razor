@@ -9,7 +9,7 @@
         </span>
     </div>
     <div class="card-body">
-        <p class="text-muted small mb-2"><i class="bi bi-hash"></i> ID: <code>@Tarea.IdPublic</code></p>
+        <p class="text-muted small mb-2"><i class="bi bi-hash" aria-hidden="true"></i> ID: <code>@Tarea.IdPublic</code></p>
         @if (!string.IsNullOrWhiteSpace(Tarea.Descripcion))
         {
             <p class="card-text lh-base mb-0">@Tarea.Descripcion</p>
@@ -17,7 +17,7 @@
         @if (!string.IsNullOrEmpty(Tarea.Imagen))
         {
             <div class="text-center mt-2">
-                <img src="@Tarea.Imagen" alt="Imagen de la tarea" class="img-fluid rounded shadow-sm" style="max-width: 100%; max-height: 250px; object-fit: cover;"/>
+                <img src="@Tarea.Imagen" alt="Imagen asociada a la tarea '@Tarea.Titulo'" class="img-fluid rounded shadow-sm" style="max-width: 100%; max-height: 250px; object-fit: cover;"/>
             </div>
         }
     </div>

@@ -5,12 +5,12 @@
 <PageTitle>Nueva Tarea</PageTitle>
 <Breadcrum></Breadcrum>
 <h3>Nueva Tarea</h3>
-<section class="card shadow-sm col-xl-6 col-lg-8 col-md-12">
+<section class="card shadow-sm col-12" aria-label="Formulario de nueva tarea">
 	<div class="card-header">
-		<h5 class="mb-0">Nueva tarea</h5>
+		<h5 class="mb-0" id="nueva-tarea-heading">Nueva tarea</h5>
 	</div>
-	<div class="card-body">
-		<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm" aria-label="Formulario de nueva tarea">
+	<div class="card-body" aria-live="polite">
+		<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
 			<ImageUploader OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
 
 			<button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>

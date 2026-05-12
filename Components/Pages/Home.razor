@@ -14,7 +14,7 @@
 	<div class="card-header">
 		<h5 class="mb-0">Estadisticas</h5>
 	</div>
-	<sec class="card-body">
+	<section class="card-body" aria-live="polite">
 		<ul class="row mb-4">
 			<li class="col-md-4 p-1">
 				<StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="bg-primary" />
@@ -26,7 +26,7 @@
 				<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-warning" />
 			</li>
 		</ul>
-	</sec>
+	</section>
 </section>
 
 
