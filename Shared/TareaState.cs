@@ -1,6 +1,7 @@
 using TareasBlazor.Infraestructure.Interfaces;
 using TareasBlazor.Models;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace TareasBlazor.Shared
 {
@@ -85,8 +86,9 @@ namespace TareasBlazor.Shared
             return _tareas.Where(t => t.Completada == completada).ToList().AsReadOnly();
         }
 
-        public TareaModel? GetTareaById(string id)
+        public async Task<TareaModel?> GetTareaById(string id)
         {
+            if (_tareas.Count == 0) await Inicializar();
             return _tareas.FirstOrDefault(t => t.IdPublic == id);
         }
 

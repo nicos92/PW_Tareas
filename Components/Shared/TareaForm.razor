@@ -1,43 +1,49 @@
-<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="container" @ref="_editForm" aria-label="Formulario de tarea">
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit" class="container" @ref="_editForm"
+          aria-label="Formulario de tarea">
     <DataAnnotationsValidator />
     <ValidationSummary aria-live="polite" />
 
     <div class="mb-3">
         <label class="form-label">Título:</label>
         <input @bind-Value="Model.Titulo" @bind-Value:event="oninput" class="form-control" maxlength="50" />
-        <span class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">@(Model.Titulo?.Length ?? 0)/50</span>
-        <ValidationMessage For="() => Model.Titulo" />
-    </div>
+        <span
+            class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">@(Model.Titulo?.Length
+                        ?? 0)/50</span>
+            <ValidationMessage For="() => Model.Titulo" />
+        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Descripción:</label>
-        <textarea @bind-Value="Model.Descripcion" @bind-Value:event="oninput" class="form-control" maxlength="200"></textarea>
-        <span class="char-counter @((Model.Descripcion?.Length ?? 0) > 180 ? "text-danger" : "text-muted")">@(Model.Descripcion?.Length ?? 0)/200</span>
-        <ValidationMessage For="() => Model.Descripcion" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Descripción:</label>
+            <textarea @bind-Value="Model.Descripcion" @bind-Value:event="oninput" class="form-control"
+                      maxlength="200">@Model.Descripcion</textarea>
+            <span
+                class="char-counter @((Model.Descripcion?.Length ?? 0) > 180 ? "text-danger" : "text-muted")">@(Model.Descripcion?.Length
+                            ?? 0)/200</span>
+                <ValidationMessage For="() => Model.Descripcion" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-check-label">Completada:</label>
-        <InputCheckbox @bind-Value="Model.Completada" class="form-check-input" />
-    </div>
+            <div class="mb-3">
+                <label class="form-check-label">Completada:</label>
+                <InputCheckbox @bind-Value="Model.Completada" class="form-check-input" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Fecha de Vencimiento:</label>
-        <InputDate @bind-Value="Model.FechaVencimiento" class="form-control" />
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de Vencimiento:</label>
+                <InputDate @bind-Value="Model.FechaVencimiento" class="form-control" />
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Prioridad:</label>
-        <InputSelect @bind-Value="Model.Prioridad" class="form-select">
-            @foreach (var prioridad in Enum.GetValues<Prioridad>())
-            {
-                <option value="@prioridad">@prioridad</option>
-            }
-        </InputSelect>
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Prioridad:</label>
+                <InputSelect @bind-Value="Model.Prioridad" class="form-select">
+                    @foreach (var prioridad in Enum.GetValues<Prioridad>())
+                    {
+                        <option value="@prioridad">@prioridad</option>
+                    }
+                </InputSelect>
+            </div>
 
-    @ChildContent
-</EditForm>
+            @ChildContent
+        </EditForm>
 
 @code {
     [Parameter, EditorRequired] public TareaModel Model { get; set; } = default!;

@@ -19,7 +19,9 @@
 			}
 			<a href="/listaDeTareas" class="icon-link" aria-label="Volver a la lista de tareas">
 				Volver
-				<svg class="bi" aria-hidden="true"><use xlink:href="#chevron-right"></use></svg>
+				<svg class="bi" aria-hidden="true">
+					<use xlink:href="#chevron-right"></use>
+				</svg>
 			</a>
 		</div>
 	</div>
@@ -50,9 +52,9 @@
 		<h3 class="fs-2 text-body-emphasis text-danger">Tarea no encontrada</h3>
 	};
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async Task OnParametersSetAsync()
 	{
-		tarea = tareaState.GetTareaById(id);
+		tarea = await tareaState.GetTareaById(id);
 		isLoading = false;
 		StateHasChanged();
 	}
