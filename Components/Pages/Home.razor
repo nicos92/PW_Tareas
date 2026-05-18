@@ -23,7 +23,7 @@
 				<StatsCard Title="Completadas" Value="@tareaState.Tareas.Count(t => t.Completada)" BackgroundClass="bg-success" />
 			</li>
 			<li class="col-md-4 p-1">
-				<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-warning" />
+				<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-danger" />
 			</li>
 		</ul>
 	</section>
