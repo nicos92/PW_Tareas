@@ -1,5 +1,6 @@
 @inject TareaState tareaState
 @implements IDisposable
+@rendermode InteractiveServer
 
 <aside class="stats-panel" aria-label="Panel de estadísticas">
     <h3>Estadísticas</h3>
@@ -16,22 +17,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine($"[StatsPanel #{_instanceId}] OnInitializedAsync - suscribiendo a OnChange");
-        tareaState.OnChange += () =>
-        {
-            Console.WriteLine($"[StatsPanel #{_instanceId}] OnChange recibido - invocando StateHasChanged");
-            _ = InvokeAsync(StateHasChanged);
-        };
+        tareaState.OnChange += StateHasChanged;
         await tareaState.Inicializar();
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Console.WriteLine($"[StatsPanel #{_instanceId}] OnAfterRender firstRender={firstRender} | Total={tareaState.Tareas.Count} Compl={tareaState.Tareas.Count(t=>t.Completada)} Pend={tareaState.Tareas.Count(t=>!t.Completada)}");
     }
 
     public void Dispose()
     {
-        Console.WriteLine($"[StatsPanel #{_instanceId}] Dispose");
+        tareaState.OnChange -= StateHasChanged;
     }
 }
