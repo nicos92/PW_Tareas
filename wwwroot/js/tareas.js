@@ -1,14 +1,14 @@
 const TAREA_STORAGE_KEY = 'tareas';
 
-export function getTareas() {
+window.getTareas =  function () {
     const data = localStorage.getItem(TAREA_STORAGE_KEY);
     return data ? JSON.parse(data) : [];
 }
 
-export function saveTareas(tareas) {
+window.saveTareas =  function (tareas) {
     localStorage.setItem(TAREA_STORAGE_KEY, JSON.stringify(tareas));
 }
 
-export function clearTareas() {
+window.clearTareas = function () {
     localStorage.removeItem(TAREA_STORAGE_KEY);
 }

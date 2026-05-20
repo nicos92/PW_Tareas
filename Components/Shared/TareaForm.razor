@@ -7,7 +7,7 @@
 		
 
 			<label for="idtitulo" class="form-label">Título:</label>
-			<input id="idtitulo" @bind-Value="Model.Titulo" @bind-Value:event="oninput" class="form-control" maxlength="50" />
+			<input id="idtitulo" value="@Model.Titulo" @oninput="OnTituloInput" class="form-control" maxlength="50" />
 			<span class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">
 				@(Model.Titulo?.Length
 						?? 0)/50
@@ -18,8 +18,8 @@
 
 	<div class="mb-3">
 		<label for="iddescripcion" class="form-label">Descripción:</label>
-		<textarea id="iddescripcion" @bind-Value="Model.Descripcion" @bind-Value:event="oninput" class="form-control"
-				  maxlength="200">@Model.Descripcion</textarea>
+		<textarea id="iddescripcion" value="@Model.Descripcion" @oninput="OnDescripcionInput" class="form-control"
+				  rows="3" maxlength="200"></textarea>
 		<span class="char-counter @((Model.Descripcion?.Length ?? 0) > 180 ? "text-danger" : "text-muted")">
 			@(Model.Descripcion?.Length
 							?? 0)/200
@@ -56,6 +56,18 @@
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 
 	private EditForm? _editForm;
+
+	private void OnTituloInput(ChangeEventArgs e)
+	{
+		Model.Titulo = e.Value?.ToString() ?? string.Empty;
+		_editForm?.EditContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Model.Titulo));
+	}
+
+	private void OnDescripcionInput(ChangeEventArgs e)
+	{
+		Model.Descripcion = e.Value?.ToString() ?? string.Empty;
+		_editForm?.EditContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Model.Descripcion));
+	}
 
 	public bool HasValidationErrors => _editForm?.EditContext?.GetValidationMessages().Any() ?? true;
 }
