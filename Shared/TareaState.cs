@@ -30,7 +30,6 @@ namespace TareasBlazor.Shared
         public async Task AgregarTarea(TareaModel t)
         {
             _tareas.Add(t);
-            Console.WriteLine(_tareas);
             await _repo.AddTareaAsync(t);
             NotificarCambio();
         }
@@ -105,7 +104,6 @@ namespace TareasBlazor.Shared
 
         private void NotificarCambio()
         {
-            Console.WriteLine($"[TareaState] NotificarCambio() - Tareas.Count={_tareas.Count}, OnChange is {(OnChange is null ? "null" : "not null")}");
             OnChange?.Invoke();
         }
     }
