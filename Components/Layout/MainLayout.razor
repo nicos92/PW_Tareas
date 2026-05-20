@@ -1,11 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page" aria-label="Pagina principal">
+    <SkipLink />
+
     <aside class="sidebar" aria-label="Barra de navegación lateral">
         <NavMenu />
     </aside>
 
-    <main aria-label="Contenido principal">
+    <main id="main-content" aria-label="Contenido principal">
         <section class="content px-4" >
             @Body
         </section>
