@@ -1,0 +1,41 @@
+.stats-panel h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: #333;
+}
+
+.stats-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stats-panel li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #eee;
+    color: #555;
+}
+
+.stats-panel li:last-child {
+    border-bottom: none;
+}
+
+@media (min-width: 641px) {
+    .stats-panel {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        background: #f8f9fa;
+        border-left: 1px solid #dee2e6;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 640.98px) {
+    .stats-panel {
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        padding: 1rem;
+    }
+}

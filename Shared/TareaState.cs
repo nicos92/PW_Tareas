@@ -103,6 +103,10 @@ namespace TareasBlazor.Shared
             }
         }
 
-        private void NotificarCambio() => OnChange?.Invoke();
+        private void NotificarCambio()
+        {
+            Console.WriteLine($"[TareaState] NotificarCambio() - Tareas.Count={_tareas.Count}, OnChange is {(OnChange is null ? "null" : "not null")}");
+            OnChange?.Invoke();
+        }
     }
 }
