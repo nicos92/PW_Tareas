@@ -59,10 +59,10 @@ else
 	{
 		if (args.LimpiarImagenExistente && tareaModel is not null)
 		{
-			tareaModel.Imagen = string.Empty;
+			await Task.Run(() => tareaModel.Imagen = string.Empty);
 		}
 	}
-    
+
 	private async Task ValidSubmit()
 	{
 		if (imageUploader?.TamanoExcedido == true || tareaModel is null)
@@ -71,17 +71,17 @@ else
 		}
 
 		var imagenAnterior = tareaModel.Imagen;
-        
+
 		if (imageUploader!.Archivo is not null)
 		{
 			if (!string.IsNullOrEmpty(imagenAnterior))
 			{
 				EliminarArchivo(imagenAnterior);
 			}
-            
+
 			tareaModel.Imagen = await GuardarArchivoAsync(imageUploader.Archivo);
 		}
-        
+
 		await TareaState.ActualizarTarea(tareaModel);
 		NavigationManager.NavigateTo("/listaDeTareas");
 	}
@@ -90,28 +90,28 @@ else
 	{
 		NavigationManager.NavigateTo("/listaDeTareas");
 	}
-    
+
 	private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
 	{
 		var trustedFileName = Path.GetRandomFileName();
 		var extension = Path.GetExtension(archivo.Name);
 		var fileName = trustedFileName + extension;
-        
+
 		var uploadsFolder = Path.Combine(Environment.WebRootPath, "uploads");
 		Directory.CreateDirectory(uploadsFolder);
-        
+
 		var filePath = Path.Combine(uploadsFolder, fileName);
-        
+
 		await using FileStream fs = new(filePath, FileMode.Create);
 		await archivo.OpenReadStream(1024 * 1024).CopyToAsync(fs);
-        
+
 		return $"/uploads/{fileName}";
 	}
 
 	private void EliminarArchivo(string rutaRelativa)
 	{
 		if (string.IsNullOrEmpty(rutaRelativa)) return;
-        
+
 		var fullPath = Path.Combine(Environment.WebRootPath, rutaRelativa.TrimStart('/'));
 		if (File.Exists(fullPath))
 		{
