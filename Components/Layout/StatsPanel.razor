@@ -4,16 +4,22 @@
 
 <aside class="stats-panel d-none d-lg-block" aria-label="Panel de estadísticas">
     <h3>Estadísticas</h3>
+    <h4>Estado:</h4>
     <ul>
         <li>Total: @tareaState.Tareas.Count</li>
         <li>Completadas: @tareaState.Tareas.Count(t => t.Completada)</li>
         <li>Pendientes: @tareaState.Tareas.Count(t => !t.Completada)</li>
     </ul>
+    <h4>Prioridad:</h4>
+    <ul>
+        <li>Baja: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Baja")</li>
+        <li>Media: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Media")</li>
+        <li>Alta: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Alta")</li>
+
+    </ul>
 </aside>
 
 @code {
-    private static int _instanceCount = 0;
-    private int _instanceId = ++_instanceCount;
 
     protected override async Task OnInitializedAsync()
     {
