@@ -76,6 +76,19 @@ namespace TareasBlazor.Shared
 
             return _tareas.Where(t => t.Prioridad == prioridadEnum).ToList().AsReadOnly();
         }
+        public IReadOnlyList<TareaModel> FiltrarPorVencimiento(string vencimiento, string date)
+        {
+            if (vencimiento == "Vencidas")
+                return _tareas.Where(t => t.FechaVencimiento < DateOnly.Parse(date)).ToList().AsReadOnly();
+
+            if (vencimiento == "VencenHoy")
+                return _tareas.Where(t => t.FechaVencimiento == DateOnly.Parse(date)).ToList().AsReadOnly();
+
+            if (vencimiento == "ATiempo")
+                return _tareas.Where(t => t.FechaVencimiento > DateOnly.Parse(date)).ToList().AsReadOnly();
+
+            return _tareas.AsReadOnly();
+        }
 
         public IReadOnlyList<TareaModel> FiltrarPorCompletada(bool? completada)
         {

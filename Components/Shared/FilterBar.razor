@@ -2,7 +2,8 @@
     <legend class="visually-hidden">Filtros de tareas</legend>
     <div class="col-md-4">
         <label class="form-label" for="filter-prioridad">Filtrar por prioridad:</label>
-        <select id="filter-prioridad" class="form-select" value="@PrioridadSeleccionada" @onchange="OnPrioridadChangedHandler">
+        <select id="filter-prioridad" class="form-select" value="@PrioridadSeleccionada"
+                @onchange="OnPrioridadChangedHandler">
             <option value="">Todas</option>
             <option value="Baja">Baja</option>
             <option value="Media">Media</option>
@@ -17,17 +18,30 @@
             <option value="Pendientes">Pendientes</option>
         </select>
     </div>
-    <div class="col-md-4 d-flex align-items-end">
-        <span class="text-muted" aria-live="polite" aria-atomic="true">Mostrando: @TotalTareas tarea@(TotalTareas != 1 ? "s" : "")</span>
+    <div class="col-md-4">
+        <label class="form-label" for="filter-vencimiento">Filtrar por vencimiento:</label>
+        <select id="filter-vencimiento" class="form-select" value="@VencimientoSeleccionado"
+                @onchange="OnVencimientoChangedHandler">
+            <option value="">Todas</option>
+            <option value="Vencidas">Vencidas</option>
+            <option value="VencenHoy">Vencen hoy</option>
+            <option value="ATiempo">A tiempo</option>
+        </select>
     </div>
-</fieldset>
+    <div class="col-md-4 d-flex align-items-end">
+        <span class="text-muted" aria-live="polite" aria-atomic="true">Mostrando: @TotalTareas tarea@(TotalTareas != 1 ?
+                                                                                                                        "s" : "")</span>
+        </div>
+    </fieldset>
 
 @code {
     [Parameter] public string PrioridadSeleccionada { get; set; } = string.Empty;
     [Parameter] public string EstadoSeleccionado { get; set; } = string.Empty;
+    [Parameter] public string VencimientoSeleccionado { get; set; } = string.Empty;
     [Parameter] public int TotalTareas { get; set; }
     [Parameter] public EventCallback<string> OnPrioridadChanged { get; set; }
     [Parameter] public EventCallback<string> OnEstadoChanged { get; set; }
+    [Parameter] public EventCallback<string> OnVencimientoChanged { get; set; }
 
     private async Task OnPrioridadChangedHandler(ChangeEventArgs e)
     {
@@ -39,5 +53,10 @@
     {
         EstadoSeleccionado = e.Value?.ToString() ?? string.Empty;
         await OnEstadoChanged.InvokeAsync(EstadoSeleccionado);
+    }
+    private async Task OnVencimientoChangedHandler(ChangeEventArgs e)
+    {
+        VencimientoSeleccionado = e.Value?.ToString() ?? string.Empty;
+        await OnVencimientoChanged.InvokeAsync(VencimientoSeleccionado);
     }
 }

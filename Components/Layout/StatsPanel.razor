@@ -17,10 +17,20 @@
         <li>Alta: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Alta")</li>
 
     </ul>
+    <h4>Vencimiento:</h4>
+    <ul>
+        <li>Vencidas: @tareaState.Tareas.Count(t => t.FechaVencimiento < DateOnly.Parse(date.ToShortDateString()))</li>
+        <li>Vencen hoy: @tareaState.Tareas.Count(t => t.FechaVencimiento == DateOnly.Parse(date.ToShortDateString()))
+        </li>
+        <li>A tiempo: @tareaState.Tareas.Count(t => t.FechaVencimiento > DateOnly.Parse(date.ToShortDateString()))</li>
+
+        
+    </ul>
 </aside>
 
 @code {
 
+    private DateTime date = DateTime.Now;
     protected override async Task OnInitializedAsync()
     {
         tareaState.OnChange += StateHasChanged;
