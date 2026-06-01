@@ -1,0 +1,37 @@
+@page "/configuracion"
+@inject ThemeService ThemeService
+@rendermode InteractiveServer
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-@("darkdarklight") text-@("darkwhitedark")">
+            <h4 class="mb-0">
+                <i class="bi bi-gear-fill"></i> Configuración
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <label class="form-label fw-bold">Tema actual:</label>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-@("darkdarkwarning") fs-6">
+                        @("🌙 Oscuro ☀️ Claro")
+                    </span>
+                </div>
+            </div>
+
+            <hr />
+
+            <p class="text-muted">Selecciona el tema de la aplicación:</p>
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline-secondary"
+                        @onclick='() => ThemeService.SetTheme("dark")'>
+                    <i class="bi bi-moon-fill"></i> Oscuro
+                </button>
+                <button class="btn btn-outline-warning"
+                        @onclick='() => ThemeService.SetTheme("light")'>
+                    <i class="bi bi-sun-fill"></i> Claro
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
