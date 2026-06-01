@@ -8,7 +8,7 @@
 <PageTitle>Lista de Tareas</PageTitle>
 <Breadcrum></Breadcrum>
 <h1>Lista de Tareas</h1>
-<section class="card shadow-sm col-12" aria-label="Lista de tareas">
+<section class="card shadow-sm col-12 mb-3" aria-label="Lista de tareas">
 	<div class="card-header">
 		<h5 class="mb-0">Lista de tareas</h5>
 	</div>
@@ -22,28 +22,38 @@
 					   OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
 					   OnVencimientoChanged="OnVencimientoChanged" />
 
-			@if (!TareasFiltradas.Any())
-			{
-				<p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
-			}
-			else
-			{
-				<div class="list-group">
-					@foreach (var tarea in TareasFiltradas)
-					{
-						<TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
-								   OnEliminar="EliminarTarea" OnEditar="IniciarEdicion">
-							<ChildContent>
-								<span class="badge @(tarea.Completada ? "bg-success" : "bg-secondary")" style="display: none">
-									#@tarea.IdPublic
-								</span>
-							</ChildContent>
-						</TareaItem>
-					}
-				</div>
-			}
-		</div>
-	</section>
+		@if (!TareasFiltradas.Any())
+		{
+			<p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
+		}
+		else
+		{
+			<div class="table-responsive">
+				<table class="table table-hover align-middle mb-0">
+					<thead>
+						<tr>
+							<th scope="col" class="text-nowrap" style="width:1%">Completada</th>
+							<th scope="col">Título</th>
+							<th scope="col">Prioridad</th>
+							<th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var tarea in TareasFiltradas)
+						{
+							<TareaItem @key="tarea.IdPublic"
+									   Tarea="tarea"
+									   OnVer="VerTarea"
+									   OnCompletar="CompletarTarea"
+									   OnEliminar="EliminarTarea"
+									   OnEditar="IniciarEdicion" />
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	</div>
+</section>
 
 <ConfirmDialog IsVisible="_showDeleteModal" Message="¿Estás seguro de que deseas eliminar la tarea"
 			   TargetName="@_tareaAEliminar?.Titulo" OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />
@@ -79,7 +89,7 @@
 		}
 	}
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async Task OnInitializedAsync()
 	{
 		tareaState.OnChange += StateHasChanged;
 		await tareaState.Inicializar();
