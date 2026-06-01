@@ -1,7 +1,7 @@
 @using TareasBlazor.Helpers
 @using TareasBlazor.Models
 
-<tr class="@(Tarea.Completada ? "table-secondary" : "")">
+<tr class="@(Tarea.Completada ? "table-active" : "")">
 	<td class="text-nowrap" style="width:1%">
 		<input id="@Tarea.IdPublic"
 			   type="checkbox"
