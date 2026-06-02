@@ -75,7 +75,10 @@
 			IEnumerable<TareaModel> tareas = tareaState.Tareas;
 
 			if (!string.IsNullOrEmpty(_prioridadSeleccionada))
-				tareas = tareaState.FiltrarPorPrioridad(_prioridadSeleccionada);
+			{
+				if (Enum.TryParse<Prioridad>(_prioridadSeleccionada, out var prioridadEnum))
+					tareas = tareas.Where(t => t.Prioridad == prioridadEnum);
+			}
 
 			if (!string.IsNullOrEmpty(_completadaSeleccionada))
 				tareas = _completadaSeleccionada == "Completadas"
@@ -83,7 +86,16 @@
 					: tareas.Where(t => !t.Completada);
 
 			if (!string.IsNullOrEmpty(_vencimientoSeleccionado))
-				tareas = tareaState.FiltrarPorVencimiento(_vencimientoSeleccionado, DateTime.Now.ToShortDateString());
+			{
+				var today = DateOnly.FromDateTime(DateTime.Now);
+				tareas = _vencimientoSeleccionado switch
+				{
+					"Vencidas" => tareas.Where(t => t.FechaVencimiento < today),
+					"VencenHoy" => tareas.Where(t => t.FechaVencimiento == today),
+					"ATiempo" => tareas.Where(t => t.FechaVencimiento > today),
+					_ => tareas
+				};
+			}
 
 			return tareas.ToList().AsReadOnly();
 		}
