@@ -4,16 +4,16 @@
 	<ValidationSummary aria-live="polite" />
 
 	<div class="mb-3">
-		
 
-			<label for="idtitulo" class="form-label">Título:</label>
-			<input id="idtitulo" value="@Model.Titulo" @oninput="OnTituloInput" class="form-control" maxlength="50" />
-			<span class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">
-				@(Model.Titulo?.Length
-						?? 0)/50
-			</span>
-			<ValidationMessage For="() => Model.Titulo" />
 		
+		<label for="idtitulo" class="form-label">Título:</label>
+		<input id="idtitulo" value="@Model.Titulo" @oninput="OnTituloInput" class="form-control" maxlength="50" />
+		<span class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">
+			@(Model.Titulo?.Length
+					?? 0)/50
+		</span>
+		<ValidationMessage For="() => Model.Titulo" />
+
 	</div>
 
 	<div class="mb-3">
@@ -43,6 +43,15 @@
 			@foreach (var prioridad in Enum.GetValues<Prioridad>())
 			{
 				<option value="@prioridad">@prioridad</option>
+			}
+		</InputSelect>
+	</div>
+	<div class="mb-3">
+		<label for="idCategoria" class="form-label">Categoria:</label>
+		<InputSelect id="idCategoria" @bind-Value="Model.Categoria" class="form-select">
+			@foreach (var categoria in Enum.GetValues<Categoria>())
+			{
+				<option value="@categoria">@categoria</option>
 			}
 		</InputSelect>
 	</div>
