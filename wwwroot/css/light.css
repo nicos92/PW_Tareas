@@ -16,6 +16,14 @@
   --md-sys-color-on-error: rgb(255 255 255);
   --md-sys-color-error-container: rgb(255 218 214);
   --md-sys-color-on-error-container: rgb(147 0 10);
+  --md-sys-color-warning: rgb(120 90 0);
+  --md-sys-color-on-warning: rgb(255 255 255);
+  --md-sys-color-warning-container: rgb(255 222 111);
+  --md-sys-color-on-warning-container: rgb(44 33 0);
+  --md-sys-color-info: rgb(0 86 97);
+  --md-sys-color-on-info: rgb(255 255 255);
+  --md-sys-color-info-container: rgb(178 235 245);
+  --md-sys-color-on-info-container: rgb(0 28 33);
   --md-sys-color-background: rgb(249 249 255);
   --md-sys-color-on-background: rgb(25 28 32);
   --md-sys-color-surface: rgb(249 249 255);
@@ -49,29 +57,5 @@
   --md-sys-color-surface-container-high: rgb(231 232 238);
   --md-sys-color-surface-container-highest: rgb(225 226 233);
 
-  --bs-body-bg: var(--md-sys-color-background);
-  --bs-body-color: var(--md-sys-color-on-background);
-  --bs-body-color-rgb: 25, 28, 32;
-  --bs-secondary-color: var(--md-sys-color-on-surface-variant);
-  --bs-secondary-color-rgb: 67, 71, 78;
-  --bs-tertiary-color: var(--md-sys-color-on-surface-variant);
-  --bs-tertiary-color-rgb: 67, 71, 78;
-  --bs-emphasis-color: var(--md-sys-color-on-surface);
-  --bs-emphasis-color-rgb: 25, 28, 32;
-  --bs-border-color: var(--md-sys-color-outline-variant);
-  --bs-border-color-translucent: rgba(67, 71, 78, 0.175);
-  --bs-link-color: var(--md-sys-color-primary);
-  --bs-link-hover-color: var(--md-sys-color-primary);
-  --bs-primary-bg-subtle: var(--md-sys-color-primary-container);
-  --bs-secondary-bg-subtle: var(--md-sys-color-secondary-container);
-  --bs-success-bg-subtle: var(--md-sys-color-tertiary-container);
-  --bs-danger-bg-subtle: var(--md-sys-color-error-container);
-  --bs-primary-text-emphasis: var(--md-sys-color-on-primary-container);
-  --bs-secondary-text-emphasis: var(--md-sys-color-on-secondary-container);
-  --bs-success-text-emphasis: var(--md-sys-color-on-tertiary-container);
-  --bs-danger-text-emphasis: var(--md-sys-color-on-error-container);
-  --bs-primary-border-subtle: var(--md-sys-color-outline);
-  --bs-secondary-border-subtle: var(--md-sys-color-outline);
-  --bs-success-border-subtle: var(--md-sys-color-outline);
-  --bs-danger-border-subtle: var(--md-sys-color-outline);
+
 }

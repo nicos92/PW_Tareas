@@ -14,10 +14,10 @@
             
             <p class="text-muted">Selecciona el tema de la aplicación:</p>
             <div class="d-flex gap-3">
-                <button class="btn btn-secondary" @onclick='() => ThemeService.SetTheme("dark")'>
+                <button class="btn btn-themedark" @onclick='() => ThemeService.SetTheme("dark")'>
                     <i class="bi bi-moon-fill"></i> Oscuro
                 </button>
-                <button class="btn btn-warning" @onclick='() => ThemeService.SetTheme("light")'>
+                <button class="btn btn-themelight" @onclick='() => ThemeService.SetTheme("light")'>
                     <i class="bi bi-sun-fill"></i> Claro
                 </button>
             </div>
