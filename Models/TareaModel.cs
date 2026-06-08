@@ -36,7 +36,7 @@ namespace TareasBlazor.Models
         public string Imagen { get; set; } = string.Empty;
 
         [EnumDataType(typeof(Categoria))]
-        public Categoria Categoria { get; set; } = Categoria.None;
+        public Categoria Categoria { get; set; } = Categoria.Ninguna;
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (Prioridad == Prioridad.Alta && FechaVencimiento > DateOnly.FromDateTime(DateTime.Now.AddDays(7)))
@@ -55,7 +55,7 @@ namespace TareasBlazor.Models
 
     public enum Categoria
     {
-        None,
+        Ninguna,
         Database,
         Backend,
         Frontend,
