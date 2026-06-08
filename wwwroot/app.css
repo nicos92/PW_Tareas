@@ -214,11 +214,11 @@ h1:focus {
 
 /* --- Background only (override Bootstrap) --- */
 .bg-primary {
-    background-color: var(--md-sys-color-primary) !important;
+    background-color: var(--md-sys-color-primary);
 }
 
 .bg-secondary {
-    background-color: var(--md-sys-color-secondary) !important;
+    background-color: var(--md-sys-color-secondary);
 }
 
 .bg-tertiary {
@@ -230,11 +230,11 @@ h1:focus {
 }
 
 .bg-warning {
-    background-color: var(--md-sys-color-warning) !important;
+    background-color: var(--md-sys-color-warning);
 }
 
 .bg-info {
-    background-color: var(--md-sys-color-info) !important;
+    background-color: var(--md-sys-color-info);
 }
 
 .bg-surface {
@@ -279,11 +279,11 @@ h1:focus {
 
 /* --- Text colors (override Bootstrap) --- */
 .text-primary {
-    color: var(--md-sys-color-primary) !important;
+    color: var(--md-sys-color-primary);
 }
 
 .text-secondary {
-    color: var(--md-sys-color-secondary) !important;
+    color: var(--md-sys-color-secondary);
 }
 
 .text-tertiary {
@@ -295,11 +295,11 @@ h1:focus {
 }
 
 .text-warning {
-    color: var(--md-sys-color-warning) !important;
+    color: var(--md-sys-color-warning);
 }
 
 .text-info {
-    color: var(--md-sys-color-info) !important;
+    color: var(--md-sys-color-info);
 }
 
 .text-on-primary {
@@ -358,25 +358,158 @@ h1:focus {
 
 /* --- Borders --- */
 .border-outline {
-    border-color: var(--md-sys-color-outline) !important;
+    border-color: var(--md-sys-color-outline);
 }
 
 .border-outline-variant {
-    border-color: var(--md-sys-color-outline-variant) !important;
+    border-color: var(--md-sys-color-outline-variant);
 }
 
 /* --- Buttons --- */
-.btn.fill-primary:hover {
+
+
+/* --- Outline buttons --- */
+.btn-outline-primary {
+    background-color: transparent;
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.btn-outline-secondary {
+    background-color: transparent;
+    border-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--md-sys-color-secondary);
+    border-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.btn-outline-tertiary {
+    background-color: transparent;
+    border-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-tertiary);
+}
+
+.btn-outline-tertiary:hover {
+    background-color: var(--md-sys-color-tertiary);
+    border-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-on-tertiary);
+}
+
+.btn-outline-error {
+    background-color: transparent;
+    border-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-error);
+}
+
+.btn-outline-error:hover {
+    background-color: var(--md-sys-color-error);
+    border-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.btn-outline-warning {
+    background-color: transparent;
+    border-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-warning);
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--md-sys-color-warning);
+    border-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-on-warning);
+}
+
+.btn-outline-info {
+    background-color: transparent;
+    border-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-info);
+}
+
+.btn-outline-info:hover {
+    background-color: var(--md-sys-color-info);
+    border-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-on-info);
+}
+
+/* --- Solid buttons (override Bootstrap) --- */
+.btn-primary {
+    background-color: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.btn-primary:hover {
     background-color: var(--md-sys-color-primary-container);
+    border-color: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
 }
 
-.btn.fill-secondary:hover {
+.btn-secondary {
+    background-color: var(--md-sys-color-secondary);
+    border-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.btn-secondary:hover {
     background-color: var(--md-sys-color-secondary-container);
+    border-color: var(--md-sys-color-secondary-container);
     color: var(--md-sys-color-on-secondary-container);
 }
 
-.btn.fill-tertiary:hover {
+.btn-success {
+    background-color: var(--md-sys-color-tertiary);
+    border-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-on-tertiary);
+}
+
+.btn-success:hover {
     background-color: var(--md-sys-color-tertiary-container);
+    border-color: var(--md-sys-color-tertiary-container);
     color: var(--md-sys-color-on-tertiary-container);
+}
+
+.btn-danger {
+    background-color: var(--md-sys-color-error);
+    border-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.btn-danger:hover {
+    background-color: var(--md-sys-color-error-container);
+    border-color: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
+
+.btn-warning {
+    background-color: var(--md-sys-color-warning);
+    border-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-on-warning);
+}
+
+.btn-warning:hover {
+    background-color: var(--md-sys-color-warning-container);
+    border-color: var(--md-sys-color-warning-container);
+    color: var(--md-sys-color-on-warning-container);
+}
+
+.btn-info {
+    background-color: var(--md-sys-color-info);
+    border-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-on-info);
+}
+
+.btn-info:hover {
+    background-color: var(--md-sys-color-info-container);
+    border-color: var(--md-sys-color-info-container);
+    color: var(--md-sys-color-on-info-container);
 }
