@@ -1,7 +1,6 @@
 .stats-panel h3 {
-    font-size: 1.1rem;
+    font-size: var(--tamano-fuente-lg);
     margin-bottom: 0.75rem;
-    color: #333;
 }
 
 .stats-panel ul {
@@ -12,8 +11,8 @@
 
 .stats-panel li {
     padding: 0.4rem 0;
-    border-bottom: 1px solid #eee;
-    color: #555;
+    border-bottom: 1px solid var(--color-texto-deshabilitado);
+    color: var(--color-texto-secundario);
 }
 
 .stats-panel li:last-child {
@@ -26,16 +25,14 @@
         height: 100vh;
         position: sticky;
         top: 0;
-        background: #f8f9fa;
-        border-left: 1px solid #dee2e6;
+        border-left: 1px solid var(--color-texto-deshabilitado);
         padding: 1.5rem;
     }
 }
 
 @media (max-width: 640.98px) {
     .stats-panel {
-        background: #f8f9fa;
-        border-top: 1px solid #dee2e6;
+        border-top: 1px solid var(--color-texto-deshabilitado);
         padding: 1rem;
     }
 }

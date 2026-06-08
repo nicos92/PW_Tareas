@@ -3,8 +3,8 @@
     top: -40px;
     left: 0;
     z-index: 1000;
-    background: #000;
-    color: #fff;
+    background: var(--color-texto-primario);
+    color: var(--color-sobre-primario);
     padding: 8px 16px;
     text-decoration: none;
 }

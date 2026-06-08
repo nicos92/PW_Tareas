@@ -2,29 +2,27 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
-<aside class="stats-panel d-none d-lg-block bg-light-subtle text-light-emphasis" aria-label="Panel de estadísticas">
+<aside class="stats-panel d-none d-lg-block" aria-label=" Panel de estadísticas">
     <h3>Estadísticas</h3>
     <h4>Estado:</h4>
     <ul>
-        <li class="text-light-emphasis">Total: @tareaState.Tareas.Count</li>
-        <li class="text-light-emphasis">Completadas: @tareaState.Tareas.Count(t => t.Completada)</li>
-        <li class="text-light-emphasis">Pendientes: @tareaState.Tareas.Count(t => !t.Completada)</li>
+        <li>Total: @tareaState.Tareas.Count</li>
+        <li>Completadas: @tareaState.Tareas.Count(t => t.Completada)</li>
+        <li>Pendientes: @tareaState.Tareas.Count(t => !t.Completada)</li>
     </ul>
     <h4>Prioridad:</h4>
     <ul>
-        <li class="text-light-emphasis">Baja: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Baja")</li>
-        <li class="text-light-emphasis">Media: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Media")</li>
-        <li class="text-light-emphasis">Alta: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Alta")</li>
+        <li>Baja: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Baja")</li>
+        <li>Media: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Media")</li>
+        <li>Alta: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Alta")</li>
 
     </ul>
     <h4>Vencimiento:</h4>
     <ul>
-        <li class="text-light-emphasis">Vencidas: @tareaState.Tareas.Count(t => t.FechaVencimiento < DateOnly.Parse(date.ToShortDateString()))</li>
-        <li class="text-light-emphasis">Vencen hoy: @tareaState.Tareas.Count(t => t.FechaVencimiento == DateOnly.Parse(date.ToShortDateString()))
+        <li>Vencidas: @tareaState.Tareas.Count(t => t.FechaVencimiento < DateOnly.Parse(date.ToShortDateString()))</li>
+        <li>Vencen hoy: @tareaState.Tareas.Count(t => t.FechaVencimiento == DateOnly.Parse(date.ToShortDateString()))
         </li>
-        <li class="text-light-emphasis">A tiempo: @tareaState.Tareas.Count(t => t.FechaVencimiento > DateOnly.Parse(date.ToShortDateString()))</li>
-
-        
+        <li>A tiempo: @tareaState.Tareas.Count(t => t.FechaVencimiento > DateOnly.Parse(date.ToShortDateString()))</li>
     </ul>
 </aside>
 
