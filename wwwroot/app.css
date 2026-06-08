@@ -513,3 +513,16 @@ h1:focus {
     border-color: var(--md-sys-color-info-container);
     color: var(--md-sys-color-on-info-container);
 }
+
+/* --- Fonts --- */
+.txt {
+    font-size: var(--tamano-fuente-cuerpo);
+}
+
+.txt-lg {
+    font-size: var(--tamano-fuente-lg);
+}
+
+.txt-sm {
+    font-size: var(--tamano-fuente-sm);
+}
