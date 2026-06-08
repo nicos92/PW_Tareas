@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 using TareasBlazor.Infraestructure.Database;
 using TareasBlazor.Infraestructure.Interfaces;
 using TareasBlazor.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace TareasBlazor.Infraestructure.Repositories
 {

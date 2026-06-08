@@ -1,7 +1,7 @@
-using TareasBlazor.Validation;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using TareasBlazor.Validation;
 
 namespace TareasBlazor.Models
 {
