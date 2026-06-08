@@ -4,22 +4,20 @@
 
 <div class="container py-4">
     <div class="card shadow-sm">
-        <div class="card-header bg-@("darkdarklight") text-@("darkwhitedark")">
+        <div class="card-header">
             <h4 class="mb-0">
                 <i class="bi bi-gear-fill"></i> Configuración
             </h4>
         </div>
         <div class="card-body">
-            
 
+            
             <p class="text-muted">Selecciona el tema de la aplicación:</p>
             <div class="d-flex gap-3">
-                <button class="btn btn-outline-secondary"
-                        @onclick='() => ThemeService.SetTheme("dark")'>
+                <button class="btn btn-secondary" @onclick='() => ThemeService.SetTheme("dark")'>
                     <i class="bi bi-moon-fill"></i> Oscuro
                 </button>
-                <button class="btn btn-outline-warning"
-                        @onclick='() => ThemeService.SetTheme("light")'>
+                <button class="btn btn-warning" @onclick='() => ThemeService.SetTheme("light")'>
                     <i class="bi bi-sun-fill"></i> Claro
                 </button>
             </div>
