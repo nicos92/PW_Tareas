@@ -14,42 +14,44 @@
     </div>
     <div class="card-body">
 
-        <button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea" aria-label="Crear nueva tarea"><i
-            class="bi bi-plus-circle" aria-hidden="true"></i> Nueva Tarea</button>
+        <button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea" aria-label="Crear nueva tarea">
+            <i class="bi bi-plus-circle" aria-hidden="true"></i>
+            Nueva Tarea
+        </button>
 
-            <FilterBar PrioridadSeleccionada="_prioridadSeleccionada" EstadoSeleccionado="_completadaSeleccionada"
-                       VencimientoSeleccionado="_vencimientoSeleccionado" TotalTareas="TareasFiltradas.Count()"
-                       OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
-                       OnVencimientoChanged="OnVencimientoChanged" />
+        <FilterBar PrioridadSeleccionada="_prioridadSeleccionada" EstadoSeleccionado="_completadaSeleccionada"
+                   VencimientoSeleccionado="_vencimientoSeleccionado" TotalTareas="TareasFiltradas.Count()"
+                   OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
+                   OnVencimientoChanged="OnVencimientoChanged" />
 
-            @if (!TareasFiltradas.Any())
-            {
-                <p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="text-nowrap" style="width:1%">Completada</th>
-                                <th scope="col">Título</th>
-                                <th scope="col">Prioridad</th>
-                                <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var tarea in TareasFiltradas)
-                            {
-                                <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
-                                           OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        </div>
-    </section>
+        @if (!TareasFiltradas.Any())
+        {
+            <p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap" style="width:1%">Completada</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tarea in TareasFiltradas)
+                        {
+                            <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
+                                       OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>
 
 <ConfirmDialog IsVisible="_showDeleteModal" Message="¿Estás seguro de que deseas eliminar la tarea"
                TargetName="@_tareaAEliminar?.Titulo" OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />
