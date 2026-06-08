@@ -11,38 +11,40 @@
 <p class="lead">Beinvenido a la app para organizar tus tareas.</p>
 
 <section class="card shadow-sm col" aria-label="Tarjetas con estadisticas de tareas">
-	<div class="card-header">
-		<h5 class="mb-0">Estadisticas</h5>
-	</div>
-	<section class="card-body" aria-live="polite">
-		<ul class="row mb-4 list-unstyled">
-			<li class="col-md-4 p-1">
-				<StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="bg-primary" />
-			</li>
-			<li class="col-md-4 p-1">
-				<StatsCard Title="Completadas" Value="@tareaState.Tareas.Count(t => t.Completada)" BackgroundClass="bg-success" />
-			</li>
-			<li class="col-md-4 p-1">
-				<StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)" BackgroundClass="bg-danger" />
-			</li>
-		</ul>
-	</section>
+    <div class="card-header">
+        <h5 class="mb-0">Estadisticas</h5>
+    </div>
+    <section class="card-body" aria-live="polite">
+        <ul class="row mb-4 list-unstyled">
+            <li class="col-md-4 p-1">
+                <StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="surface-tint-primary" />
+            </li>
+            <li class="col-md-4 p-1">
+                <StatsCard Title="Completadas" Value="@tareaState.Tareas.Count(t => t.Completada)"
+                           BackgroundClass="surface-tint-secondary" />
+            </li>
+            <li class="col-md-4 p-1">
+                <StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)"
+                           BackgroundClass="surface-tint-tertiary" />
+            </li>
+        </ul>
+    </section>
 </section>
 
 
 @code {
-	[Inject]
-	private TareaState tareaState { get; set; } = default!;
+    [Inject]
+    private TareaState tareaState { get; set; } = default!;
 
-	protected override async Task OnInitializedAsync()
-	{
-		tareaState.OnChange += StateHasChanged;
-		await tareaState.Inicializar();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        tareaState.OnChange += StateHasChanged;
+        await tareaState.Inicializar();
+    }
 
-	public void Dispose()
-	{
-		tareaState.OnChange -= StateHasChanged;
-	}
+    public void Dispose()
+    {
+        tareaState.OnChange -= StateHasChanged;
+    }
 
 }

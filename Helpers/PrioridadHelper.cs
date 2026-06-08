@@ -6,9 +6,9 @@ public static class PrioridadHelper
 {
     public static string GetClase(Prioridad prioridad) => prioridad switch
     {
-        Prioridad.Alta => "bg-danger",
-        Prioridad.Media => "bg-warning text-dark",
-        Prioridad.Baja => "bg-info text-dark",
+        Prioridad.Alta => "badge-alta",
+        Prioridad.Media => "badge-media",
+        Prioridad.Baja => "badge-baja",
         _ => "bg-secondary"
     };
 }
