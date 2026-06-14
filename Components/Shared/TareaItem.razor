@@ -7,7 +7,7 @@
                @onchange="Completar"
                aria-label="Marcar tarea '@Tarea.Titulo' como @(Tarea.Completada ? "pendiente" : "completada")" />
         <label class="form-check-label" for="@Tarea.IdPublic">
-            @(Tarea.Completada ? "Completada" : "Pendiente")
+            @(Tarea.Completada ? "Si" : "No")
         </label>
     </td>
     <td style="word-break:break-word">
