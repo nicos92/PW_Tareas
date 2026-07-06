@@ -69,9 +69,7 @@
     display: none;
 }
 
-.navbar-toggler:checked~.nav-scrollable {
-    display: block;
-}
+
 
 @media (min-width: 641px) {
     .navbar-toggler {
