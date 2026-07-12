@@ -24,67 +24,67 @@
                    OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
                    OnVencimientoChanged="OnVencimientoChanged" />
 
-        @if (!TareasFiltradas.Any())
+        @if (!_skeleton)
+        {
+            <p class="placeholder-glow">
+
+                <span class="placeholder col-12"></span>
+            </p>
+
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+            <p class="placeholder-glow">
+                <span class="placeholder col-12 bg-secondary"></span>
+            </p>
+
+        }
+        else if (!TareasFiltradas.Any())
         {
             <p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
+
         }
         else
         {
-            if (!_skeleton)
-            {
-                <p class="placeholder-glow">
 
-                    <span class="placeholder col-12"></span>
-                </p>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap" style="width:1%">Lista</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tarea in TareasFiltradas)
+                        {
+                            <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
+                                       OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-                <p class="placeholder-glow">
-                    <span class="placeholder col-12 bg-secondary"></span>
-                </p>
-            }
-            else
-            {
-
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="text-nowrap" style="width:1%">Lista</th>
-                                <th scope="col">Título</th>
-                                <th scope="col">Prioridad</th>
-                                <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var tarea in TareasFiltradas)
-                            {
-                                <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
-                                           OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
         }
     </div>
 </section>
@@ -105,8 +105,16 @@
 
     private async Task<bool> SetSkeleton()
     {
-        await Task.Delay(3000);
+        await Task.Delay(1000);
         return _skeleton = true;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        await SetSkeleton();
+        StateHasChanged();
+
+        
     }
     public IReadOnlyList<TareaModel> TareasFiltradas
     {
@@ -145,7 +153,7 @@
     {
         tareaState.OnChange += StateHasChanged;
         await tareaState.Inicializar();
-        await SetSkeleton();
+
     }
 
     private async Task OnPrioridadChanged(string valor)
