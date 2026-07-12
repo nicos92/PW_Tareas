@@ -1,8 +1,9 @@
-<fieldset class="row mb-3" aria-label="Filtros de tareas">
+<fieldset class="row mb-3" aria-label="Filtros de tareas" disabled="@IsLoading">
     <legend class="">Filtros de tareas</legend>
     <div class="col-lg-4">
         <label class="form-label" for="filter-prioridad">Prioridad:</label>
         <select id="filter-prioridad" class="form-select" value="@PrioridadSeleccionada"
+                disabled="@IsLoading"
                 @onchange="OnPrioridadChangedHandler">
             <option value="">Todas</option>
             <option value="Baja">Baja</option>
@@ -12,7 +13,9 @@
     </div>
     <div class="col-lg-4">
         <label class="form-label" for="filter-estado">Estado:</label>
-        <select id="filter-estado" class="form-select" value="@EstadoSeleccionado" @onchange="OnEstadoChangedHandler">
+        <select id="filter-estado" class="form-select" value="@EstadoSeleccionado"
+                disabled="@IsLoading"
+                @onchange="OnEstadoChangedHandler">
             <option value="">Todas</option>
             <option value="Completadas">Completadas</option>
             <option value="Pendientes">Pendientes</option>
@@ -21,6 +24,7 @@
     <div class="col-lg-4">
         <label class="form-label" for="filter-vencimiento">Vencimiento:</label>
         <select id="filter-vencimiento" class="form-select" value="@VencimientoSeleccionado"
+                disabled="@IsLoading"
                 @onchange="OnVencimientoChangedHandler">
             <option value="">Todas</option>
             <option value="Vencidas">Vencidas</option>
@@ -35,6 +39,7 @@
     </fieldset>
 
 @code {
+    [Parameter] public bool IsLoading { get; set; }
     [Parameter] public string PrioridadSeleccionada { get; set; } = string.Empty;
     [Parameter] public string EstadoSeleccionado { get; set; } = string.Empty;
     [Parameter] public string VencimientoSeleccionado { get; set; } = string.Empty;

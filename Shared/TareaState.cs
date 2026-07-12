@@ -6,21 +6,37 @@ namespace TareasBlazor.Shared
     public class TareaState(IWebHostEnvironment _env, ITareaRepository _repo)
     {
         private readonly List<TareaModel> _tareas = [];
+        private readonly SemaphoreSlim _initLock = new(1, 1);
         private bool _inicializado = false;
 
         public IReadOnlyList<TareaModel> Tareas => _tareas.AsReadOnly();
+        public bool IsLoading { get; private set; }
         public event Action? OnChange;
 
         public async Task Inicializar()
         {
             if (_inicializado) return;
 
-            var tareas = await _repo.GetTareasAsync();
+            await _initLock.WaitAsync();
+            try
+            {
+                if (_inicializado) return;
 
-            _tareas.Clear();
-            _tareas.AddRange([.. tareas.OrderByDescending(t => t.Id)]);
+                IsLoading = true;
+                NotificarCambio();
 
-            _inicializado = true;
+                var tareas = await _repo.GetTareasAsync();
+
+                _tareas.Clear();
+                _tareas.AddRange([.. tareas.OrderByDescending(t => t.Id)]);
+
+                _inicializado = true;
+            }
+            finally
+            {
+                IsLoading = false;
+                _initLock.Release();
+            }
 
             NotificarCambio();
         }

@@ -19,8 +19,8 @@
                     }
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="OnCancel">@CancelText</button>
-                    <button type="button" class="btn btn-outline-danger" @onclick="OnConfirm">@ConfirmText</button>
+                    <button type="button" class="btn btn-secondary" disabled="@_procesando" @onclick="OnCancel">@CancelText</button>
+                    <button type="button" class="btn btn-outline-danger" disabled="@_procesando" @onclick="Confirmar">@ConfirmText</button>
                 </div>
             </div>
         </div>
@@ -36,4 +36,14 @@
     [Parameter] public string CancelText { get; set; } = "Cancelar";
     [Parameter] public EventCallback OnConfirm { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
+
+    private bool _procesando = false;
+
+    private async Task Confirmar()
+    {
+        if (_procesando) return;
+        _procesando = true;
+        await OnConfirm.InvokeAsync();
+        _procesando = false;
+    }
 }
