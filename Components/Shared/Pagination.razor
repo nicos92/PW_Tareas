@@ -3,26 +3,23 @@
     <nav aria-label="Navegación de páginas">
         <ul class="pagination mb-0">
             <li class="page-item @(HasPrevious ? "" : "disabled")">
-                <button class="page-link" @onclick="PaginaAnterior"
-                        disabled="@(!HasPrevious)" aria-label="Página anterior">
+                <button class="page-link" @onclick="PaginaAnterior" disabled="@(!HasPrevious)" aria-label="Página anterior">
                     &laquo;
                 </button>
             </li>
 
-            @for (int i = 1; i <= TotalPages; i++)
+            @if (TotalPages >= 1)
             {
-                var pageNum = i;
-                <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
-                    <button class="page-link" @onclick="() => IrAPagina(pageNum)"
-                            aria-current="@(pageNum == CurrentPage ? "page" : null)">
-                        @pageNum
+                <li class="page-item @(CurrentPage >= 1 ? "active" : "")">
+                    <button class="page-link" @onclick="() => IrAPagina(CurrentPage)"
+                            aria-current="@(CurrentPage >= 1 ? "page" : null)">
+                        @CurrentPage
                     </button>
                 </li>
             }
 
             <li class="page-item @(HasNext ? "" : "disabled")">
-                <button class="page-link" @onclick="PaginaSiguiente"
-                        disabled="@(!HasNext)" aria-label="Página siguiente">
+                <button class="page-link" @onclick="PaginaSiguiente" disabled="@(!HasNext)" aria-label="Página siguiente">
                     &raquo;
                 </button>
             </li>
