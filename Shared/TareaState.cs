@@ -5,11 +5,15 @@ namespace TareasBlazor.Shared
 {
     public class TareaState(IWebHostEnvironment _env, ITareaRepository _repo)
     {
-        private readonly List<TareaModel> _tareas = [];
         private readonly SemaphoreSlim _initLock = new(1, 1);
         private bool _inicializado = false;
 
-        public IReadOnlyList<TareaModel> Tareas => _tareas.AsReadOnly();
+        public PaginatedResult<TareaModel>? ResultadoPaginado { get; private set; }
+        public EstadisticasTareas Estadisticas { get; private set; } = new();
+        public PaginationParams PaginacionActual { get; } = new();
+        public string? FiltroPrioridad { get; private set; }
+        public string? FiltroEstado { get; private set; }
+        public string? FiltroVencimiento { get; private set; }
         public bool IsLoading { get; private set; }
         public event Action? OnChange;
 
@@ -21,44 +25,81 @@ namespace TareasBlazor.Shared
             try
             {
                 if (_inicializado) return;
-
-                IsLoading = true;
-                NotificarCambio();
-
-                var tareas = await _repo.GetTareasAsync();
-
-                _tareas.Clear();
-                _tareas.AddRange([.. tareas.OrderByDescending(t => t.Id)]);
-
                 _inicializado = true;
             }
             finally
             {
-                IsLoading = false;
                 _initLock.Release();
             }
 
+            await CargarPaginaAsync();
+        }
+
+        public async Task CargarPaginaAsync()
+        {
+            IsLoading = true;
             NotificarCambio();
+
+            var tareaPagina = _repo.GetTareasPaginadasAsync(
+                PaginacionActual, FiltroPrioridad, FiltroEstado, FiltroVencimiento);
+            var estadisticas = _repo.GetEstadisticasAsync();
+
+            await Task.WhenAll(tareaPagina, estadisticas);
+
+            ResultadoPaginado = await tareaPagina;
+            Estadisticas = await estadisticas;
+
+            IsLoading = false;
+            NotificarCambio();
+        }
+
+        public async Task SetFiltroPrioridadAsync(string? prioridad)
+        {
+            FiltroPrioridad = prioridad;
+            PaginacionActual.Page = 1;
+            await CargarPaginaAsync();
+        }
+
+        public async Task SetFiltroEstadoAsync(string? estado)
+        {
+            FiltroEstado = estado;
+            PaginacionActual.Page = 1;
+            await CargarPaginaAsync();
+        }
+
+        public async Task SetFiltroVencimientoAsync(string? vencimiento)
+        {
+            FiltroVencimiento = vencimiento;
+            PaginacionActual.Page = 1;
+            await CargarPaginaAsync();
+        }
+
+        public async Task IrAPaginaAsync(int page)
+        {
+            PaginacionActual.Page = page;
+            await CargarPaginaAsync();
         }
 
         public async Task AgregarTarea(TareaModel t)
         {
-            _tareas.Add(t);
             await _repo.AddTareaAsync(t);
-            NotificarCambio();
+            await CargarPaginaAsync();
         }
 
         public async Task EliminarTarea(string id)
         {
-            var tarea = _tareas.FirstOrDefault(t => t.IdPublic == id);
+            var tarea = ResultadoPaginado?.Items.FirstOrDefault(t => t.IdPublic == id);
             if (tarea is not null && !string.IsNullOrEmpty(tarea.Imagen))
             {
                 EliminarArchivo(tarea.Imagen);
             }
 
-            _tareas.RemoveAll(t => t.IdPublic == id);
             await _repo.DeleteTareaByIdAsync(id);
-            NotificarCambio();
+
+            if (ResultadoPaginado is not null && ResultadoPaginado.Items.Count == 1 && PaginacionActual.Page > 1)
+                PaginacionActual.Page--;
+
+            await CargarPaginaAsync();
         }
 
         private void EliminarArchivo(string rutaRelativa)
@@ -74,59 +115,22 @@ namespace TareasBlazor.Shared
 
         public async Task Toggle(string id)
         {
-            var tarea = _tareas.FirstOrDefault(t => t.IdPublic == id);
+            var tarea = ResultadoPaginado?.Items.FirstOrDefault(t => t.IdPublic == id);
             if (tarea is null) return;
 
-            tarea.Completada = !tarea.Completada;
-
-            await _repo.ToggleTareaCompletadaAsync(id, tarea.Completada);
-            NotificarCambio();
-        }
-
-        public IReadOnlyList<TareaModel> FiltrarPorPrioridad(string prioridad)
-        {
-            if (!Enum.TryParse<Prioridad>(prioridad, out var prioridadEnum))
-                return _tareas.AsReadOnly();
-
-            return _tareas.Where(t => t.Prioridad == prioridadEnum).ToList().AsReadOnly();
-        }
-        public IReadOnlyList<TareaModel> FiltrarPorVencimiento(string vencimiento, string date)
-        {
-            if (vencimiento == "Vencidas")
-                return _tareas.Where(t => t.FechaVencimiento < DateOnly.Parse(date)).ToList().AsReadOnly();
-
-            if (vencimiento == "VencenHoy")
-                return _tareas.Where(t => t.FechaVencimiento == DateOnly.Parse(date)).ToList().AsReadOnly();
-
-            if (vencimiento == "ATiempo")
-                return _tareas.Where(t => t.FechaVencimiento > DateOnly.Parse(date)).ToList().AsReadOnly();
-
-            return _tareas.AsReadOnly();
-        }
-
-        public IReadOnlyList<TareaModel> FiltrarPorCompletada(bool? completada)
-        {
-            if (completada is null)
-                return _tareas.AsReadOnly();
-
-            return _tareas.Where(t => t.Completada == completada).ToList().AsReadOnly();
+            await _repo.ToggleTareaCompletadaAsync(id, !tarea.Completada);
+            await CargarPaginaAsync();
         }
 
         public async Task<TareaModel?> GetTareaById(string id)
         {
-            if (_tareas.Count == 0) await Inicializar();
-            return _tareas.FirstOrDefault(t => t.IdPublic == id);
+            return await _repo.GetTareaByIdAsync(id);
         }
 
         public async Task ActualizarTarea(TareaModel tarea)
         {
-            var index = _tareas.FindIndex(t => t.IdPublic == tarea.IdPublic);
-            if (index >= 0)
-            {
-                _tareas[index] = tarea;
-                await _repo.UpdateTareaAsync(tarea);
-                NotificarCambio();
-            }
+            await _repo.UpdateTareaAsync(tarea);
+            await CargarPaginaAsync();
         }
 
         private void NotificarCambio()

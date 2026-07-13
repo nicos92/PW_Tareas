@@ -17,14 +17,14 @@
     <section class="card-body" aria-live="polite">
         <ul class="row mb-4 list-unstyled">
             <li class="col-md-4 p-1">
-                <StatsCard Title="Total" Value="@tareaState.Tareas.Count" BackgroundClass="surface-tint-primary" />
+                <StatsCard Title="Total" Value="@tareaState.Estadisticas.Total" BackgroundClass="surface-tint-primary" />
             </li>
             <li class="col-md-4 p-1">
-                <StatsCard Title="Listas" Value="@tareaState.Tareas.Count(t => t.Completada)"
+                <StatsCard Title="Listas" Value="@tareaState.Estadisticas.Completadas"
                            BackgroundClass="surface-tint-secondary" />
             </li>
             <li class="col-md-4 p-1">
-                <StatsCard Title="Pendientes" Value="@tareaState.Tareas.Count(t => !t.Completada)"
+                <StatsCard Title="Pendientes" Value="@tareaState.Estadisticas.Pendientes"
                            BackgroundClass="surface-tint-tertiary" />
             </li>
         </ul>

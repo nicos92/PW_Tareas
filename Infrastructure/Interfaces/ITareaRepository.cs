@@ -13,5 +13,11 @@ namespace TareasBlazor.Infraestructure.Interfaces
         Task<List<TareaModel>> GetTareasCompletadasAsync();
         Task<List<TareaModel>> GetTareasPendientesAsync();
         Task DeleteTareasAsync();
+        Task<PaginatedResult<TareaModel>> GetTareasPaginadasAsync(
+            PaginationParams paginationParams,
+            string? prioridad = null,
+            string? estado = null,
+            string? vencimiento = null);
+        Task<EstadisticasTareas> GetEstadisticasAsync();
     }
 }

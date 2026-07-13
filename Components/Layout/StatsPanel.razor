@@ -6,29 +6,27 @@
     <h3>Estadísticas</h3>
     <h4>Estado:</h4>
     <ul>
-        <li>Total: @tareaState.Tareas.Count</li>
-        <li>Listas: @tareaState.Tareas.Count(t => t.Completada)</li>
-        <li>Pendientes: @tareaState.Tareas.Count(t => !t.Completada)</li>
+        <li>Total: @tareaState.Estadisticas.Total</li>
+        <li>Listas: @tareaState.Estadisticas.Completadas</li>
+        <li>Pendientes: @tareaState.Estadisticas.Pendientes</li>
     </ul>
     <h4>Prioridad:</h4>
     <ul>
-        <li>Baja: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Baja")</li>
-        <li>Media: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Media")</li>
-        <li>Alta: @tareaState.Tareas.Count(t => t.Prioridad.ToString() == "Alta")</li>
+        <li>Baja: @tareaState.Estadisticas.Baja</li>
+        <li>Media: @tareaState.Estadisticas.Media</li>
+        <li>Alta: @tareaState.Estadisticas.Alta</li>
 
     </ul>
     <h4>Vencimiento:</h4>
     <ul>
-        <li>Vencidas: @tareaState.Tareas.Count(t => t.FechaVencimiento < DateOnly.Parse(date.ToShortDateString()))</li>
-        <li>Vencen hoy: @tareaState.Tareas.Count(t => t.FechaVencimiento == DateOnly.Parse(date.ToShortDateString()))
-        </li>
-        <li>A tiempo: @tareaState.Tareas.Count(t => t.FechaVencimiento > DateOnly.Parse(date.ToShortDateString()))</li>
+        <li>Vencidas: @tareaState.Estadisticas.Vencidas</li>
+        <li>Vencen hoy: @tareaState.Estadisticas.VencenHoy</li>
+        <li>A tiempo: @tareaState.Estadisticas.ATiempo</li>
     </ul>
 </aside>
 
 @code {
 
-    private DateTime date = DateTime.Now;
     protected override async Task OnInitializedAsync()
     {
         tareaState.OnChange += StateHasChanged;

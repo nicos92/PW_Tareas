@@ -19,11 +19,10 @@
             Nueva Tarea
         </button>
 
-        <FilterBar IsLoading="tareaState.IsLoading"
-                   PrioridadSeleccionada="_prioridadSeleccionada" EstadoSeleccionado="_completadaSeleccionada"
-                   VencimientoSeleccionado="_vencimientoSeleccionado" TotalTareas="TareasFiltradas.Count()"
-                   OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
-                   OnVencimientoChanged="OnVencimientoChanged" />
+        <FilterBar IsLoading="tareaState.IsLoading" PrioridadSeleccionada="@(tareaState.FiltroPrioridad ?? "")"
+                   EstadoSeleccionado="@(tareaState.FiltroEstado ?? "")" VencimientoSeleccionado="@(tareaState.FiltroVencimiento ?? "")"
+                   TotalTareas="@(tareaState.ResultadoPaginado?.TotalCount ?? 0)" OnPrioridadChanged="OnPrioridadChanged"
+                   OnEstadoChanged="OnEstadoChanged" OnVencimientoChanged="OnVencimientoChanged" />
 
         @if (tareaState.IsLoading)
         {
@@ -51,7 +50,7 @@
                 </table>
             </div>
         }
-        else if (!TareasFiltradas.Any())
+        else if (tareaState.ResultadoPaginado is null || !tareaState.ResultadoPaginado.Items.Any())
         {
             <p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
 
@@ -70,13 +69,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var tarea in TareasFiltradas)
+                        @foreach (var tarea in tareaState.ResultadoPaginado.Items)
                         {
                             <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
                                        OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
                         }
                     </tbody>
                 </table>
+            </div>
+            <div class="container d-flex justify-content-center p-2">
+
+                <Pagination CurrentPage="@(tareaState.ResultadoPaginado.Page)"
+                            TotalPages="@(tareaState.ResultadoPaginado.TotalPages)"
+                            HasPrevious="@(tareaState.ResultadoPaginado.HasPrevious)"
+                            HasNext="@(tareaState.ResultadoPaginado.HasNext)"
+                            OnPageChanged="OnPageChanged" />
             </div>
 
         }
@@ -87,68 +94,35 @@
                TargetName="@_tareaAEliminar?.Titulo" OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />
 
 @code {
-    private string _prioridadSeleccionada = string.Empty;
-    private string _completadaSeleccionada = string.Empty;
-    private string _vencimientoSeleccionado = string.Empty;
-
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
     [Inject]
     private TareaState tareaState { get; set; } = default!;
 
-    public IReadOnlyList<TareaModel> TareasFiltradas
-    {
-        get
-        {
-            IEnumerable<TareaModel> tareas = tareaState.Tareas;
-
-            if (!string.IsNullOrEmpty(_prioridadSeleccionada))
-            {
-                if (Enum.TryParse<Prioridad>(_prioridadSeleccionada, out var prioridadEnum))
-                    tareas = tareas.Where(t => t.Prioridad == prioridadEnum);
-            }
-
-            if (!string.IsNullOrEmpty(_completadaSeleccionada))
-                tareas = _completadaSeleccionada == "Completadas"
-                    ? tareas.Where(t => t.Completada)
-                    : tareas.Where(t => !t.Completada);
-
-            if (!string.IsNullOrEmpty(_vencimientoSeleccionado))
-            {
-                var today = DateOnly.FromDateTime(DateTime.Now);
-                tareas = _vencimientoSeleccionado switch
-                {
-                    "Vencidas" => tareas.Where(t => t.FechaVencimiento < today),
-                    "VencenHoy" => tareas.Where(t => t.FechaVencimiento == today),
-                    "ATiempo" => tareas.Where(t => t.FechaVencimiento > today),
-                    _ => tareas
-                };
-            }
-
-            return tareas.ToList().AsReadOnly();
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
         tareaState.OnChange += StateHasChanged;
         await tareaState.Inicializar();
-
     }
 
-    private void OnPrioridadChanged(string valor)
+    private async Task OnPrioridadChanged(string valor)
     {
-        _prioridadSeleccionada = valor;
+        await tareaState.SetFiltroPrioridadAsync(valor);
     }
 
-    private void OnEstadoChanged(string valor)
+    private async Task OnEstadoChanged(string valor)
     {
-        _completadaSeleccionada = valor;
+        await tareaState.SetFiltroEstadoAsync(valor);
     }
 
-    private void OnVencimientoChanged(string valor)
+    private async Task OnVencimientoChanged(string valor)
     {
-        _vencimientoSeleccionado = valor;
+        await tareaState.SetFiltroVencimientoAsync(valor);
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        await tareaState.IrAPaginaAsync(page);
     }
 
     private void VerTarea(TareaModel tarea)

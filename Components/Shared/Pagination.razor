@@ -1,0 +1,57 @@
+@if (TotalPages > 1)
+{
+    <nav aria-label="Navegación de páginas">
+        <ul class="pagination mb-0">
+            <li class="page-item @(HasPrevious ? "" : "disabled")">
+                <button class="page-link" @onclick="PaginaAnterior"
+                        disabled="@(!HasPrevious)" aria-label="Página anterior">
+                    &laquo;
+                </button>
+            </li>
+
+            @for (int i = 1; i <= TotalPages; i++)
+            {
+                var pageNum = i;
+                <li class="page-item @(pageNum == CurrentPage ? "active" : "")">
+                    <button class="page-link" @onclick="() => IrAPagina(pageNum)"
+                            aria-current="@(pageNum == CurrentPage ? "page" : null)">
+                        @pageNum
+                    </button>
+                </li>
+            }
+
+            <li class="page-item @(HasNext ? "" : "disabled")">
+                <button class="page-link" @onclick="PaginaSiguiente"
+                        disabled="@(!HasNext)" aria-label="Página siguiente">
+                    &raquo;
+                </button>
+            </li>
+        </ul>
+    </nav>
+}
+
+@code {
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public bool HasPrevious { get; set; }
+    [Parameter] public bool HasNext { get; set; }
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
+    private async Task IrAPagina(int page)
+    {
+        if (page != CurrentPage)
+            await OnPageChanged.InvokeAsync(page);
+    }
+
+    private async Task PaginaAnterior()
+    {
+        if (HasPrevious)
+            await OnPageChanged.InvokeAsync(CurrentPage - 1);
+    }
+
+    private async Task PaginaSiguiente()
+    {
+        if (HasNext)
+            await OnPageChanged.InvokeAsync(CurrentPage + 1);
+    }
+}

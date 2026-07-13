@@ -71,5 +71,57 @@ namespace TareasBlazor.Infraestructure.Repositories
             var tareasPendientes = InMemory.Tareas.Where(t => !t.Completada).ToList();
             return await Task.FromResult(tareasPendientes);
         }
+
+        public Task<PaginatedResult<TareaModel>> GetTareasPaginadasAsync(
+            PaginationParams paginationParams,
+            string? prioridad = null,
+            string? estado = null,
+            string? vencimiento = null)
+        {
+            IEnumerable<TareaModel> query = InMemory.Tareas;
+
+            if (!string.IsNullOrEmpty(prioridad) && Enum.TryParse<Prioridad>(prioridad, out var p))
+                query = query.Where(t => t.Prioridad == p);
+
+            if (!string.IsNullOrEmpty(estado))
+                query = estado == "Completadas" ? query.Where(t => t.Completada) : query.Where(t => !t.Completada);
+
+            if (!string.IsNullOrEmpty(vencimiento))
+            {
+                var today = DateOnly.FromDateTime(DateTime.Now);
+                query = vencimiento switch
+                {
+                    "Vencidas" => query.Where(t => t.FechaVencimiento < today),
+                    "VencenHoy" => query.Where(t => t.FechaVencimiento == today),
+                    "ATiempo" => query.Where(t => t.FechaVencimiento > today),
+                    _ => query
+                };
+            }
+
+            var list = query.OrderByDescending(t => t.Id).ToList();
+            var totalCount = list.Count;
+            var items = list.Skip((paginationParams.Page - 1) * paginationParams.PageSize)
+                            .Take(paginationParams.PageSize).ToList();
+
+            return Task.FromResult(new PaginatedResult<TareaModel>(
+                items.AsReadOnly(), totalCount, paginationParams.Page, paginationParams.PageSize));
+        }
+
+        public Task<EstadisticasTareas> GetEstadisticasAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            return Task.FromResult(new EstadisticasTareas
+            {
+                Total = InMemory.Tareas.Count,
+                Completadas = InMemory.Tareas.Count(t => t.Completada),
+                Baja = InMemory.Tareas.Count(t => t.Prioridad == Prioridad.Baja),
+                Media = InMemory.Tareas.Count(t => t.Prioridad == Prioridad.Media),
+                Alta = InMemory.Tareas.Count(t => t.Prioridad == Prioridad.Alta),
+                Vencidas = InMemory.Tareas.Count(t => t.FechaVencimiento < today),
+                VencenHoy = InMemory.Tareas.Count(t => t.FechaVencimiento == today),
+                ATiempo = InMemory.Tareas.Count(t => t.FechaVencimiento > today)
+            });
+        }
     }
 }
