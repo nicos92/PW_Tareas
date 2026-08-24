@@ -1,0 +1,9 @@
+# .github/CODEOWNERS
+
+# Regla global: usuario por defecto para todo el repositorio
+
+* @nicos92
+
+# los campbios dentro de components los revisa
+
+/Components/ @nicos92
