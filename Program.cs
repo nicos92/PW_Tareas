@@ -1,9 +1,11 @@
+
+using Microsoft.EntityFrameworkCore;
+
 using TareasBlazor.Components;
 using TareasBlazor.Infraestructure.Database;
 using TareasBlazor.Infraestructure.Interfaces;
 using TareasBlazor.Infraestructure.Repositories;
 using TareasBlazor.Shared;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +14,12 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Configurar DbContext con SQLite
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, "tareas.db");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=tareas.db"));
+    options.UseSqlite($"Data Source={dbPath}"));
+builder.Services.AddScoped<ThemeService>();
+
 
 // Registrar repositorio (elegir una implementación)
 builder.Services.AddScoped<ITareaRepository, TareaSqliteRepository>();
@@ -38,5 +44,11 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();

@@ -1,35 +1,68 @@
 @using TareasBlazor.Helpers
 @using TareasBlazor.Models
 
-<div class="card shadow-sm border-0 col-sm-12">
-    <div class="card-header d-flex justify-content-between align-items-center @(Tarea.Completada ? "bg-success-subtle border-success-subtle" : "bg-secondary-subtle border-secondary-subtle")">
-        <h4 class="card-title mb-0 text-body-emphasis">@Tarea.Titulo</h4>
-        <span class="badge @(Tarea.Completada ? "bg-success" : "bg-secondary") rounded-pill">
-            @(Tarea.Completada ? "Completada" : "Pendiente")
+@{
+    var hoy = DateOnly.FromDateTime(DateTime.Now);
+    var estaVencida = !Tarea.Completada && Tarea.FechaVencimiento.HasValue && Tarea.FechaVencimiento.Value < hoy;
+    var estaPorVencer = !Tarea.Completada && !estaVencida && Tarea.FechaVencimiento.HasValue
+        && (Tarea.FechaVencimiento.Value.DayNumber - hoy.DayNumber) <= 2;
+}
+
+<article class="card surface-low border-outline-variant shadow-sm"
+         style="@(estaVencida ? "border-left: 4px solid var(--md-sys-color-error-container)" : estaPorVencer ? "border-left: 4px solid var(--md-sys-color-warning)" : null)">
+
+    <div
+        class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2
+        @(Tarea.Completada ? "surface-tint-tertiary" : estaVencida ? "surface-tint-error" : estaPorVencer ? "surface-tint-warning" : "surface-tint-secondary")">
+        <h4 class="card-title mb-0">@Tarea.Titulo</h4>
+        <span
+            class="badge @(Tarea.Completada ? "badge-completada" : estaVencida ? "badge-alta" : estaPorVencer ? "badge-media" : "badge-pendiente") rounded-pill fs-6">
+            @(Tarea.Completada ? "Completada" : estaVencida ? "Vencida" : estaPorVencer ? "Por vencer" : "Pendiente")
         </span>
     </div>
+
     <div class="card-body">
-        <p class="text-muted small mb-2"><i class="bi bi-hash"></i> ID: <code>@Tarea.IdPublic</code></p>
+        <p class="text-on-surface-variant small mb-3">
+            <i class="bi bi-hash" aria-hidden="true"></i> ID: <code>@Tarea.IdPublic</code>
+        </p>
+        <p class="text-on-surface-variant small mb-3">
+            <i class="bi bi-stack" aria-hidden="true"></i> categoria: <code>@Tarea.Categoria</code>
+        </p>
+
         @if (!string.IsNullOrWhiteSpace(Tarea.Descripcion))
         {
-            <p class="card-text lh-base mb-0">@Tarea.Descripcion</p>
+            <p class="card-text lh-lg mb-0">@Tarea.Descripcion</p>
         }
+
         @if (!string.IsNullOrEmpty(Tarea.Imagen))
         {
-            <div class="text-center mt-2">
-                <img src="@Tarea.Imagen" alt="Imagen de la tarea" class="img-fluid rounded shadow-sm" style="max-width: 100%; max-height: 250px; object-fit: cover;"/>
+            <div class="text-center mt-3">
+                <img src="@Tarea.Imagen" alt="Imagen asociada a la tarea @Tarea.Titulo" class="img-fluid rounded shadow-sm"
+                     style="max-height: 300px; width: auto; object-fit: contain;" loading="lazy" />
             </div>
         }
     </div>
-    <div class="card-footer bg-transparent border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad) rounded-pill">
+
+    <div
+        class="card-footer bg-transparent border-top d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+        <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad) rounded-pill fs-6">
             Prioridad: @Tarea.Prioridad
         </span>
-        <span class="text-muted small">
+        <span class="text-on-surface-variant small d-flex align-items-center gap-1">
+            <i class="bi bi-calendar3"></i>
             Vence: @Tarea.FechaVencimiento?.ToString("dd MMM yyyy")
+            @if (estaPorVencer)
+            {
+                var dias = Tarea.FechaVencimiento!.Value.DayNumber - hoy.DayNumber;
+                <span class="badge badge-media rounded-pill ms-1">@dias día@(dias != 1 ? "s" : "")</span>
+            }
+            @if (estaVencida)
+            {
+                <span class="badge badge-alta rounded-pill ms-1">Atrasada</span>
+            }
         </span>
     </div>
-</div>
+</article>
 
 @code {
     [Parameter, EditorRequired]

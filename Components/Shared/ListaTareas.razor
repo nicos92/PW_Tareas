@@ -8,147 +8,174 @@
 <PageTitle>Lista de Tareas</PageTitle>
 <Breadcrum></Breadcrum>
 <h1>Lista de Tareas</h1>
-<div class="card shadow-sm col-xl-6 col-lg-8 col-md-12">
-	<div class="card-header">
-		<h5 class="mb-0">Lista de tareas</h5>
-	</div>
-	<div class="card-body">
-		
-		<button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea"><i class="bi bi-plus-circle"></i> Nueva Tarea</button>
+<section class="card shadow-sm col-12 mb-3" aria-label="Lista de tareas">
+    <div class="card-header">
+        <h5 class="mb-0">Lista de tareas</h5>
+    </div>
+    <div class="card-body">
 
-		<FilterBar PrioridadSeleccionada="_prioridadSeleccionada"
-				   EstadoSeleccionado="_completadaSeleccionada"
-				   TotalTareas="TareasFiltradas.Count()"
-				   OnPrioridadChanged="OnPrioridadChanged"
-				   OnEstadoChanged="OnEstadoChanged" />
+        <button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea" aria-label="Crear nueva tarea">
+            <i class="bi bi-plus-circle" aria-hidden="true"></i>
+            Nueva Tarea
+        </button>
 
-		@if (!TareasFiltradas.Any())
-		{
-			<p class="text-muted mb-0">No hay tareas. Añade una arriba.</p>
-		}
-		else
-		{
-			<div class="list-group">
-				@foreach (var tarea in TareasFiltradas)
-				{
-					<TareaItem @key="tarea.IdPublic"
-							   Tarea="tarea"
-							   OnVer="VerTarea"
-							   OnCompletar="CompletarTarea"
-							   OnEliminar="EliminarTarea"
-							   OnEditar="IniciarEdicion">
-						<ChildContent>
-							<span class="badge @(tarea.Completada ? "bg-success" : "bg-secondary")" style="display: none">
-								#@tarea.IdPublic
-							</span>
-						</ChildContent>
-					</TareaItem>
-				}
-			</div>
-		}
-	</div>
-</div>
+        <FilterBar IsLoading="tareaState.IsLoading" PrioridadSeleccionada="@(tareaState.FiltroPrioridad ?? "")"
+                   EstadoSeleccionado="@(tareaState.FiltroEstado ?? "")" VencimientoSeleccionado="@(tareaState.FiltroVencimiento ?? "")"
+                   TotalTareas="@(tareaState.ResultadoPaginado?.TotalCount ?? 0)" OnPrioridadChanged="OnPrioridadChanged"
+                   OnEstadoChanged="OnEstadoChanged" OnVencimientoChanged="OnVencimientoChanged" />
 
-<ConfirmDialog IsVisible="_showDeleteModal"
-			   Message="¿Estás seguro de que deseas eliminar la tarea"
-			   TargetName="@_tareaAEliminar?.Titulo"
-			   OnConfirm="ConfirmarEliminar"
-			   OnCancel="CancelarEliminar" />
+        @if (tareaState.IsLoading)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap" style="width:1%">Lista</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (var i = 0; i < 6; i++)
+                        {
+                            <tr class="placeholder-glow">
+                                <td style="width:1%"><span class="placeholder col-6"></span></td>
+                                <td><span class="placeholder col-8"></span></td>
+                                <td><span class="placeholder col-4"></span></td>
+                                <td style="width:1%"><span class="placeholder col-6"></span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else if (tareaState.ResultadoPaginado is null || !tareaState.ResultadoPaginado.Items.Any())
+        {
+            <p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
+
+        }
+        else
+        {
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap" style="width:1%">Lista</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tarea in tareaState.ResultadoPaginado.Items)
+                        {
+                            <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
+                                       OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="container d-flex justify-content-center p-2">
+
+                <Pagination CurrentPage="@(tareaState.ResultadoPaginado.Page)"
+                            TotalPages="@(tareaState.ResultadoPaginado.TotalPages)"
+                            HasPrevious="@(tareaState.ResultadoPaginado.HasPrevious)"
+                            HasNext="@(tareaState.ResultadoPaginado.HasNext)"
+                            OnPageChanged="OnPageChanged" />
+            </div>
+
+        }
+    </div>
+</section>
+
+<ConfirmDialog IsVisible="_showDeleteModal" Message="¿Estás seguro de que deseas eliminar la tarea"
+               TargetName="@_tareaAEliminar?.Titulo" OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />
 
 @code {
-	private string _prioridadSeleccionada = string.Empty;
-	private string _completadaSeleccionada = string.Empty;
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject]
+    private TareaState tareaState { get; set; } = default!;
 
-	[Inject]
-	private NavigationManager NavigationManager { get; set; } = default!;
-	[Inject]
-	private TareaState tareaState { get; set; } = default!;
+    protected override async Task OnInitializedAsync()
+    {
+        tareaState.OnChange += StateHasChanged;
+        await tareaState.Inicializar();
+    }
 
-	public IReadOnlyList<TareaModel> TareasFiltradas
-	{
-		get
-		{
-			IEnumerable<TareaModel> tareas = tareaState.Tareas;
+    private async Task OnPrioridadChanged(string valor)
+    {
+        await tareaState.SetFiltroPrioridadAsync(valor);
+    }
 
-			if (!string.IsNullOrEmpty(_prioridadSeleccionada))
-				tareas = tareaState.FiltrarPorPrioridad(_prioridadSeleccionada);
+    private async Task OnEstadoChanged(string valor)
+    {
+        await tareaState.SetFiltroEstadoAsync(valor);
+    }
 
-			if (!string.IsNullOrEmpty(_completadaSeleccionada))
-				tareas = _completadaSeleccionada == "Completadas"
-					? tareas.Where(t => t.Completada)
-					: tareas.Where(t => !t.Completada);
+    private async Task OnVencimientoChanged(string valor)
+    {
+        await tareaState.SetFiltroVencimientoAsync(valor);
+    }
 
-			return tareas.ToList().AsReadOnly();
-		}
-	}
+    private async Task OnPageChanged(int page)
+    {
+        await tareaState.IrAPaginaAsync(page);
+    }
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		tareaState.OnChange += StateHasChanged;
-		await tareaState.Inicializar();
-	}
+    private void VerTarea(TareaModel tarea)
+    {
 
-	private async Task OnPrioridadChanged(string valor)
-	{
-		_prioridadSeleccionada = valor;
-	}
+        string url = $"/listaDeTareas/tarea/{tarea.IdPublic}";
+        NavigationManager.NavigateTo(url);
+    }
 
-	private async Task OnEstadoChanged(string valor)
-	{
-		_completadaSeleccionada = valor;
-	}
+    private async Task CompletarTarea(TareaModel tarea)
+    {
+        await tareaState.Toggle(tarea.IdPublic);
+    }
 
-	private void VerTarea(TareaModel tarea)
-	{
+    private bool _showDeleteModal = false;
+    private TareaModel? _tareaAEliminar;
 
-		string url = $"/listaDeTareas/tarea/{tarea.IdPublic}";
-		NavigationManager.NavigateTo(url);
-	}
+    private void EliminarTarea(TareaModel tarea)
+    {
+        _tareaAEliminar = tarea;
+        _showDeleteModal = true;
+    }
 
-	private async Task CompletarTarea(TareaModel tarea)
-	{
-		await tareaState.Toggle(tarea.IdPublic);
-	}
+    private async Task ConfirmarEliminar()
+    {
+        if (_tareaAEliminar is not null)
+        {
+            await tareaState.EliminarTarea(_tareaAEliminar.IdPublic);
+            _tareaAEliminar = null;
+        }
+        _showDeleteModal = false;
+    }
 
-	private bool _showDeleteModal = false;
-	private TareaModel? _tareaAEliminar;
+    private void CancelarEliminar()
+    {
+        _tareaAEliminar = null;
+        _showDeleteModal = false;
+    }
 
-	private void EliminarTarea(TareaModel tarea)
-	{
-		_tareaAEliminar = tarea;
-		_showDeleteModal = true;
-	}
+    private void IniciarEdicion(string id)
+    {
+        NavigationManager.NavigateTo($"/listaDeTareas/editarTarea/{id}");
+    }
 
-	private async Task ConfirmarEliminar()
-	{
-		if (_tareaAEliminar is not null)
-		{
-			await tareaState.EliminarTarea(_tareaAEliminar.IdPublic);
-			_tareaAEliminar = null;
-		}
-		_showDeleteModal = false;
-	}
-
-	private void CancelarEliminar()
-	{
-		_tareaAEliminar = null;
-		_showDeleteModal = false;
-	}
-
-	private void IniciarEdicion(string id)
-	{
-		NavigationManager.NavigateTo($"/listaDeTareas/editarTarea/{id}");
-	}
-
-	private void NuevaTarea()
-	{
-		NavigationManager.NavigateTo("/listaDeTareas/nuevaTarea");
-	}
+    private void NuevaTarea()
+    {
+        NavigationManager.NavigateTo("/listaDeTareas/nuevaTarea");
+    }
 
 
-	public void Dispose()
-	{
-		tareaState.OnChange -= StateHasChanged;
-	}
+    public void Dispose()
+    {
+        tareaState.OnChange -= StateHasChanged;
+    }
 
 }

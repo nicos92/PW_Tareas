@@ -9,111 +9,113 @@
 
 @if (tareaModel is null)
 {
-    <p>Cargando...</p>
+	<p aria-live="polite">Cargando...</p>
 }
 else
 {
-    <div class="card shadow-sm col-xl-6 col-lg-8 col-md-12">
-        <div class="card-header">
-            <h5 class="mb-0">Editar tarea</h5>
-        </div>
-        <div class="card-body">
-    <TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
-        <ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="1048576" @ref="imageUploader" />
+	<section class="card shadow-sm col-12" aria-label="Formulario de edición de tarea" aria-describedby="editar-heading">
+		<div class="card-header">
+			<h5 class="mb-0" id="editar-heading">Editar tarea</h5>
+		</div>
+		<div class="card-body" aria-live="polite">
+			<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+				<ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="1048576"
+							   @ref="imageUploader" />
 
-        <button type="submit" class="btn btn-primary" disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
-        <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
-    </TareaForm>
-        </div>
-    </div>
+				<button type="submit" class="btn btn-primary"
+						disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
+				<button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+			</TareaForm>
+		</div>
+	</section>
 }
 
 @code {
-    [Parameter]
-    public string Id { get; set; } = string.Empty;
+	[Parameter]
+	public string Id { get; set; } = string.Empty;
 
-    [Inject]
-    private TareaState TareaState { get; set; } = default!;
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject]
-    private IWebHostEnvironment Environment { get; set; } = default!;
+	[Inject]
+	private TareaState TareaState { get; set; } = default!;
+	[Inject]
+	private NavigationManager NavigationManager { get; set; } = default!;
+	[Inject]
+	private IWebHostEnvironment Environment { get; set; } = default!;
 
-    private TareaModel? tareaModel;
-    private TareaForm? tareaForm;
-    private ImageUploader? imageUploader;
+	private TareaModel? tareaModel;
+	private TareaForm? tareaForm;
+	private ImageUploader? imageUploader;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && tareaModel is null)
-        {
-            await TareaState.Inicializar();
-            tareaModel = TareaState.GetTareaById(Id);
-            StateHasChanged();
-        }
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender && tareaModel is null)
+		{
+			await TareaState.Inicializar();
+			tareaModel = await TareaState.GetTareaById(Id);
+			StateHasChanged();
+		}
+	}
 
-    private async Task OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
-    {
-        if (args.LimpiarImagenExistente && tareaModel is not null)
-        {
-            tareaModel.Imagen = string.Empty;
-        }
-    }
-    
-    private async Task ValidSubmit()
-    {
-        if (imageUploader?.TamanoExcedido == true || tareaModel is null)
-        {
-            return;
-        }
+	private async Task OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
+	{
+		if (args.LimpiarImagenExistente && tareaModel is not null)
+		{
+			await Task.Run(() => tareaModel.Imagen = string.Empty);
+		}
+	}
 
-        var imagenAnterior = tareaModel.Imagen;
-        
-        if (imageUploader!.Archivo is not null)
-        {
-            if (!string.IsNullOrEmpty(imagenAnterior))
-            {
-                EliminarArchivo(imagenAnterior);
-            }
-            
-            tareaModel.Imagen = await GuardarArchivoAsync(imageUploader.Archivo);
-        }
-        
-        await TareaState.ActualizarTarea(tareaModel);
-        NavigationManager.NavigateTo("/listaDeTareas");
-    }
+	private async Task ValidSubmit()
+	{
+		if (imageUploader?.TamanoExcedido == true || tareaModel is null)
+		{
+			return;
+		}
 
-    private void Cancelar()
-    {
-        NavigationManager.NavigateTo("/listaDeTareas");
-    }
-    
-    private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
-    {
-        var trustedFileName = Path.GetRandomFileName();
-        var extension = Path.GetExtension(archivo.Name);
-        var fileName = trustedFileName + extension;
-        
-        var uploadsFolder = Path.Combine(Environment.WebRootPath, "uploads");
-        Directory.CreateDirectory(uploadsFolder);
-        
-        var filePath = Path.Combine(uploadsFolder, fileName);
-        
-        await using FileStream fs = new(filePath, FileMode.Create);
-        await archivo.OpenReadStream(1024 * 1024).CopyToAsync(fs);
-        
-        return $"/uploads/{fileName}";
-    }
+		var imagenAnterior = tareaModel.Imagen;
 
-    private void EliminarArchivo(string rutaRelativa)
-    {
-        if (string.IsNullOrEmpty(rutaRelativa)) return;
-        
-        var fullPath = Path.Combine(Environment.WebRootPath, rutaRelativa.TrimStart('/'));
-        if (File.Exists(fullPath))
-        {
-            File.Delete(fullPath);
-        }
-    }
+		if (imageUploader!.Archivo is not null)
+		{
+			if (!string.IsNullOrEmpty(imagenAnterior))
+			{
+				EliminarArchivo(imagenAnterior);
+			}
+
+			tareaModel.Imagen = await GuardarArchivoAsync(imageUploader.Archivo);
+		}
+
+		await TareaState.ActualizarTarea(tareaModel);
+		NavigationManager.NavigateTo("/listaDeTareas");
+	}
+
+	private void Cancelar()
+	{
+		NavigationManager.NavigateTo("/listaDeTareas");
+	}
+
+	private async Task<string> GuardarArchivoAsync(IBrowserFile archivo)
+	{
+		var trustedFileName = Path.GetRandomFileName();
+		var extension = Path.GetExtension(archivo.Name);
+		var fileName = trustedFileName + extension;
+
+		var uploadsFolder = Path.Combine(Environment.WebRootPath, "uploads");
+		Directory.CreateDirectory(uploadsFolder);
+
+		var filePath = Path.Combine(uploadsFolder, fileName);
+
+		await using FileStream fs = new(filePath, FileMode.Create);
+		await archivo.OpenReadStream(1024 * 1024).CopyToAsync(fs);
+
+		return $"/uploads/{fileName}";
+	}
+
+	private void EliminarArchivo(string rutaRelativa)
+	{
+		if (string.IsNullOrEmpty(rutaRelativa)) return;
+
+		var fullPath = Path.Combine(Environment.WebRootPath, rutaRelativa.TrimStart('/'));
+		if (File.Exists(fullPath))
+		{
+			File.Delete(fullPath);
+		}
+	}
 }

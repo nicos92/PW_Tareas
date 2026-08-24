@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Cryptography;
+
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+
 using TareasBlazor.Infraestructure.Interfaces;
 using TareasBlazor.Models;
 
@@ -95,6 +97,60 @@ namespace TareasBlazor.Infraestructure.Repositories
         private async Task SaveAll(List<TareaModel> tareas)
         {
             await _protectedLocalStorage.SetAsync(StorageKey, tareas);
+        }
+
+        public async Task<PaginatedResult<TareaModel>> GetTareasPaginadasAsync(
+            PaginationParams paginationParams,
+            string? prioridad = null,
+            string? estado = null,
+            string? vencimiento = null)
+        {
+            var tareas = await GetTareasAsync();
+            IEnumerable<TareaModel> query = tareas;
+
+            if (!string.IsNullOrEmpty(prioridad) && Enum.TryParse<Prioridad>(prioridad, out var p))
+                query = query.Where(t => t.Prioridad == p);
+
+            if (!string.IsNullOrEmpty(estado))
+                query = estado == "Completadas" ? query.Where(t => t.Completada) : query.Where(t => !t.Completada);
+
+            if (!string.IsNullOrEmpty(vencimiento))
+            {
+                var today = DateOnly.FromDateTime(DateTime.Now);
+                query = vencimiento switch
+                {
+                    "Vencidas" => query.Where(t => t.FechaVencimiento < today),
+                    "VencenHoy" => query.Where(t => t.FechaVencimiento == today),
+                    "ATiempo" => query.Where(t => t.FechaVencimiento > today),
+                    _ => query
+                };
+            }
+
+            var list = query.OrderByDescending(t => t.Id).ToList();
+            var totalCount = list.Count;
+            var items = list.Skip((paginationParams.Page - 1) * paginationParams.PageSize)
+                            .Take(paginationParams.PageSize).ToList();
+
+            return new PaginatedResult<TareaModel>(
+                items.AsReadOnly(), totalCount, paginationParams.Page, paginationParams.PageSize);
+        }
+
+        public async Task<EstadisticasTareas> GetEstadisticasAsync()
+        {
+            var tareas = await GetTareasAsync();
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            return new EstadisticasTareas
+            {
+                Total = tareas.Count,
+                Completadas = tareas.Count(t => t.Completada),
+                Baja = tareas.Count(t => t.Prioridad == Prioridad.Baja),
+                Media = tareas.Count(t => t.Prioridad == Prioridad.Media),
+                Alta = tareas.Count(t => t.Prioridad == Prioridad.Alta),
+                Vencidas = tareas.Count(t => t.FechaVencimiento < today),
+                VencenHoy = tareas.Count(t => t.FechaVencimiento == today),
+                ATiempo = tareas.Count(t => t.FechaVencimiento > today)
+            };
         }
     }
 }

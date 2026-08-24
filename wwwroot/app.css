@@ -1,19 +1,57 @@
-html, body {
+:root {
+    --color-primario: #1b6ec2;
+    --color-fondo: #f8f9fa;
+    --radio-borde: 0.375rem;
+
+    --color-secundario: #6c5ce7;
+    --color-superficie: #ffffff;
+    --color-error: #dc3545;
+
+    --color-primario-claro: #e8f0fe;
+    --color-primario-oscuro: #1557a0;
+    --color-texto-primario: #212529;
+    --color-texto-secundario: #6c757d;
+    --color-texto-deshabilitado: #adb5bd;
+
+    --color-sobre-primario: #ffffff;
+    --color-sobre-secundario: #ffffff;
+    --color-sobre-superficie: #212529;
+
+    --sombra-1: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .08);
+    --sombra-2: 0 4px 6px rgba(0, 0, 0, .12), 0 2px 4px rgba(0, 0, 0, .08);
+    --sombra-3: 0 10px 20px rgba(0, 0, 0, .12), 0 4px 8px rgba(0, 0, 0, .08);
+    --sombra-4: 0 14px 28px rgba(0, 0, 0, .16), 0 6px 10px rgba(0, 0, 0, .08);
+
+    --radio-borde-sm: 0.25rem;
+    --radio-borde-lg: 0.5rem;
+    --radio-borde-xl: 1rem;
+    --radio-borde-circular: 50%;
+
+    --transicion-rapida: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transicion-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transicion-lenta: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --fuente-primaria: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --fuente-mono: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --tamano-fuente-cuerpo: 1rem;
+    --tamano-fuente-sm: 0.875rem;
+    --tamano-fuente-lg: 1.125rem;
+    --peso-fuente-normal: 400;
+    --peso-fuente-medium: 500;
+    --peso-fuente-bold: 700;
+}
+
+html,
+body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-a, .btn-link {
-    color: #006bb7;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -42,10 +80,449 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
+}
+
+/* ==========================================
+   MATERIAL DESIGN 3 UTILITY CLASSES
+   ========================================== */
+
+/* --- Surface elevation (background only) --- */
+.surface-lowest {
+    background-color: var(--md-sys-color-surface-container-lowest);
+}
+
+.surface-low {
+    background-color: var(--md-sys-color-surface-container-low);
+}
+
+.surface {
+    background-color: var(--md-sys-color-surface-container);
+}
+
+.surface-high {
+    background-color: var(--md-sys-color-surface-container-high);
+}
+
+.surface-highest {
+    background-color: var(--md-sys-color-surface-container-highest);
+}
+
+.surface-variant {
+    background-color: var(--md-sys-color-surface-variant);
+}
+
+.surface-dim {
+    background-color: var(--md-sys-color-surface-dim);
+}
+
+.surface-bright {
+    background-color: var(--md-sys-color-surface-bright);
+}
+
+/* --- Tinted surfaces (container background + text) --- */
+.surface-tint-primary {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.surface-tint-secondary {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.surface-tint-tertiary {
+    background-color: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+}
+
+.surface-tint-error {
+    background-color: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
+
+.surface-tint-warning {
+    background-color: var(--md-sys-color-warning-container);
+    color: var(--md-sys-color-on-warning-container);
+}
+
+.surface-tint-info {
+    background-color: var(--md-sys-color-info-container);
+    color: var(--md-sys-color-on-info-container);
+}
+
+/* --- Solid fills (background + text) --- */
+.fill-primary {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.fill-secondary {
+    background-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.fill-tertiary {
+    background-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-on-tertiary);
+}
+
+.fill-error {
+    background-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.fill-warning {
+    background-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-on-warning);
+}
+
+.fill-info {
+    background-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-on-info);
+}
+
+.fill-surface {
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+}
+
+.fill-surface-variant {
+    background-color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.fill-background {
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+}
+
+.fill-inverse-surface {
+    background-color: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+}
+
+.fill-inverse-primary {
+    background-color: var(--md-sys-color-inverse-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+/* --- Background only (override Bootstrap) --- */
+.bg-primary {
+    background-color: var(--md-sys-color-primary);
+}
+
+.bg-secondary {
+    background-color: var(--md-sys-color-secondary);
+}
+
+.bg-tertiary {
+    background-color: var(--md-sys-color-tertiary);
+}
+
+.bg-error {
+    background-color: var(--md-sys-color-error);
+}
+
+.bg-warning {
+    background-color: var(--md-sys-color-warning);
+}
+
+.bg-info {
+    background-color: var(--md-sys-color-info);
+}
+
+.bg-surface {
+    background-color: var(--md-sys-color-surface);
+}
+
+.bg-surface-variant {
+    background-color: var(--md-sys-color-surface-variant);
+}
+
+.bg-background {
+    background-color: var(--md-sys-color-background);
+}
+
+.bg-inverse-surface {
+    background-color: var(--md-sys-color-inverse-surface);
+}
+
+.bg-primary-container {
+    background-color: var(--md-sys-color-primary-container);
+}
+
+.bg-secondary-container {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.bg-tertiary-container {
+    background-color: var(--md-sys-color-tertiary-container);
+}
+
+.bg-error-container {
+    background-color: var(--md-sys-color-error-container);
+}
+
+.bg-warning-container {
+    background-color: var(--md-sys-color-warning-container);
+}
+
+.bg-info-container {
+    background-color: var(--md-sys-color-info-container);
+}
+
+/* --- Text colors (override Bootstrap) --- */
+.text-primary {
+    color: var(--md-sys-color-primary);
+}
+
+.text-secondary {
+    color: var(--md-sys-color-secondary);
+}
+
+.text-tertiary {
+    color: var(--md-sys-color-tertiary);
+}
+
+.text-error {
+    color: var(--md-sys-color-error);
+}
+
+.text-warning {
+    color: var(--md-sys-color-warning);
+}
+
+.text-info {
+    color: var(--md-sys-color-info);
+}
+
+.text-on-primary {
+    color: var(--md-sys-color-on-primary);
+}
+
+.text-on-secondary {
+    color: var(--md-sys-color-on-secondary);
+}
+
+.text-on-tertiary {
+    color: var(--md-sys-color-on-tertiary);
+}
+
+.text-on-surface {
+    color: var(--md-sys-color-on-surface);
+}
+
+.text-on-surface-variant {
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.text-on-background {
+    color: var(--md-sys-color-on-background);
+}
+
+.text-inverse-on-surface {
+    color: var(--md-sys-color-inverse-on-surface);
+}
+
+/* --- Priority badges --- */
+.badge-pendiente {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.badge-completada {
+    background-color: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+}
+
+.badge-alta {
+    background-color: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
+
+.badge-media {
+    background-color: var(--md-sys-color-warning-container);
+    color: var(--md-sys-color-on-warning-container);
+}
+
+.badge-baja {
+    background-color: var(--md-sys-color-info-container);
+    color: var(--md-sys-color-on-info-container);
+}
+
+/* --- Borders --- */
+.border-outline {
+    border-color: var(--md-sys-color-outline);
+}
+
+.border-outline-variant {
+    border-color: var(--md-sys-color-outline-variant);
+}
+
+/* --- Buttons --- */
+
+
+/* --- Outline buttons --- */
+.btn-outline-primary {
+    background-color: transparent;
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.btn-outline-secondary {
+    background-color: transparent;
+    border-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--md-sys-color-secondary);
+    border-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.btn-outline-tertiary {
+    background-color: transparent;
+    border-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-tertiary);
+}
+
+.btn-outline-tertiary:hover {
+    background-color: var(--md-sys-color-tertiary);
+    border-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-on-tertiary);
+}
+
+.btn-outline-error {
+    background-color: transparent;
+    border-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-error);
+}
+
+.btn-outline-error:hover {
+    background-color: var(--md-sys-color-error);
+    border-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.btn-outline-warning {
+    background-color: transparent;
+    border-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-warning);
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--md-sys-color-warning);
+    border-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-on-warning);
+}
+
+.btn-outline-info {
+    background-color: transparent;
+    border-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-info);
+}
+
+.btn-outline-info:hover {
+    background-color: var(--md-sys-color-info);
+    border-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-on-info);
+}
+
+/* --- Solid buttons (override Bootstrap) --- */
+.btn-primary {
+    background-color: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--md-sys-color-primary-container);
+    border-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.btn-secondary {
+    background-color: var(--md-sys-color-secondary);
+    border-color: var(--md-sys-color-secondary);
+    color: var(--md-sys-color-on-secondary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--md-sys-color-secondary-container);
+    border-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.btn-success {
+    background-color: var(--md-sys-color-tertiary);
+    border-color: var(--md-sys-color-tertiary);
+    color: var(--md-sys-color-on-tertiary);
+}
+
+.btn-success:hover {
+    background-color: var(--md-sys-color-tertiary-container);
+    border-color: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+}
+
+.btn-danger {
+    background-color: var(--md-sys-color-error);
+    border-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+}
+
+.btn-danger:hover {
+    background-color: var(--md-sys-color-error-container);
+    border-color: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+}
+
+.btn-warning {
+    background-color: var(--md-sys-color-warning);
+    border-color: var(--md-sys-color-warning);
+    color: var(--md-sys-color-on-warning);
+}
+
+.btn-warning:hover {
+    background-color: var(--md-sys-color-warning-container);
+    border-color: var(--md-sys-color-warning-container);
+    color: var(--md-sys-color-on-warning-container);
+}
+
+.btn-info {
+    background-color: var(--md-sys-color-info);
+    border-color: var(--md-sys-color-info);
+    color: var(--md-sys-color-on-info);
+}
+
+.btn-info:hover {
+    background-color: var(--md-sys-color-info-container);
+    border-color: var(--md-sys-color-info-container);
+    color: var(--md-sys-color-on-info-container);
+}
+
+/* --- Fonts --- */
+.txt {
+    font-size: var(--tamano-fuente-cuerpo);
+}
+
+.txt-lg {
+    font-size: var(--tamano-fuente-lg);
+}
+
+.txt-sm {
+    font-size: var(--tamano-fuente-sm);
 }

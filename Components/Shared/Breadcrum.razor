@@ -7,7 +7,8 @@
 
         @foreach (var segment in BreadcrumbSegments)
         {
-            <li class="breadcrumb-item @(segment.IsActive ? "active" : "")" aria-current="@(segment.IsActive ? "page" : null)">
+            <li class="breadcrumb-item @(segment.IsActive ? "active" : "")"
+                aria-current="@(segment.IsActive ? "page" : null)">
                 @if (!segment.IsActive)
                 {
                     <a href="@segment.Url">@segment.Name</a>
@@ -88,7 +89,7 @@
 
             if (isGuid)
             {
-                var tarea = TareaState.GetTareaById(segment);
+                var tarea = await TareaState.GetTareaById(segment);
                 name = tarea?.Titulo ?? segment;
             }
 

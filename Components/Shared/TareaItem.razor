@@ -1,51 +1,45 @@
 @using TareasBlazor.Helpers
 @using TareasBlazor.Models
-@using System.Threading.Tasks
 
-<div class="list-group-item d-flex flex-column gap-2 @(Tarea.Completada ? "list-group-item-secondary" : "")">
-    <div class="d-flex align-items-center gap-2 flex-wrap w-100">
-        <input type="checkbox"
-               class="form-check-input flex-shrink-0"
-               checked="@Tarea.Completada"
-               @onchange="Completar" />
-        <span class="@(Tarea.Completada ? "text-decoration-line-through text-muted flex-grow-1" : "flex-grow-1")">
+<tr class="@(Tarea.Completada ? "table-active" : "")">
+    <td class="text-nowrap" style="width:1%">
+        <input id="@Tarea.IdPublic" type="checkbox" class="form-check-input" checked="@Tarea.Completada"
+               @onchange="Completar"
+               aria-label="Marcar tarea '@Tarea.Titulo' como @(Tarea.Completada ? "pendiente" : "completada")" />
+        <label class="form-check-label" for="@Tarea.IdPublic">
+            @(Tarea.Completada ? "Si" : "No")
+        </label>
+    </td>
+    <td style="word-break:break-word">
+        <span class="@(Tarea.Completada ? "text-decoration-line-through text-muted" : "")">
             @Tarea.Titulo
-            <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad) ms-1">@Tarea.Prioridad</span>
         </span>
-        @if (ChildContent is not null)
-        {
-            <div class="d-flex align-items-center flex-shrink-0">
-                @ChildContent
-            </div>
-        }
-        <div class="d-flex gap-1 ms-auto flex-shrink-0">
-            <button type="button"
-                    class="btn btn-success"
-                    @onclick="Ver">
-                <i class="bi bi-eye"></i>
+    </td>
+    <td style="word-break:break-word">
+        <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad)">@Tarea.Prioridad</span>
+    </td>
+    <td class="text-nowrap" style="width:1%">
+        <div class="d-flex gap-1">
+            <button type="button" class="btn btn-secondary btn-sm" @onclick="Ver"
+                    aria-label="Ver detalle de '@Tarea.Titulo'">
+                <i class="bi bi-eye" aria-hidden="true"></i>
             </button>
-
-            <button type="button"
-                    class="btn btn-sm btn-outline-primary"
-                    @onclick="Editar">
-                <i class="bi bi-pencil"></i>
+            <button type="button" class="btn btn-outline-primary btn-sm" @onclick="Editar"
+                    aria-label="Editar tarea '@Tarea.Titulo'">
+                <i class="bi bi-pencil" aria-hidden="true"></i>
             </button>
-            <button type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    @onclick="Eliminar">
-                <i class="bi bi-trash"></i>
+            <button type="button" class="btn btn-outline-danger btn-sm" @onclick="Eliminar"
+                    aria-label="Eliminar tarea '@Tarea.Titulo'">
+                <i class="bi bi-trash" aria-hidden="true"></i>
             </button>
         </div>
-    </div>
-</div>
+    </td>
+</tr>
 
 @code {
     [Parameter, EditorRequired]
     public TareaModel Tarea { get; set; } = default!;
 
-    /// <summary>Contenido opcional definido por el padre (por ejemplo badges o metadatos).</summary>
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
     [Parameter]
     public EventCallback<TareaModel> OnVer { get; set; }
 

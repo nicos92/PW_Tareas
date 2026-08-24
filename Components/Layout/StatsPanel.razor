@@ -1,0 +1,40 @@
+@inject TareaState tareaState
+@implements IDisposable
+@rendermode InteractiveServer
+
+<aside class="stats-panel d-none d-lg-block" aria-label=" Panel de estadísticas">
+    <h3>Estadísticas</h3>
+    <h4>Estado:</h4>
+    <ul>
+        <li>Total: @tareaState.Estadisticas.Total</li>
+        <li>Listas: @tareaState.Estadisticas.Completadas</li>
+        <li>Pendientes: @tareaState.Estadisticas.Pendientes</li>
+    </ul>
+    <h4>Prioridad:</h4>
+    <ul>
+        <li>Baja: @tareaState.Estadisticas.Baja</li>
+        <li>Media: @tareaState.Estadisticas.Media</li>
+        <li>Alta: @tareaState.Estadisticas.Alta</li>
+
+    </ul>
+    <h4>Vencimiento:</h4>
+    <ul>
+        <li>Vencidas: @tareaState.Estadisticas.Vencidas</li>
+        <li>Vencen hoy: @tareaState.Estadisticas.VencenHoy</li>
+        <li>A tiempo: @tareaState.Estadisticas.ATiempo</li>
+    </ul>
+</aside>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        tareaState.OnChange += StateHasChanged;
+        await tareaState.Inicializar();
+    }
+
+    public void Dispose()
+    {
+        tareaState.OnChange -= StateHasChanged;
+    }
+}

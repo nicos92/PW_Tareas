@@ -1,11 +1,12 @@
 @if (IsVisible)
 {
-    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);" role="dialog" aria-modal="true"
+         aria-labelledby="confirm-dialog-title" aria-label="@Title">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">@Title</h5>
-                    <button type="button" class="btn-close" @onclick="OnCancel"></button>
+                    <h5 class="modal-title" id="confirm-dialog-title">@Title</h5>
+                    <button type="button" class="btn-close" @onclick="OnCancel" aria-label="Cerrar diálogo"></button>
                 </div>
                 <div class="modal-body">
                     @if (!string.IsNullOrEmpty(TargetName))
@@ -18,8 +19,8 @@
                     }
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="OnCancel">@CancelText</button>
-                    <button type="button" class="btn btn-danger" @onclick="OnConfirm">@ConfirmText</button>
+                    <button type="button" class="btn btn-secondary" disabled="@_procesando" @onclick="OnCancel">@CancelText</button>
+                    <button type="button" class="btn btn-outline-danger" disabled="@_procesando" @onclick="Confirmar">@ConfirmText</button>
                 </div>
             </div>
         </div>
@@ -35,4 +36,14 @@
     [Parameter] public string CancelText { get; set; } = "Cancelar";
     [Parameter] public EventCallback OnConfirm { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
+
+    private bool _procesando = false;
+
+    private async Task Confirmar()
+    {
+        if (_procesando) return;
+        _procesando = true;
+        await OnConfirm.InvokeAsync();
+        _procesando = false;
+    }
 }

@@ -6,54 +6,52 @@
 <PageTitle>Tarea</PageTitle>
 <Breadcrum></Breadcrum>
 <h3>Ver Tarea</h3>
-<div class="container px-4 py-5" id="featured-3">
-	<div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-		<div class="feature col">
-			@if (isLoading)
-			{
-				<h3 class="fs-2 text-body-emphasis">Cargando...</h3>
-			}
-			else
-			{
-				@DetalleTarea()
-			}
-			<a href="/listaDeTareas" class="icon-link">
-				Volver
-				<svg class="bi" aria-hidden="true"><use xlink:href="#chevron-right"></use></svg>
-			</a>
-		</div>
-	</div>
-</div>
+<section class="container py-4">
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    }
+    else if (tarea is not null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <TareaCard Tarea="tarea" />
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-12 col-md-10 col-lg-8">
+                <a href="/listaDeTareas" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> Tarea no encontrada.
+        </div>
+        <a href="/listaDeTareas" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    }
+</section>
 
 @code {
-	[Parameter]
-	public string id { get; set; } = string.Empty;
-	[Inject]
-	private TareaState tareaState { get; set; } = default!;
-	private bool isLoading = true;
-	private TareaModel? tarea { get; set; }
+    [Parameter]
+    public string id { get; set; } = string.Empty;
+    [Inject]
+    private TareaState tareaState { get; set; } = default!;
+    private bool isLoading = true;
+    private TareaModel? tarea { get; set; }
 
-	private RenderFragment DetalleTarea() => tarea != null
-		? TareaEncontrada()
-		: TareaNoEncontrada();
-
-	private RenderFragment TareaEncontrada() => __builder =>
-	{
-		if (tarea != null)
-		{
-			<TareaCard Tarea="tarea" />
-		}
-	};
-
-	private RenderFragment TareaNoEncontrada() => __builder =>
-	{
-		<h3 class="fs-2 text-body-emphasis text-danger">Tarea no encontrada</h3>
-	};
-
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		tarea = tareaState.GetTareaById(id);
-		isLoading = false;
-		StateHasChanged();
-	}
+    protected override async Task OnParametersSetAsync()
+    {
+        tarea = await tareaState.GetTareaById(id);
+        isLoading = false;
+    }
 }
