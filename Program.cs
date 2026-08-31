@@ -14,8 +14,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// 1. Obtener la ruta de la carpeta Local del usuario (ej: C:\Users\Usuario\AppData\Local)
+var localDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+// 2. (Opcional pero recomendado) Crear una subcarpeta para tu aplicación para no ensuciar la raíz
+var appDataPath = Path.Combine(localDataPath, "Nicolas_Sandoval", "PW_Tareas");
+
+
+// Asegurarse de que la carpeta exista
+Directory.CreateDirectory(appDataPath);
+
+// 3. Definir la ruta completa del archivo .db
+var dbPath = Path.Combine(appDataPath, "tareas.db");
 // Configurar DbContext con SQLite
-var dbPath = Path.Combine(builder.Environment.ContentRootPath, "tareas.db");
+// var dbPath = Path.Combine(builder.Environment.ContentRootPath, "tareas.db");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
