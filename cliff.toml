@@ -1,0 +1,16 @@
+[git]
+tag_prefix = "v" # Prefijo de las etiquetas semánticas
+
+[output]
+file = "CHANGELOG.md"
+format = "MD"         # Markdown
+
+[sections]
+"🚀 Features" = ["feat"]
+"🐛 Bug Fixes" = ["fix"]
+"🧰 Improvements" = ["improvement", "perf"]
+"💄 Style" = ["style"]
+"📝 Docs" = ["docs"]
+"⚠️ Deprecated" = ["chore(deprecate)", "feat(deprecate)"]
+"🚫 Removed" = ["feat!", "BREAKING CHANGE"]
+"🔒 Security" = ["fix(security)", "security"]
