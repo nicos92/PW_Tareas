@@ -14,18 +14,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// 1. Obtener la ruta de la carpeta Local del usuario (ej: C:\Users\Usuario\AppData\Local)
-var localDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+// Ruta de datos configurable: si existe la variable de entorno DATA_DIR (p. ej. en
+// el contenedor Docker), se usa esa carpeta; si no, se usa la carpeta Local del usuario.
+var dataDir = Environment.GetEnvironmentVariable("DATA_DIR");
 
-// 2. (Opcional pero recomendado) Crear una subcarpeta para tu aplicación para no ensuciar la raíz
-var appDataPath = Path.Combine(localDataPath, "Nicolas_Sandoval", "PW_Tareas");
-
+if (string.IsNullOrWhiteSpace(dataDir))
+{
+    var localDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    dataDir = Path.Combine(localDataPath, "Nicolas_Sandoval", "PW_Tareas");
+}
 
 // Asegurarse de que la carpeta exista
-Directory.CreateDirectory(appDataPath);
+Directory.CreateDirectory(dataDir);
 
-// 3. Definir la ruta completa del archivo .db
-var dbPath = Path.Combine(appDataPath, "tareas.db");
+// Definir la ruta completa del archivo .db
+var dbPath = Path.Combine(dataDir, "tareas.db");
 // Configurar DbContext con SQLite
 // var dbPath = Path.Combine(builder.Environment.ContentRootPath, "tareas.db");
 
@@ -50,7 +53,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// En el contenedor Docker solo hay HTTP (TLS lo termina el proxy inverso),
+// así que solo se fuerza HTTPS fuera de Development.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseStaticFiles();
 app.UseAntiforgery();
