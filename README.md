@@ -1,3 +1,13 @@
+---
+title: PW Tareas
+emoji: ✅
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8080
+pinned: false
+---
+
 # TareasBlazor
 
 Aplicación de gestión de tareas (TODO) desarrollada con Blazor Server (.NET 8).
@@ -24,6 +34,28 @@ dotnet run
 ```
 
 La aplicación estará disponible en `https://localhost:7245` o `http://localhost:5017`.
+
+## Ejecución con Docker
+
+```bash
+docker build -t tareas-blazor .
+docker run --rm -p 8080:8080 tareas-blazor
+```
+
+La aplicación estará disponible en `http://localhost:8080`.
+
+Variables de entorno del contenedor:
+
+| Variable | Valor por defecto | Descripción |
+|---|---|---|
+| `ASPNETCORE_URLS` | `http://+:8080` | Dirección/puerto de escucha |
+| `DATA_DIR` | `/app/data` | Carpeta donde se guarda `tareas.db` |
+
+## Despliegue en Hugging Face Spaces
+
+Ver [docs/DESPLIEGUE_HF.md](docs/DESPLIEGUE_HF.md). El README ya incluye el
+front matter necesario (`sdk: docker`, `app_port: 8080`), así que basta con
+hacer push del repositorio a un Space con SDK Docker.
 
 ## Estructura del proyecto
 
