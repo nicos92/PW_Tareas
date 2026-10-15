@@ -1,0 +1,29 @@
+# Artefactos de compilación
+**/bin/
+**/obj/
+publish/
+
+# IDE y git
+.vs/
+.git/
+.gitignore
+*.user
+*.suo
+
+# Documentación y configs que no van en la imagen
+docs/
+.github/
+*.md
+!README.md
+opencode.json
+cliff.toml
+dotnet-tools.json
+.editorconfig
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Carpeta legacy de uploads en la raíz (la real es wwwroot/uploads)
+uploads/
