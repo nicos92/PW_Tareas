@@ -98,11 +98,27 @@ no pase desapercibido. Los tres fallaban con `ThrowIdentityConflict` antes del f
 - `dotnet test`: 27/27 en verde (3 nuevos + 24 existentes).
 - `dotnet build PW_Tareas.sln`: 0 warnings, 0 errores.
 
-## Efecto colateral relacionado (fuera de alcance de este fix)
+## Efecto colateral relacionado: validación de la fecha en vivo (corregido)
 
-En `TareaForm.razor` el campo de fecha usa `<input type="date" @bind="Model.FechaVencimiento">`
-(input nativo, cambio sin commitear respecto de `<InputDate @bind-Value>`). El `@bind` plano
-**no llama a `EditContext.NotifyFieldChanged`**, por lo que la validación de la fecha
-(`Required`/`FutureDate`) no se refresca en vivo: los mensajes y el estado del botón Guardar
-sólo se actualizan al tocar título/descripción o al enviar. El envío sigue validando bien
-(`EditForm` valida antes de `OnValidSubmit`); sólo afecta el feedback en vivo.
+El campo de fecha usa `<input type="date" @bind="Model.FechaVencimiento">` (input nativo sin
+`<InputDate>`), y el `@bind` plano **no llama a `EditContext.NotifyFieldChanged`**. Como
+`TareaForm.HasValidationErrors` (que deshabilita el botón Guardar) lee los mensajes de
+`EditContext`, corregir la fecha no revalidaba: los mensajes viejos del `IValidatableObject`
+(prioridad Alta con vencimiento > 7 días) quedaban pegados y el botón seguía deshabilitado.
+
+Corregido con `@bind:after="OnFechaChanged"` en el input de fecha, que notifica el campo y
+dispara la revalidación completa en el mismo cambio:
+
+```razor
+<input type="date" id="idfechavencimiento" @bind="Model.FechaVencimiento"
+       @bind:after="OnFechaChanged" class="form-control" lang="es-AR" />
+```
+```csharp
+private void OnFechaChanged()
+{
+    _editForm?.EditContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Model.FechaVencimiento));
+}
+```
+
+Con esto el error de prioridad Alta aparece al instante al elegir una fecha inválida y se
+borra (habilitando Guardar) al elegir una válida, sin necesidad de tocar otro campo.

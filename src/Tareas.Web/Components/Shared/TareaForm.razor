@@ -28,7 +28,8 @@
 
 	<div class="mb-3">
 		<label for="idfechavencimiento" class="form-label">Fecha de Vencimiento:</label>
-		<input type="date" id="idfechavencimiento" @bind="Model.FechaVencimiento" class="form-control" lang="es-AR" />
+		<input type="date" id="idfechavencimiento" @bind="Model.FechaVencimiento" @bind:after="OnFechaChanged"
+			   class="form-control" lang="es-AR" />
 	</div>
 
 	<div class="mb-3">
@@ -75,6 +76,11 @@
 	{
 		Model.Descripcion = e.Value?.ToString() ?? string.Empty;
 		_editForm?.EditContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Model.Descripcion));
+	}
+
+	private void OnFechaChanged()
+	{
+		_editForm?.EditContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Model.FechaVencimiento));
 	}
 
 	public bool HasValidationErrors => _editForm?.EditContext?.GetValidationMessages().Any() ?? true;
