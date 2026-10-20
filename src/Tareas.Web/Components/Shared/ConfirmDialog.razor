@@ -1,0 +1,56 @@
+@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);" role="dialog" aria-modal="true"
+         aria-labelledby="confirm-dialog-title" aria-label="@Title">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirm-dialog-title">@Title</h5>
+                    <button type="button" class="btn-close" @onclick="OnCancel" aria-label="Cerrar diálogo"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(TargetName))
+                    {
+                        <p>@Message <strong>@TargetName</strong>?</p>
+                    }
+                    else
+                    {
+                        <p>@Message</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" disabled="@_procesando" @onclick="OnCancel">@CancelText</button>
+                    <button type="button" class="btn btn-outline-danger" disabled="@_procesando" @onclick="Confirmar">@ConfirmText</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirmar eliminación";
+    [Parameter, EditorRequired] public string Message { get; set; } = string.Empty;
+    [Parameter] public string? TargetName { get; set; }
+    [Parameter] public string ConfirmText { get; set; } = "Eliminar";
+    [Parameter] public string CancelText { get; set; } = "Cancelar";
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private bool _procesando = false;
+
+    private async Task Confirmar()
+    {
+        if (_procesando) return;
+        _procesando = true;
+
+        try
+        {
+            await OnConfirm.InvokeAsync();
+        }
+        finally
+        {
+            _procesando = false;
+        }
+    }
+}

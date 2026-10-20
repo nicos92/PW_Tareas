@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TareasBlazor</RootNamespace>
+    <AssemblyName>Tareas.Web</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.26" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tareas.Domain\Tareas.Domain.csproj" />
+    <ProjectReference Include="..\Tareas.Application\Tareas.Application.csproj" />
+    <ProjectReference Include="..\Tareas.Infrastructure\Tareas.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

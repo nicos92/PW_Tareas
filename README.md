@@ -10,7 +10,8 @@ pinned: false
 
 # TareasBlazor
 
-Aplicación de gestión de tareas (TODO) desarrollada con Blazor Server (.NET 8).
+Aplicación de gestión de tareas (TODO) desarrollada con Blazor Server (.NET 8) y
+organizada con **Clean Architecture** por proyectos.
 
 ## Características
 
@@ -20,7 +21,7 @@ Aplicación de gestión de tareas (TODO) desarrollada con Blazor Server (.NET 8)
 - Dashboard con estadísticas en tiempo real
 - Validación de formulario con DataAnnotations y atributos personalizados
 - Componentes reutilizables: `TareaForm`, `ImageUploader`, `FilterBar`, `ConfirmDialog`
-- Almacenamiento con ProtectedLocalStorage (encriptado en servidor)
+- Persistencia en SQLite vía EF Core; almacenamiento de imágenes en disco
 
 ## Requisitos
 
@@ -30,7 +31,7 @@ Aplicación de gestión de tareas (TODO) desarrollada con Blazor Server (.NET 8)
 ## Ejecución
 
 ```bash
-dotnet run
+dotnet run --project src/Tareas.Web
 ```
 
 La aplicación estará disponible en `https://localhost:7245` o `http://localhost:5017`.
@@ -57,20 +58,40 @@ Ver [docs/DESPLIEGUE_HF.md](docs/DESPLIEGUE_HF.md). El README ya incluye el
 front matter necesario (`sdk: docker`, `app_port: 8080`), así que basta con
 hacer push del repositorio a un Space con SDK Docker.
 
-## Estructura del proyecto
+## Arquitectura
+
+Clean Architecture por proyectos (sin API HTTP). Regla de dependencia:
+`Web → Application → Domain` e `Infrastructure → Application`. **Domain no depende de nadie.**
+
+```
+PW_Tareas.sln
+├── src/
+│   ├── Tareas.Domain/         # Entidad Tarea, reglas de negocio, value objects. SIN dependencias.
+│   ├── Tareas.Application/    # Casos de uso, DTOs, puertos (interfaces). Sólo depende de Domain.
+│   ├── Tareas.Infrastructure/ # EF Core, migraciones, repositorio, almacenamiento, reloj.
+│   └── Tareas.Web/            # Front end Blazor. Composition root.
+└── tests/
+    └── Tareas.Tests/          # xUnit + FluentAssertions (dominio, aplicación, integración).
+```
+
+Detalle de la migración en [docs/PLAN_LIMPIA_ARQUITECTURA.md](docs/PLAN_LIMPIA_ARQUITECTURA.md).
+
+### Estructura del front end (`src/Tareas.Web`)
 
 ```
 Components/
-  Pages/        # Páginas de la aplicación (Home, NuevaTarea, EditarTarea, ListaTareas)
-  Shared/       # Componentes reutilizables
-  (TareaForm, ImageUploader, FilterBar, ConfirmDialog, etc.)
-  Layout/       # Layouts principales (MainLayout, NavMenu)
-Models/         # Modelos de datos (TareaModel)
-Infrastructure/ # Repositorios, interfaces, base de datos
-Validation/     # Atributos de validación personalizados (FutureDate, ArchivoImagen)
-Helpers/        # Helpers estáticos (PrioridadHelper)
-Shared/         # State management (TareaState)
+  Pages/         # Páginas ruteables (Home, ListaTareas, Tarea, NuevaTarea, EditarTarea, Configuracion)
+  Shared/        # Componentes reutilizables (TareaForm, ImageUploader, FilterBar, TareaCard, TareaItem, ...)
+  Layout/        # MainLayout, NavMenu, StatsPanel
+  Features/
+    Tareas/      # TareaEstado (estado de presentación) y su base de suscripción
+    Tema/        # ThemeService
+    Archivos/    # Adaptador IBrowserFile -> SubidaArchivo
+Helpers/         # PrioridadHelper
 ```
+
+Los componentes reciben sólo **DTOs** (`TareaDto`); nunca ven entidades de dominio,
+`DbContext` ni strings de filtro.
 
 ## Componentes reutilizables
 
@@ -84,37 +105,49 @@ Shared/         # State management (TareaState)
 | `TareaItem` | Item de lista con checkbox, badges y botones de acción |
 | `Breadcrum` | Navegación breadcrumb dinámica |
 
-## Repositorios disponibles
+## Persistencia
 
-| Repository | Almacenamiento |
+Una única implementación de `ITareaRepository`:
+
+| Implementación | Almacenamiento |
 |---|---|
-| `TareaProtectedLocalStorageRepository` | Server-side encrypted storage **(activo)** |
-| `TareaSqliteRepository` | SQLite (`tareas.db`) |
-| `TareaLocalStorageRepository` | Browser localStorage (vía JS interop) |
-| `TareaRepository` | In-memory (lista estática) |
+| `Tareas.Infrastructure.Repositories.TareaRepository` | SQLite (`tareas.db`) vía EF Core |
 
-Para cambiar el almacenamiento, modificar la línea en `Program.cs`:
+La ruta de la base de datos se resuelve así (en orden):
+`ConnectionStrings:Tareas` en `appsettings.json` → variable de entorno `DATA_DIR`
+→ `%LOCALAPPDATA%/PW_Tareas/tareas.db`.
 
-```csharp
-builder.Services.AddScoped<ITareaRepository, TuRepositoryElegido>();
+### Migraciones EF Core
+
+```bash
+dotnet ef migrations add <Nombre> --project src/Tareas.Infrastructure --context TareaDbContext
+dotnet ef database update --project src/Tareas.Infrastructure --context TareaDbContext
 ```
+
+Las migraciones se aplican automáticamente al arrancar la aplicación.
 
 ## Publicación
 
 ```bash
-dotnet publish TareasBlazor.csproj -c Release -o ./publish
+dotnet publish src/Tareas.Web/Tareas.Web.csproj -c Release -o ./publish
 ```
 
 Esto genera la aplicación compilada en la carpeta `./publish` lista para desplegar en IIS, Docker, Azure App Services, etc.
 
 ## Paquetes NuGet
 
-Paquetes Entity Framework Core instalados:
+| Proyecto | Paquete | Versión |
+|---|---|---|
+| `Tareas.Infrastructure` | `Microsoft.EntityFrameworkCore.Sqlite` | 8.0.26 |
+| `Tareas.Infrastructure` | `Microsoft.EntityFrameworkCore.Design` | 8.0.26 |
+| `Tareas.Web` | `Microsoft.EntityFrameworkCore.Sqlite` | 8.0.26 |
+| `Tareas.Tests` | `FluentAssertions`, `xunit`, `Microsoft.NET.Test.Sdk` | — |
 
-| Paquete | Versión |
-|---|---|
-| `Microsoft.EntityFrameworkCore.Sqlite` | 8.0.26 |
-| `Microsoft.EntityFrameworkCore.Design` | 8.0.26 |
+## Tests
+
+```bash
+dotnet test
+```
 
 ## Validaciones
 
@@ -126,3 +159,5 @@ Paquetes Entity Framework Core instalados:
 | `Prioridad` | Requerida, valor válido del enum |
 | `Imagen` | Extensiones válidas: .jpg, .jpeg, .png, .gif, .webp |
 | Regla de negocio | Tareas de alta prioridad deben vencer en ≤ 7 días |
+
+Los textos de error provienen de `Tareas.Domain.Reglas.TareaReglas` (fuente única).

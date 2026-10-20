@@ -1,10 +1,17 @@
 # Plan de Desarrollo - TareasBlazor
 
+> **Nota (Refactor Clean Architecture):** varias FASE 2/3 de este documento quedaron
+> **resueltas** por la migración a Clean Architecture descrita en
+> [PLAN_LIMPIA_ARQUITECTURA.md](PLAN_LIMPIA_ARQUITECTURA.md): doble suscripción a
+> `OnChange` (§2.1), `PesoArchivoAttribute` (§2.2, código muerto eliminado), archivos
+> huérfanos (§2.3) y el `DbContext` registrado sin usar (§3.1, ahora es la única
+> persistencia). El documento se conserva como registro histórico.
+
 ## Estado actual del proyecto
 
 - **Framework:** .NET 8.0 Blazor Interactive Server
-- **Base de datos:** SQLite (EF Core 8.0.26) con DbContext registrado pero sin usar
-- **Almacenamiento activo:** `TareaProtectedLocalStorageRepository` (server-side encrypted storage)
+- **Base de datos:** SQLite (EF Core 8.0.26) — persistencia única vía `TareaDbContext`
+- **Almacenamiento de tareas:** `Tareas.Infrastructure.Repositories.TareaRepository` (SQLite)
 - **Idioma:** Español
 
 ---
@@ -351,6 +358,8 @@
 ---
 
 ## FASE 2: Corrección de Bugs
+
+> **Estado:** Resuelta por el refactor Clean Architecture (ver banner superior).
 
 ### 2.1 Doble suscripción en ListaTareas.razor
 

@@ -1,0 +1,28 @@
+@page "/listaDeTareas/editarTarea/{Id}"
+
+<PageTitle>Editar Tarea</PageTitle>
+<Breadcrum></Breadcrum>
+<h3>Editar Tarea</h3>
+
+@if (tareaModel is null)
+{
+	<p aria-live="polite">Cargando...</p>
+}
+else
+{
+	<section class="card shadow-sm col-12" aria-label="Formulario de edición de tarea" aria-describedby="editar-heading">
+		<div class="card-header">
+			<h5 class="mb-0" id="editar-heading">Editar tarea</h5>
+		</div>
+		<div class="card-body" aria-live="polite">
+			<TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+				<ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="MaxFileSize"
+							   @ref="imageUploader" />
+
+				<button type="submit" class="btn btn-primary"
+						disabled="@(tareaForm?.HasValidationErrors == true || imageUploader?.TamanoExcedido == true)">Guardar</button>
+				<button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+			</TareaForm>
+		</div>
+	</section>
+}

@@ -2,13 +2,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar solo el .csproj primero para aprovechar la caché de capas
-COPY ["TareasBlazor.csproj", "./"]
-RUN dotnet restore "TareasBlazor.csproj"
+# Copiar la solución y los .csproj primero para aprovechar la caché de capas
+COPY ["PW_Tareas.sln", "./"]
+COPY ["src/Tareas.Domain/Tareas.Domain.csproj", "src/Tareas.Domain/"]
+COPY ["src/Tareas.Application/Tareas.Application.csproj", "src/Tareas.Application/"]
+COPY ["src/Tareas.Infrastructure/Tareas.Infrastructure.csproj", "src/Tareas.Infrastructure/"]
+COPY ["src/Tareas.Web/Tareas.Web.csproj", "src/Tareas.Web/"]
+RUN dotnet restore "src/Tareas.Web/Tareas.Web.csproj"
 
 # Copiar el resto del código y publicar en Release
 COPY . .
-RUN dotnet publish "TareasBlazor.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "src/Tareas.Web/Tareas.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # ========================= Etapa 2: runtime =======================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
@@ -34,4 +38,4 @@ EXPOSE 8080
 USER user
 
 # Las migraciones EF Core se aplican automáticamente al arrancar
-ENTRYPOINT ["dotnet", "TareasBlazor.dll"]
+ENTRYPOINT ["dotnet", "Tareas.Web.dll"]

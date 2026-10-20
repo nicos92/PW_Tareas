@@ -1,0 +1,30 @@
+﻿@page "/"
+@inherits TareaEstadoComponentBase
+
+<PageTitle>Home</PageTitle>
+<Breadcrum />
+
+<h1>Gestión de Tareas!</h1>
+
+<p class="lead">Bienvenido a la app para organizar tus tareas.</p>
+
+<section class="card shadow-sm col" aria-label="Tarjetas con estadisticas de tareas">
+    <div class="card-header">
+        <h5 class="mb-0">Estadisticas</h5>
+    </div>
+    <section class="card-body" aria-live="polite">
+        <ul class="row mb-4 list-unstyled">
+            <li class="col-md-4 p-1">
+                <StatsCard Title="Total" Value="@TareaEstado.Estadisticas.Total" BackgroundClass="surface-tint-primary" />
+            </li>
+            <li class="col-md-4 p-1">
+                <StatsCard Title="Listas" Value="@TareaEstado.Estadisticas.Completadas"
+                           BackgroundClass="surface-tint-secondary" />
+            </li>
+            <li class="col-md-4 p-1">
+                <StatsCard Title="Pendientes" Value="@TareaEstado.Estadisticas.Pendientes"
+                           BackgroundClass="surface-tint-tertiary" />
+            </li>
+        </ul>
+    </section>
+</section>

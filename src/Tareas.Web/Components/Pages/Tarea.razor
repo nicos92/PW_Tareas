@@ -1,0 +1,39 @@
+@page "/listaDeTareas/tarea/{id}"
+
+<PageTitle>Tarea</PageTitle>
+<Breadcrum></Breadcrum>
+<h3>Ver Tarea</h3>
+<section class="container py-4">
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    }
+    else if (tarea is not null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <TareaCard Tarea="tarea" />
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-12 col-md-10 col-lg-8">
+                <a href="/listaDeTareas" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> Tarea no encontrada.
+        </div>
+        <a href="/listaDeTareas" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    }
+</section>

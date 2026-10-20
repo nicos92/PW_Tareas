@@ -1,0 +1,21 @@
+@implements IDisposable
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+
+        @foreach (var segment in BreadcrumbSegments)
+        {
+            <li class="breadcrumb-item @(segment.IsActive ? "active" : "")"
+                aria-current="@(segment.IsActive ? "page" : null)">
+                @if (!segment.IsActive)
+                {
+                    <a href="@segment.Url">@segment.Name</a>
+                }
+                else
+                {
+                    @segment.Name
+                }
+            </li>
+        }
+    </ol>
+</nav>

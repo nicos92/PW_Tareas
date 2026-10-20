@@ -1,0 +1,90 @@
+@page "/listaDeTareas"
+@inherits TareaEstadoComponentBase
+
+<PageTitle>Lista de Tareas</PageTitle>
+<Breadcrum></Breadcrum>
+<h1>Lista de Tareas</h1>
+<section class="card shadow-sm col-12 mb-3" aria-label="Lista de tareas">
+    <div class="card-header">
+        <h5 class="mb-0">Lista de tareas</h5>
+    </div>
+    <div class="card-body">
+
+        <button class="btn btn-primary btn-lg my-2" @onclick="NuevaTarea" aria-label="Crear nueva tarea">
+            <i class="bi bi-plus-circle" aria-hidden="true"></i>
+            Nueva Tarea
+        </button>
+
+        <FilterBar IsLoading="TareaEstado.IsLoading" PrioridadSeleccionada="@TareaEstado.FiltroPrioridadTexto"
+                   EstadoSeleccionado="@TareaEstado.FiltroEstadoTexto" VencimientoSeleccionado="@TareaEstado.FiltroVencimientoTexto"
+                   TotalTareas="@(TareaEstado.ResultadoPaginado?.TotalCount ?? 0)" OnPrioridadChanged="OnPrioridadChanged"
+                   OnEstadoChanged="OnEstadoChanged" OnVencimientoChanged="OnVencimientoChanged" />
+
+        @if (TareaEstado.IsLoading)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap" style="width:1%">Lista</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (var i = 0; i < 6; i++)
+                        {
+                            <tr class="placeholder-glow">
+                                <td style="width:1%"><span class="placeholder col-6"></span></td>
+                                <td><span class="placeholder col-8"></span></td>
+                                <td><span class="placeholder col-4"></span></td>
+                                <td style="width:1%"><span class="placeholder col-6"></span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else if (TareaEstado.ResultadoPaginado is null || !TareaEstado.ResultadoPaginado.Items.Any())
+        {
+            <p class="text-muted mb-0" aria-live="polite">No hay tareas. Añade una arriba.</p>
+
+        }
+        else
+        {
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-nowrap" style="width:1%">Lista</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tarea in TareaEstado.ResultadoPaginado.Items)
+                        {
+                            <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
+                                       OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="container d-flex justify-content-center p-2">
+
+                <Pagination CurrentPage="@(TareaEstado.ResultadoPaginado.Page)"
+                            TotalPages="@(TareaEstado.ResultadoPaginado.TotalPages)"
+                            HasPrevious="@(TareaEstado.ResultadoPaginado.HasPrevious)"
+                            HasNext="@(TareaEstado.ResultadoPaginado.HasNext)"
+                            OnPageChanged="OnPageChanged" />
+            </div>
+
+        }
+    </div>
+</section>
+
+<ConfirmDialog IsVisible="_showDeleteModal" Message="¿Estás seguro de que deseas eliminar la tarea"
+               TargetName="@_tareaAEliminar?.Titulo" OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />

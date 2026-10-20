@@ -1,0 +1,34 @@
+* text=auto eol=lf
+
+*.cs      text diff=csharp
+*.razor   text
+*.razor.cs text diff=csharp
+*.cshtml  text
+*.html    text
+*.css     text
+*.js      text
+*.json    text
+*.md      text
+*.yml     text
+*.yaml    text
+*.sql     text
+*.editorconfig text
+
+*.sln     text eol=crlf
+*.csproj  text eol=crlf
+*.props   text eol=crlf
+*.targets text eol=crlf
+
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.webp    binary
+*.ico     binary
+*.ttf     binary
+*.woff    binary
+*.woff2   binary
+
+*.db      binary
+*.db-shm  binary
+*.db-wal  binary
