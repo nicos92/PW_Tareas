@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+
+using System.Globalization;
 
 using Tareas.Application;
 using Tareas.Infrastructure;
@@ -19,6 +22,19 @@ builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<TareaEstado>();
 
 var app = builder.Build();
+
+var culture = new CultureInfo("es-AR");
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(culture),
+    SupportedCultures = [culture],
+    SupportedUICultures = [culture],
+    ApplyCurrentCultureToResponseHeaders = true
+};
+app.UseRequestLocalization(localizationOptions);
 
 if (!app.Environment.IsDevelopment())
 {
