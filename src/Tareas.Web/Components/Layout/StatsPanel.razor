@@ -1,13 +1,16 @@
 @inherits TareaEstadoComponentBase
 
-<aside class="stats-panel d-none d-lg-block" aria-label=" Panel de estadísticas">
+<aside class="stats-panel d-none d-lg-block" aria-label="Panel de estadísticas">
     <h3>Estadísticas</h3>
     <h4>Estado:</h4>
-    <ul>
-        <li>Total: @TareaEstado.Estadisticas.Total</li>
-        <li>Listas: @TareaEstado.Estadisticas.Completadas</li>
-        <li>Pendientes: @TareaEstado.Estadisticas.Pendientes</li>
-    </ul>
+    <div class="d-flex flex-column gap-2 mb-3">
+        <StatsCard Title="Total" Value="@TareaEstado.Estadisticas.Total" BackgroundClass="surface-tint-primary"
+                   CssClass="stats-card-compact" />
+        <StatsCard Title="Listas" Value="@TareaEstado.Estadisticas.Completadas"
+                   BackgroundClass="surface-tint-secondary" CssClass="stats-card-compact" />
+        <StatsCard Title="Pendientes" Value="@TareaEstado.Estadisticas.Pendientes"
+                   BackgroundClass="surface-tint-tertiary" CssClass="stats-card-compact" />
+    </div>
     <h4>Prioridad:</h4>
     <ul>
         <li>Baja: @TareaEstado.Estadisticas.Baja</li>
