@@ -59,6 +59,18 @@ public sealed class TareaRepository : ITareaRepository
 
     public async Task ActualizarAsync(Tarea tarea, CancellationToken ct = default)
     {
+        // El DbContext es scoped: en Blazor Server vive todo el circuito, y una operación
+        // anterior (un guardado, un toggle, una creación) puede dejar trackeada otra
+        // instancia de la misma fila. Adjuntar la nueva sin más lanzaría
+        // ThrowIdentityConflict, así que se desengancha la instancia previa.
+        var previa = tarea.Id != 0
+            ? _contexto.Tareas.Local.FirstOrDefault(t => t.Id == tarea.Id)
+            : null;
+        if (previa is not null)
+        {
+            _contexto.Entry(previa).State = EntityState.Detached;
+        }
+
         _contexto.Tareas.Update(tarea);
         await _contexto.SaveChangesAsync(ct);
     }
