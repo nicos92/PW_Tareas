@@ -22,4 +22,10 @@ public partial class Tarea : ComponentBase
         tarea = await TareaEstado.ObtenerPorIdAsync(id);
         isLoading = false;
     }
+
+    private async Task<string?> ResolverTituloTarea(string segmento)
+    {
+        var tarea = await TareaEstado.ObtenerPorIdAsync(segmento);
+        return tarea?.Titulo;
+    }
 }

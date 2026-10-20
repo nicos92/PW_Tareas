@@ -1,0 +1,12 @@
+<span class="char-counter @(_excedido ? "text-danger" : "text-muted")">
+    @(Length)/@MaxLength
+</span>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public int MaxLength { get; set; }
+    [Parameter] public double WarnAt { get; set; } = 0.9;
+
+    private int Length => Value?.Length ?? 0;
+    private bool _excedido => Length > MaxLength * WarnAt;
+}

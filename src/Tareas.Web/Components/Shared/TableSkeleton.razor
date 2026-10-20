@@ -1,0 +1,28 @@
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                @foreach (var columna in Columnas)
+                {
+                    <th scope="col" class="text-nowrap" style="width:1%">@columna</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Filas; i++)
+            {
+                <tr class="placeholder-glow">
+                    @foreach (var _ in Columnas)
+                    {
+                        <td style="width:1%"><span class="placeholder col-6"></span></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<string> Columnas { get; set; } = Array.Empty<string>();
+    [Parameter] public int Filas { get; set; } = 6;
+}

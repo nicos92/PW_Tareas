@@ -1,45 +1,33 @@
-<fieldset class="row mb-3" aria-label="Filtros de tareas" disabled="@IsLoading">
-    <legend class="">Filtros de tareas</legend>
-    <div class="col-lg-4">
-        <label class="form-label" for="filter-prioridad">Prioridad:</label>
-        <select id="filter-prioridad" class="form-select" value="@PrioridadSeleccionada"
-                disabled="@IsLoading"
-                @onchange="OnPrioridadChangedHandler">
-            <option value="">Todas</option>
-            <option value="Baja">Baja</option>
-            <option value="Media">Media</option>
-            <option value="Alta">Alta</option>
-        </select>
-    </div>
-    <div class="col-lg-4">
-        <label class="form-label" for="filter-estado">Estado:</label>
-        <select id="filter-estado" class="form-select" value="@EstadoSeleccionado"
-                disabled="@IsLoading"
-                @onchange="OnEstadoChangedHandler">
-            <option value="">Todas</option>
-            <option value="Completadas">Completadas</option>
-            <option value="Pendientes">Pendientes</option>
-        </select>
-    </div>
-    <div class="col-lg-4">
-        <label class="form-label" for="filter-vencimiento">Vencimiento:</label>
-        <select id="filter-vencimiento" class="form-select" value="@VencimientoSeleccionado"
-                disabled="@IsLoading"
-                @onchange="OnVencimientoChangedHandler">
-            <option value="">Todas</option>
-            <option value="Vencidas">Vencidas</option>
-            <option value="VencenHoy">Vencen hoy</option>
-            <option value="ATiempo">A tiempo</option>
-        </select>
-    </div>
+@using System.Linq
+@using Tareas.Application.Filtros
+@using Tareas.Domain.ValueObjects
+
+<fieldset class="row mb-3" aria-label="@AriaLabel" disabled="@IsLoading">
+    <legend>@Legend</legend>
+
+    <SelectFilter Id="filter-prioridad" Label="Prioridad" Options="_opcionesPrioridad"
+                  Value="@PrioridadSeleccionada" EmptyLabel="Todas" Disabled="@IsLoading"
+                  OnChanged="OnPrioridadChanged" />
+
+    <SelectFilter Id="filter-estado" Label="Estado" Options="_opcionesEstado"
+                  Value="@EstadoSeleccionado" EmptyLabel="Todas" Disabled="@IsLoading"
+                  OnChanged="OnEstadoChanged" />
+
+    <SelectFilter Id="filter-vencimiento" Label="Vencimiento" Options="_opcionesVencimiento"
+                  Value="@VencimientoSeleccionado" EmptyLabel="Todas" Disabled="@IsLoading"
+                  OnChanged="OnVencimientoChanged" />
+
     <div class="col d-flex align-items-end">
-        <span class="text-muted" aria-live="polite" aria-atomic="true">Mostrando: @TotalTareas tarea@(TotalTareas != 1 ?
-                                                                                 "s" : "")</span>
-        </div>
-    </fieldset>
+        <span class="text-muted" aria-live="polite" aria-atomic="true">
+            Mostrando: @TotalTareas tarea@(TotalTareas != 1 ? "s" : "")
+        </span>
+    </div>
+</fieldset>
 
 @code {
     [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string AriaLabel { get; set; } = "Filtros de tareas";
+    [Parameter] public string Legend { get; set; } = "Filtros de tareas";
     [Parameter] public string PrioridadSeleccionada { get; set; } = string.Empty;
     [Parameter] public string EstadoSeleccionado { get; set; } = string.Empty;
     [Parameter] public string VencimientoSeleccionado { get; set; } = string.Empty;
@@ -48,20 +36,26 @@
     [Parameter] public EventCallback<string> OnEstadoChanged { get; set; }
     [Parameter] public EventCallback<string> OnVencimientoChanged { get; set; }
 
-    private async Task OnPrioridadChangedHandler(ChangeEventArgs e)
-    {
-        PrioridadSeleccionada = e.Value?.ToString() ?? string.Empty;
-        await OnPrioridadChanged.InvokeAsync(PrioridadSeleccionada);
-    }
+    private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesPrioridad =
+        CrearOpciones<Prioridad>();
 
-    private async Task OnEstadoChangedHandler(ChangeEventArgs e)
+    private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesEstado =
+        CrearOpciones<EstadoFiltro>(excluirPrimero: true);
+
+    private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesVencimiento =
+        CrearOpciones<VencimientoFiltro>(excluirPrimero: true);
+
+    private static IReadOnlyList<SelectFilter.OpcionFiltro> CrearOpciones<TEnum>(bool excluirPrimero = false)
+        where TEnum : struct, Enum
     {
-        EstadoSeleccionado = e.Value?.ToString() ?? string.Empty;
-        await OnEstadoChanged.InvokeAsync(EstadoSeleccionado);
-    }
-    private async Task OnVencimientoChangedHandler(ChangeEventArgs e)
-    {
-        VencimientoSeleccionado = e.Value?.ToString() ?? string.Empty;
-        await OnVencimientoChanged.InvokeAsync(VencimientoSeleccionado);
+        var valores = Enum.GetValues<TEnum>();
+        if (excluirPrimero && valores.Length > 0)
+        {
+            valores = valores[1..];
+        }
+
+        return valores
+            .Select(v => new SelectFilter.OpcionFiltro(v.ToString(), v.ToString()))
+            .ToList();
     }
 }

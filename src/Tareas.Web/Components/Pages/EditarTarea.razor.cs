@@ -1,32 +1,18 @@
 using Microsoft.AspNetCore.Components;
 
-using Tareas.Application.Configuracion;
 using Tareas.Application.Dtos;
-using TareasBlazor.Components.Features.Archivos;
-using TareasBlazor.Components.Features.Tareas;
 using TareasBlazor.Components.Shared;
 
 namespace TareasBlazor.Components.Pages;
 
-public partial class EditarTarea : ComponentBase
+public partial class EditarTarea
 {
     [Parameter]
     public string Id { get; set; } = string.Empty;
 
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    [Inject]
-    private TareaEstado TareaEstado { get; set; } = default!;
-
-    [Inject]
-    private OpcionesAlmacenamiento Opciones { get; set; } = default!;
-
     private TareaDto? tareaModel;
-    private TareaForm? tareaForm;
-    private ImageUploader? imageUploader;
 
-    private long MaxFileSize => Opciones.MaximoBytes;
+    protected override string RutaLista => "/listaDeTareas";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -46,9 +32,15 @@ public partial class EditarTarea : ComponentBase
         }
     }
 
+    private async Task<string?> ResolverTituloTarea(string segmento)
+    {
+        var tarea = await TareaEstado.ObtenerPorIdAsync(segmento);
+        return tarea?.Titulo;
+    }
+
     private async Task ValidSubmit()
     {
-        if (imageUploader?.TamanoExcedido == true || tareaModel is null)
+        if (ImagenInvalida || tareaModel is null)
         {
             return;
         }
@@ -58,16 +50,7 @@ public partial class EditarTarea : ComponentBase
             return;
         }
 
-        SubidaArchivo? subida = imageUploader?.Archivo is { } archivo
-            ? SubidaArchivoFactory.Crear(archivo, MaxFileSize)
-            : null;
-
-        await TareaEstado.ActualizarTareaAsync(guid, tareaModel, subida);
-        NavigationManager.NavigateTo("/listaDeTareas");
-    }
-
-    private void Cancelar()
-    {
-        NavigationManager.NavigateTo("/listaDeTareas");
+        await TareaEstado.ActualizarTareaAsync(guid, tareaModel, CrearSubida());
+        NavigationManager.NavigateTo(RutaLista);
     }
 }

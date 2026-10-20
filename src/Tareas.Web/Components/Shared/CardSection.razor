@@ -1,0 +1,26 @@
+<section class="card shadow-sm @CssClass" aria-label="@(AriaLabel ?? Title)">
+    <div class="card-header">
+        <h5 class="mb-0" id="@HeaderId">
+            @if (HeaderContent is not null)
+            {
+                @HeaderContent
+            }
+            else
+            {
+                @Title
+            }
+        </h5>
+    </div>
+    <div class="card-body" aria-live="polite">
+        @ChildContent
+    </div>
+</section>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+    [Parameter] public string? HeaderId { get; set; }
+    [Parameter] public string CssClass { get; set; } = "col-12";
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
+}

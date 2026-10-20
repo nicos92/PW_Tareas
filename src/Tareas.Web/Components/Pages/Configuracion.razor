@@ -2,24 +2,21 @@
 @inject ThemeService ThemeService
 
 <div class="container py-4">
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h4 class="mb-0">
-                <i class="bi bi-gear-fill"></i> Configuración
-            </h4>
-        </div>
-        <div class="card-body">
+    <CardSection AriaLabel="Configuración" CssClass="" HeaderId="configuracion-heading">
+        <HeaderContent>
+            <i class="bi bi-gear-fill" aria-hidden="true"></i> Configuración
+        </HeaderContent>
 
-            
+        <ChildContent>
             <p class="text-muted">Selecciona el tema de la aplicación:</p>
             <div class="d-flex gap-3">
                 <button class="btn btn-themedark" @onclick='() => ThemeService.SetTheme("dark")'>
-                    <i class="bi bi-moon-fill"></i> Oscuro
+                    <i class="bi bi-moon-fill" aria-hidden="true"></i> Oscuro
                 </button>
                 <button class="btn btn-themelight" @onclick='() => ThemeService.SetTheme("light")'>
-                    <i class="bi bi-sun-fill"></i> Claro
+                    <i class="bi bi-sun-fill" aria-hidden="true"></i> Claro
                 </button>
             </div>
-        </div>
-    </div>
+        </ChildContent>
+    </CardSection>
 </div>

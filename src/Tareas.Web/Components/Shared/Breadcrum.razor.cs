@@ -1,17 +1,23 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 
-using TareasBlazor.Components.Features.Tareas;
-
 namespace TareasBlazor.Components.Shared;
 
+/// <summary>
+/// Breadcrumb derivado de la URL actual. No conoce ningún dominio: los segmentos
+/// opacos (p. ej. GUID) se resuelven mediante <see cref="SegmentNameResolver"/>.
+/// </summary>
 public partial class Breadcrum : ComponentBase, IDisposable
 {
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject]
-    private TareaEstado TareaEstado { get; set; } = default!;
+    /// <summary>
+    /// Resolver opcional para nombrar segmentos no legibles (GUID, ids). Recibe el
+    /// segmento y devuelve el nombre a mostrar, o null para conservar el segmento.
+    /// </summary>
+    [Parameter]
+    public Func<string, Task<string?>>? SegmentNameResolver { get; set; }
 
     private List<BreadcrumbSegment> BreadcrumbSegments = new();
 
@@ -42,11 +48,6 @@ public partial class Breadcrum : ComponentBase, IDisposable
 
     private async Task UpdateBreadcrumbAsync()
     {
-        if (BreadcrumbSegments.Count == 0 && !NavigationManager.Uri.Contains("listaDeTareas"))
-        {
-            return;
-        }
-
         var uri = NavigationManager.Uri;
         var absolutePath = NavigationManager.ToBaseRelativePath(uri);
 
@@ -77,10 +78,9 @@ public partial class Breadcrum : ComponentBase, IDisposable
             var isLast = i == segments.Length - 1;
             var name = segment;
 
-            if (isGuid)
+            if (isGuid && SegmentNameResolver is not null)
             {
-                var tarea = await TareaEstado.ObtenerPorIdAsync(segment);
-                name = tarea?.Titulo ?? segment;
+                name = await SegmentNameResolver(segment) ?? segment;
             }
 
             BreadcrumbSegments.Add(new BreadcrumbSegment

@@ -1,0 +1,13 @@
+<p class="@ClaseTexto mb-0" aria-live="polite">
+    @if (!string.IsNullOrEmpty(Icono))
+    {
+        <i class="bi @Icono" aria-hidden="true"></i>
+    }
+    @Mensaje
+</p>
+
+@code {
+    [Parameter, EditorRequired] public string Mensaje { get; set; } = string.Empty;
+    [Parameter] public string? Icono { get; set; }
+    [Parameter] public string ClaseTexto { get; set; } = "text-muted";
+}

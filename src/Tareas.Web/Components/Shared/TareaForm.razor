@@ -8,10 +8,7 @@
 		
 		<label for="idtitulo" class="form-label">Título:</label>
 		<input id="idtitulo" value="@Model.Titulo" @oninput="OnTituloInput" class="form-control" maxlength="50" />
-		<span class="char-counter @((Model.Titulo?.Length ?? 0) > 45 ? "text-danger" : "text-muted")">
-			@(Model.Titulo?.Length
-					?? 0)/50
-		</span>
+		<CharCounter Value="@Model.Titulo" MaxLength="50" />
 		<ValidationMessage For="() => Model.Titulo" />
 
 	</div>
@@ -20,10 +17,7 @@
 		<label for="iddescripcion" class="form-label">Descripción:</label>
 		<textarea id="iddescripcion" value="@Model.Descripcion" @oninput="OnDescripcionInput" class="form-control"
 				  rows="3" maxlength="200"></textarea>
-		<span class="char-counter @((Model.Descripcion?.Length ?? 0) > 180 ? "text-danger" : "text-muted")">
-			@(Model.Descripcion?.Length
-							?? 0)/200
-		</span>
+		<CharCounter Value="@Model.Descripcion" MaxLength="200" />
 		<ValidationMessage For="() => Model.Descripcion" />
 	</div>
 
