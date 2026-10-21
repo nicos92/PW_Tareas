@@ -30,11 +30,15 @@ public static class DependencyInjection
         services.AddDbContext<TareaDbContext>(options => options.UseSqlite(cadena));
 
         var rutaUploads = configuration["Storage:UploadsPath"];
+        var rutaFisicaUploads = configuration["Storage:UploadsPhysicalPath"];
         var opcionesAlmacenamiento = new OpcionesAlmacenamiento
         {
             RutaUploads = string.IsNullOrWhiteSpace(rutaUploads)
                 ? OpcionesAlmacenamiento.RutaUploadsPorDefecto
                 : rutaUploads,
+            RutaFisicaUploads = string.IsNullOrWhiteSpace(rutaFisicaUploads)
+                ? null
+                : rutaFisicaUploads,
             MaximoBytes = long.TryParse(configuration["Storage:MaxFileSizeBytes"], out var maximo) && maximo > 0
                 ? maximo
                 : OpcionesAlmacenamiento.MaximoBytesPorDefecto

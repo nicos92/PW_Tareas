@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 using Tareas.Application;
+using Tareas.Application.Configuracion;
 using Tareas.Infrastructure;
 using Tareas.Infrastructure.Persistence;
 using TareasBlazor.Components;
 using TareasBlazor.Components.Features.Tareas;
 using TareasBlazor.Components.Features.Tema;
+using TareasBlazor.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +45,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-app.UseStaticFiles();
+app.UseArchivosEstaticos(
+    builder.Configuration["Storage:UploadsPhysicalPath"],
+    builder.Configuration["Storage:UploadsPath"] ?? OpcionesAlmacenamiento.RutaUploadsPorDefecto);
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
