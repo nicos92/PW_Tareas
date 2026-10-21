@@ -50,13 +50,23 @@ Variables de entorno del contenedor:
 | Variable | Valor por defecto | Descripción |
 |---|---|---|
 | `ASPNETCORE_URLS` | `http://+:8080` | Dirección/puerto de escucha |
-| `DATA_DIR` | `/app/data` | Carpeta donde se guarda `tareas.db` |
+| `DATA_DIR` | `/app/data` | Carpeta donde se guarda `tareas.db`. Si no admite escritura, la app cae a `/tmp/PW_Tareas` y lo avisa en el log |
+| `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` | Procesa `X-Forwarded-Proto`/`X-Forwarded-For` de los proxies (Cloud Run, Hugging Face, Nginx) |
+| `Storage__UploadsPhysicalPath` | *(vacío)* | Ruta absoluta donde se guardan los adjuntos. Vacío = `wwwroot/uploads` |
 
 ## Despliegue en Hugging Face Spaces
 
 Ver [docs/DESPLIEGUE_HF.md](docs/DESPLIEGUE_HF.md). El README ya incluye el
 front matter necesario (`sdk: docker`, `app_port: 8080`), así que basta con
 hacer push del repositorio a un Space con SDK Docker.
+
+## Despliegue en Google Cloud (Cloud Run)
+
+Ver [docs/DESPLIEGUE_GCP.md](docs/DESPLIEGUE_GCP.md). El flujo es publicar la
+imagen en **Artifact Registry** y desplegarla con `gcloud run deploy`. En Cloud
+Run hay que setear `DATA_DIR=/tmp/data` y `Storage__UploadsPhysicalPath=/tmp/uploads`
+(carpetas escribibles y efímeras) y usar `--max-instances=1` para que todas las
+peticiones peguen a la misma base SQLite (ver el documento para el detalle).
 
 ## Arquitectura
 
@@ -115,7 +125,14 @@ Una única implementación de `ITareaRepository`:
 
 La ruta de la base de datos se resuelve así (en orden):
 `ConnectionStrings:Tareas` en `appsettings.json` → variable de entorno `DATA_DIR`
-→ `%LOCALAPPDATA%/PW_Tareas/tareas.db`.
+→ `%LOCALAPPDATA%/PW_Tareas/tareas.db`. Si el directorio resuelto no admite
+escritura (por ejemplo `/app/data` en Cloud Run), se usa `/tmp/PW_Tareas` como
+respaldo y la ruta real se informa en el log al arrancar.
+
+Los adjuntos se guardan en `wwwroot/uploads` (`Storage:UploadsPath`) y se sirven
+en `/uploads/...`. Con `Storage:UploadsPhysicalPath` se puede escribir en otra
+carpeta del disco (por ejemplo `/tmp/uploads` en Cloud Run) sin cambiar la URL
+pública.
 
 ### Migraciones EF Core
 

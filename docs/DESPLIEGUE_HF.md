@@ -6,13 +6,18 @@ mismo puerto gracias a `app_port: 8080` en el front matter del `README.md`.
 
 ## 1. Crear la cuenta y el token
 
-1. Regístrate en https://huggingface.co (es gratis).
-2. Ve a https://huggingface.co/settings/tokens
+1. Regístrate en <https://huggingface.co> (es gratis).
+2. Ve a <https://huggingface.co/settings/tokens>
 3. Crea un token con permisos **write** (los tokens `read` no permiten hacer push).
+
+> **El token es una credencial:** guardalo fuera del repositorio (gestor de
+> contraseñas o variable de entorno). Nunca lo escribas en un archivo versionado,
+> porque queda accesible para cualquiera que lea el repositorio y Hugging Face
+> puede revocarlo sin avisar. Si se filtró, revocalo y creá uno nuevo.
 
 ## 2. Crear el Space
 
-1. Ve a https://huggingface.co/new-space
+1. Ve a <https://huggingface.co/new-space>
 2. Completa:
    - **Owner**: tu usuario.
    - **Space name**: p. ej. `pw-tareas`.
@@ -60,8 +65,11 @@ En cada push posterior, el Space se reconstruye automáticamente.
 - **Datos efímeros**: la base de datos SQLite vive en `/app/data` dentro del
   contenedor. Al reconstruir el Space (cada push) la BD y las imágenes
   subidas se pierden. Suficiente para una demo/presentación.
-- **HTTPS**: el proxy de Hugging Face termina TLS; dentro del contenedor solo
-  hay HTTP, por lo que `UseHttpsRedirection` está desactivado fuera de Development.
+- **HTTPS**: el proxy de Hugging Face termina TLS; dentro del contenedor sólo
+  hay HTTP. El `Dockerfile` define `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`
+  para que la app procese `X-Forwarded-Proto` y sepa que el esquema real es
+  HTTPS. `UseHttpsRedirection` sólo redirige si se define un puerto HTTPS
+  (`ASPNETCORE_HTTPS_PORT`), que en este despliegue no ocurre.
 - **Migraciones**: EF Core aplica las migraciones automáticamente al arrancar
   (`db.Database.Migrate()` en `Program.cs`), no hay pasos manuales.
 - **Usuario no root**: el contenedor corre como el usuario `user` (uid 1000),
