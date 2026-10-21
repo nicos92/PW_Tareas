@@ -25,6 +25,9 @@ RUN useradd -m -u 1000 user
 ENV ASPNETCORE_URLS=http://+:8080
 # Carpeta de datos persistente dentro del contenedor (SQLite)
 ENV DATA_DIR=/app/data
+# Hugging Face, Cloud Run y Nginx terminan TLS y reenvían X-Forwarded-Proto.
+# Sin esto Kestrel cree que la petición es HTTP y no puede redireccionar ni conocer el esquema real.
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 
 # Copiar la aplicación publicada
 COPY --chown=user:user --from=build /app/publish .
