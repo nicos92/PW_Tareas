@@ -60,6 +60,19 @@ using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<TareaDbContext>();
         db.Database.Migrate();
+
+        var ruta = db.Database.GetDbConnection().DataSource;
+        logger.LogInformation("Base de datos SQLite en {Ruta}", ruta);
+
+        var dataDir = Environment.GetEnvironmentVariable("DATA_DIR");
+        if (!string.IsNullOrWhiteSpace(dataDir) && !ruta.StartsWith(dataDir, StringComparison.Ordinal))
+        {
+            logger.LogWarning(
+                "El directorio {Directorio} no admite escritura: la base se guardó en {Respaldo}. " +
+                "En Cloud Run usá DATA_DIR=/tmp/data.",
+                dataDir,
+                ruta);
+        }
     }
     catch (Exception ex)
     {
