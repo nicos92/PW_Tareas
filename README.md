@@ -15,7 +15,7 @@ organizada con **Clean Architecture** por proyectos.
 
 ## Características
 
-- CRUD completo de tareas
+- CRUD completo de tareas con baja lógica (las tareas dadas de baja no se muestran)
 - Carga de imágenes con vista previa en base64
 - Filtros por prioridad (Baja, Media, Alta) y estado (Completadas, Pendientes)
 - Dashboard con estadísticas en tiempo real
