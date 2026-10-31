@@ -18,7 +18,7 @@ public sealed class TareaEstado
     private readonly ObtenerEstadisticasQuery _obtenerEstadisticas;
     private readonly CrearTareaCommand _crearTarea;
     private readonly ActualizarTareaCommand _actualizarTarea;
-    private readonly EliminarTareaCommand _eliminarTarea;
+    private readonly DarDeBajaTareaCommand _darDeBajaTarea;
     private readonly CambiarCompletadaTareaCommand _cambiarCompletada;
 
     private readonly SemaphoreSlim _initLock = new(1, 1);
@@ -30,7 +30,7 @@ public sealed class TareaEstado
         ObtenerEstadisticasQuery obtenerEstadisticas,
         CrearTareaCommand crearTarea,
         ActualizarTareaCommand actualizarTarea,
-        EliminarTareaCommand eliminarTarea,
+        DarDeBajaTareaCommand darDeBajaTarea,
         CambiarCompletadaTareaCommand cambiarCompletada)
     {
         _obtenerTareas = obtenerTareas;
@@ -38,7 +38,7 @@ public sealed class TareaEstado
         _obtenerEstadisticas = obtenerEstadisticas;
         _crearTarea = crearTarea;
         _actualizarTarea = actualizarTarea;
-        _eliminarTarea = eliminarTarea;
+        _darDeBajaTarea = darDeBajaTarea;
         _cambiarCompletada = cambiarCompletada;
     }
 
@@ -153,9 +153,9 @@ public sealed class TareaEstado
         await CargarPaginaAsync();
     }
 
-    public async Task EliminarTareaAsync(Guid id)
+    public async Task DarDeBajaTareaAsync(Guid id)
     {
-        await _eliminarTarea.EjecutarAsync(id);
+        await _darDeBajaTarea.EjecutarAsync(id);
 
         if (ResultadoPaginado is not null && ResultadoPaginado.Items.Count == 1 && PaginacionActual.Page > 1)
         {

@@ -70,35 +70,35 @@ public class CasosDeUsoTests
     }
 
     [Fact]
-    public async Task EliminarTarea_borra_la_entidad_y_el_archivo()
+    public async Task DarDeBaja_marca_la_tarea_y_conserva_la_imagen()
     {
         var repo = new FakeTareaRepository();
-        var almacenamiento = new FakeArchivoStorage();
         var tarea = Tarea.Crear("Con imagen", "Descripción válida", Hoy.AddDays(2),
             Prioridad.Baja, Categoria.Backend, "/uploads/vieja.png", Hoy);
         repo.Sembrar(tarea);
 
-        var cmd = new EliminarTareaCommand(repo, almacenamiento);
+        var cmd = new DarDeBajaTareaCommand(repo);
         await cmd.EjecutarAsync(tarea.IdPublic);
 
+        repo.Tareas[tarea.IdPublic].IsDeleted.Should().BeTrue();
+        repo.Tareas[tarea.IdPublic].Imagen.Should().Be("/uploads/vieja.png");
         (await repo.ObtenerPorIdAsync(tarea.IdPublic)).Should().BeNull();
-        almacenamiento.Eliminados.Should().ContainSingle().Which.Should().Be("/uploads/vieja.png");
     }
 
     [Fact]
-    public async Task EliminarTarea_no_falla_si_el_archivo_ya_no_existe()
+    public async Task DarDeBaja_es_idempotente()
     {
         var repo = new FakeTareaRepository();
-        var almacenamiento = new FakeArchivoStorage();
         var tarea = Tarea.Crear("Sin imagen", "Descripción válida", Hoy.AddDays(2),
             Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
         repo.Sembrar(tarea);
 
-        var cmd = new EliminarTareaCommand(repo, almacenamiento);
+        var cmd = new DarDeBajaTareaCommand(repo);
+        await cmd.EjecutarAsync(tarea.IdPublic);
         var acto = () => cmd.EjecutarAsync(tarea.IdPublic);
 
         await acto.Should().NotThrowAsync();
-        almacenamiento.Eliminados.Should().BeEmpty();
+        repo.Tareas[tarea.IdPublic].IsDeleted.Should().BeTrue();
     }
 
     [Fact]

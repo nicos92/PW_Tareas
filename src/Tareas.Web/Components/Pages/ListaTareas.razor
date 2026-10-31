@@ -40,7 +40,7 @@
                         @foreach (var tarea in TareaEstado.ResultadoPaginado.Items)
                         {
                             <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
-                                       OnEliminar="EliminarTarea" OnEditar="IniciarEdicion" />
+                                       OnDarDeBaja="DarDeBajaTarea" OnEditar="IniciarEdicion" />
                         }
                     </tbody>
                 </table>
@@ -57,5 +57,7 @@
         }
 </CardSection>
 
-<ConfirmDialog IsVisible="_showDeleteModal" Message="¿Estás seguro de que deseas eliminar la tarea"
-               TargetName="@_tareaAEliminar?.Titulo" OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />
+<ConfirmDialog IsVisible="_showBajaModal" Title="Confirmar baja"
+               Message="¿Estás seguro de que deseas dar de baja la tarea"
+               ConfirmText="Dar de baja" TargetName="@_tareaADarDeBaja?.Titulo"
+               OnConfirm="ConfirmarBaja" OnCancel="CancelarBaja" />

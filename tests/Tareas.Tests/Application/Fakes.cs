@@ -49,13 +49,13 @@ internal sealed class FakeTareaRepository : ITareaRepository
     public Task<PaginadoResult<Tarea>> ObtenerPaginadoAsync(
         ParametrosPaginacion paginacion, FiltroTareas filtro, CancellationToken ct = default)
     {
-        var items = _tareas.Values.ToList().AsReadOnly();
+        var items = _tareas.Values.Where(t => !t.IsDeleted).ToList().AsReadOnly();
         return Task.FromResult(new PaginadoResult<Tarea>(
             items, items.Count, paginacion.Page, paginacion.PageSize));
     }
 
     public Task<Tarea?> ObtenerPorIdAsync(Guid id, CancellationToken ct = default)
-        => Task.FromResult(_tareas.TryGetValue(id, out var t) ? t : null);
+        => Task.FromResult(_tareas.TryGetValue(id, out var t) && !t.IsDeleted ? t : null);
 
     public Task AgregarAsync(Tarea tarea, CancellationToken ct = default)
     {
@@ -69,9 +69,13 @@ internal sealed class FakeTareaRepository : ITareaRepository
         return Task.CompletedTask;
     }
 
-    public Task EliminarAsync(Guid id, CancellationToken ct = default)
+    public Task DarDeBajaAsync(Guid id, CancellationToken ct = default)
     {
-        _tareas.Remove(id);
+        if (_tareas.TryGetValue(id, out var tarea))
+        {
+            tarea.DarDeBaja();
+        }
+
         return Task.CompletedTask;
     }
 
@@ -86,11 +90,5 @@ internal sealed class FakeTareaRepository : ITareaRepository
     }
 
     public Task<EstadisticasTareas> ObtenerEstadisticasAsync(CancellationToken ct = default)
-        => Task.FromResult(new EstadisticasTareas { Total = _tareas.Count });
-
-    public Task EliminarTodasAsync(CancellationToken ct = default)
-    {
-        _tareas.Clear();
-        return Task.CompletedTask;
-    }
+        => Task.FromResult(new EstadisticasTareas { Total = _tareas.Values.Count(t => !t.IsDeleted) });
 }

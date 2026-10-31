@@ -25,6 +25,7 @@ public sealed class Tarea
     public Prioridad Prioridad { get; private set; }
     public string Imagen { get; private set; } = string.Empty;
     public Categoria Categoria { get; private set; }
+    public bool IsDeleted { get; private set; }
 
     public static Tarea Crear(
         string titulo,
@@ -74,6 +75,16 @@ public sealed class Tarea
     public void AsignarImagen(string rutaImagen) => Imagen = rutaImagen ?? string.Empty;
 
     public void CambiarCompletada(bool completada) => Completada = completada;
+
+    public void DarDeBaja()
+    {
+        if (IsDeleted)
+        {
+            return;
+        }
+
+        IsDeleted = true;
+    }
 
     private static void Validar(
         string titulo,

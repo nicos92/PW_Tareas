@@ -20,11 +20,9 @@ public interface ITareaRepository
 
     Task ActualizarAsync(Tarea tarea, CancellationToken ct = default);
 
-    Task EliminarAsync(Guid id, CancellationToken ct = default);
+    Task DarDeBajaAsync(Guid id, CancellationToken ct = default);
 
     Task CambiarCompletadaAsync(Guid id, bool completada, CancellationToken ct = default);
 
     Task<EstadisticasTareas> ObtenerEstadisticasAsync(CancellationToken ct = default);
-
-    Task EliminarTodasAsync(CancellationToken ct = default);
 }

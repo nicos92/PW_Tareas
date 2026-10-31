@@ -41,5 +41,11 @@ public sealed class TareaEntityTypeConfiguration : IEntityTypeConfiguration<Tare
 
         entity.Property(t => t.Categoria)
             .HasConversion<string>();
+
+        entity.Property(t => t.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        entity.HasQueryFilter(t => !t.IsDeleted);
     }
 }

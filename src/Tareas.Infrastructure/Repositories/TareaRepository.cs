@@ -75,14 +75,16 @@ public sealed class TareaRepository : ITareaRepository
         await _contexto.SaveChangesAsync(ct);
     }
 
-    public async Task EliminarAsync(Guid id, CancellationToken ct = default)
+    public async Task DarDeBajaAsync(Guid id, CancellationToken ct = default)
     {
         var tarea = await _contexto.Tareas.FirstOrDefaultAsync(t => t.IdPublic == id, ct);
-        if (tarea is not null)
+        if (tarea is null)
         {
-            _contexto.Tareas.Remove(tarea);
-            await _contexto.SaveChangesAsync(ct);
+            return;
         }
+
+        tarea.DarDeBaja();
+        await _contexto.SaveChangesAsync(ct);
     }
 
     public async Task CambiarCompletadaAsync(Guid id, bool completada, CancellationToken ct = default)
@@ -133,12 +135,6 @@ public sealed class TareaRepository : ITareaRepository
             VencenHoy = agregado.VencenHoy,
             ATiempo = agregado.ATiempo
         };
-    }
-
-    public async Task EliminarTodasAsync(CancellationToken ct = default)
-    {
-        _contexto.Tareas.RemoveRange(_contexto.Tareas);
-        await _contexto.SaveChangesAsync(ct);
     }
 }
 
