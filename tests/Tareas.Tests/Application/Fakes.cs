@@ -1,5 +1,6 @@
 using Tareas.Application.Abstractions;
 using Tareas.Application.Dtos;
+using Tareas.Application.Filtros;
 using Tareas.Domain.Entidades;
 
 namespace Tareas.Tests.Application;
@@ -49,7 +50,16 @@ internal sealed class FakeTareaRepository : ITareaRepository
     public Task<PaginadoResult<Tarea>> ObtenerPaginadoAsync(
         ParametrosPaginacion paginacion, FiltroTareas filtro, CancellationToken ct = default)
     {
-        var items = _tareas.Values.Where(t => !t.IsDeleted).ToList().AsReadOnly();
+        IEnumerable<Tarea> query = _tareas.Values;
+
+        query = filtro.EstadoBaja switch
+        {
+            EstadoBajaFiltro.Activas => query.Where(t => !t.IsDeleted),
+            EstadoBajaFiltro.DadasDeBaja => query.Where(t => t.IsDeleted),
+            _ => query
+        };
+
+        var items = query.ToList().AsReadOnly();
         return Task.FromResult(new PaginadoResult<Tarea>(
             items, items.Count, paginacion.Page, paginacion.PageSize));
     }
@@ -74,6 +84,16 @@ internal sealed class FakeTareaRepository : ITareaRepository
         if (_tareas.TryGetValue(id, out var tarea))
         {
             tarea.DarDeBaja();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task RestaurarAsync(Guid id, CancellationToken ct = default)
+    {
+        if (_tareas.TryGetValue(id, out var tarea))
+        {
+            tarea.Restaurar();
         }
 
         return Task.CompletedTask;

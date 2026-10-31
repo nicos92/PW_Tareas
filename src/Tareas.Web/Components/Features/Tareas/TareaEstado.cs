@@ -19,6 +19,7 @@ public sealed class TareaEstado
     private readonly CrearTareaCommand _crearTarea;
     private readonly ActualizarTareaCommand _actualizarTarea;
     private readonly DarDeBajaTareaCommand _darDeBajaTarea;
+    private readonly RestaurarTareaCommand _restaurarTarea;
     private readonly CambiarCompletadaTareaCommand _cambiarCompletada;
 
     private readonly SemaphoreSlim _initLock = new(1, 1);
@@ -31,7 +32,8 @@ public sealed class TareaEstado
         CrearTareaCommand crearTarea,
         ActualizarTareaCommand actualizarTarea,
         DarDeBajaTareaCommand darDeBajaTarea,
-        CambiarCompletadaTareaCommand cambiarCompletada)
+        CambiarCompletadaTareaCommand cambiarCompletada,
+        RestaurarTareaCommand restaurarTarea)
     {
         _obtenerTareas = obtenerTareas;
         _obtenerPorId = obtenerPorId;
@@ -40,6 +42,7 @@ public sealed class TareaEstado
         _actualizarTarea = actualizarTarea;
         _darDeBajaTarea = darDeBajaTarea;
         _cambiarCompletada = cambiarCompletada;
+        _restaurarTarea = restaurarTarea;
     }
 
     public PaginadoResult<TareaDto>? ResultadoPaginado { get; private set; }
@@ -55,6 +58,7 @@ public sealed class TareaEstado
         Filtro.Prioridad?.ToString() ?? string.Empty;
     public string FiltroEstadoTexto => Filtro.Estado.ToString();
     public string FiltroVencimientoTexto => Filtro.Vencimiento.ToString();
+    public string FiltroBajaTexto => Filtro.EstadoBaja.ToString();
 
     public async Task Inicializar()
     {
@@ -128,6 +132,18 @@ public sealed class TareaEstado
         return ReiniciarYCargarAsync();
     }
 
+    public Task SetFiltroBajaAsync(string? estadoBaja)
+    {
+        Filtro = Filtro with
+        {
+            EstadoBaja = Enum.TryParse<EstadoBajaFiltro>(estadoBaja, out var b)
+                ? b
+                : EstadoBajaFiltro.Activas
+        };
+
+        return ReiniciarYCargarAsync();
+    }
+
     private Task ReiniciarYCargarAsync()
     {
         PaginacionActual.Page = 1;
@@ -156,7 +172,17 @@ public sealed class TareaEstado
     public async Task DarDeBajaTareaAsync(Guid id)
     {
         await _darDeBajaTarea.EjecutarAsync(id);
+        await RecargarAjustandoPaginaAsync();
+    }
 
+    public async Task RestaurarTareaAsync(Guid id)
+    {
+        await _restaurarTarea.EjecutarAsync(id);
+        await RecargarAjustandoPaginaAsync();
+    }
+
+    private async Task RecargarAjustandoPaginaAsync()
+    {
         if (ResultadoPaginado is not null && ResultadoPaginado.Items.Count == 1 && PaginacionActual.Page > 1)
         {
             PaginacionActual.Page--;

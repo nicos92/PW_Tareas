@@ -86,6 +86,16 @@ public sealed class Tarea
         IsDeleted = true;
     }
 
+    public void Restaurar()
+    {
+        if (!IsDeleted)
+        {
+            return;
+        }
+
+        IsDeleted = false;
+    }
+
     private static void Validar(
         string titulo,
         string? descripcion,

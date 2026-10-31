@@ -22,6 +22,8 @@ public interface ITareaRepository
 
     Task DarDeBajaAsync(Guid id, CancellationToken ct = default);
 
+    Task RestaurarAsync(Guid id, CancellationToken ct = default);
+
     Task CambiarCompletadaAsync(Guid id, bool completada, CancellationToken ct = default);
 
     Task<EstadisticasTareas> ObtenerEstadisticasAsync(CancellationToken ct = default);

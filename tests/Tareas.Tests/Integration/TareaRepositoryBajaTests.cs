@@ -89,6 +89,46 @@ public class TareaRepositoryBajaTests : IDisposable
         fila.IsDeleted.Should().BeTrue();
     }
 
+    [Fact]
+    public async Task Listado_puede_filtrar_solo_bajas_o_incluir_todas()
+    {
+        var idBaja = await SembrarAsync("Baja");
+        var idActiva = await SembrarAsync("Activa");
+        await _repo.DarDeBajaAsync(idBaja);
+
+        var soloBajas = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(EstadoBaja: EstadoBajaFiltro.DadasDeBaja));
+
+        soloBajas.Items.Should().ContainSingle()
+            .Which.IdPublic.Should().Be(idBaja);
+
+        var todas = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(EstadoBaja: EstadoBajaFiltro.Todas));
+
+        todas.Items.Should().HaveCount(2);
+        todas.Items.Select(t => t.IdPublic).Should().BeEquivalentTo(new[] { idBaja, idActiva });
+    }
+
+    [Fact]
+    public async Task Restaurar_reactiva_la_tarea_y_la_devuelve_al_listado_activo()
+    {
+        var id = await SembrarAsync("A restaurar");
+        await _repo.DarDeBajaAsync(id);
+
+        await _repo.RestaurarAsync(id);
+
+        (await _repo.ObtenerPorIdAsync(id)).Should().NotBeNull();
+
+        var listado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas());
+
+        listado.Items.Should().ContainSingle()
+            .Which.IdPublic.Should().Be(id);
+    }
+
     public void Dispose()
     {
         _contexto.Dispose();

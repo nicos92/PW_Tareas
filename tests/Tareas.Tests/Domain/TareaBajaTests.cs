@@ -35,4 +35,26 @@ public class TareaBajaTests
 
         tarea.IsDeleted.Should().BeTrue();
     }
+
+    [Fact]
+    public void Restaurar_reactiva_la_tarea()
+    {
+        var tarea = CrearTarea();
+        tarea.DarDeBaja();
+
+        tarea.Restaurar();
+
+        tarea.IsDeleted.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Restaurar_es_idempotente()
+    {
+        var tarea = CrearTarea();
+
+        tarea.Restaurar();
+        tarea.Restaurar();
+
+        tarea.IsDeleted.Should().BeFalse();
+    }
 }

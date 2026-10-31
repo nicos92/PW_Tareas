@@ -17,6 +17,10 @@
                   Value="@VencimientoSeleccionado" EmptyLabel="Todas" Disabled="@IsLoading"
                   OnChanged="OnVencimientoChanged" />
 
+    <SelectFilter Id="filter-baja" Label="Estado de baja" Options="_opcionesBaja"
+                  Value="@BajaSeleccionada" Disabled="@IsLoading"
+                  OnChanged="OnBajaChanged" />
+
     <div class="col d-flex align-items-end">
         <span class="text-muted" aria-live="polite" aria-atomic="true">
             Mostrando: @TotalTareas tarea@(TotalTareas != 1 ? "s" : "")
@@ -31,10 +35,12 @@
     [Parameter] public string PrioridadSeleccionada { get; set; } = string.Empty;
     [Parameter] public string EstadoSeleccionado { get; set; } = string.Empty;
     [Parameter] public string VencimientoSeleccionado { get; set; } = string.Empty;
+    [Parameter] public string BajaSeleccionada { get; set; } = string.Empty;
     [Parameter] public int TotalTareas { get; set; }
     [Parameter] public EventCallback<string> OnPrioridadChanged { get; set; }
     [Parameter] public EventCallback<string> OnEstadoChanged { get; set; }
     [Parameter] public EventCallback<string> OnVencimientoChanged { get; set; }
+    [Parameter] public EventCallback<string> OnBajaChanged { get; set; }
 
     private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesPrioridad =
         CrearOpciones<Prioridad>();
@@ -44,6 +50,13 @@
 
     private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesVencimiento =
         CrearOpciones<VencimientoFiltro>(excluirPrimero: true);
+
+    private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesBaja = new[]
+    {
+        new SelectFilter.OpcionFiltro(nameof(EstadoBajaFiltro.Activas), "Activas"),
+        new SelectFilter.OpcionFiltro(nameof(EstadoBajaFiltro.DadasDeBaja), "Dadas de baja"),
+        new SelectFilter.OpcionFiltro(nameof(EstadoBajaFiltro.Todas), "Todas")
+    };
 
     private static IReadOnlyList<SelectFilter.OpcionFiltro> CrearOpciones<TEnum>(bool excluirPrimero = false)
         where TEnum : struct, Enum

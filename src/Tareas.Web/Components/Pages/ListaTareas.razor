@@ -12,8 +12,9 @@
 
         <FilterBar IsLoading="TareaEstado.IsLoading" PrioridadSeleccionada="@TareaEstado.FiltroPrioridadTexto"
                    EstadoSeleccionado="@TareaEstado.FiltroEstadoTexto" VencimientoSeleccionado="@TareaEstado.FiltroVencimientoTexto"
-                   TotalTareas="@(TareaEstado.ResultadoPaginado?.TotalCount ?? 0)" OnPrioridadChanged="OnPrioridadChanged"
-                   OnEstadoChanged="OnEstadoChanged" OnVencimientoChanged="OnVencimientoChanged" />
+                   BajaSeleccionada="@TareaEstado.FiltroBajaTexto" TotalTareas="@(TareaEstado.ResultadoPaginado?.TotalCount ?? 0)"
+                   OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
+                   OnVencimientoChanged="OnVencimientoChanged" OnBajaChanged="OnBajaChanged" />
 
         @if (TareaEstado.IsLoading)
         {
@@ -40,7 +41,7 @@
                         @foreach (var tarea in TareaEstado.ResultadoPaginado.Items)
                         {
                             <TareaItem @key="tarea.IdPublic" Tarea="tarea" OnVer="VerTarea" OnCompletar="CompletarTarea"
-                                       OnDarDeBaja="DarDeBajaTarea" OnEditar="IniciarEdicion" />
+                                       OnDarDeBaja="DarDeBajaTarea" OnRestaurar="RestaurarTarea" OnEditar="IniciarEdicion" />
                         }
                     </tbody>
                 </table>

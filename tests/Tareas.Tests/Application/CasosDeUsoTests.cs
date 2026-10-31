@@ -102,6 +102,51 @@ public class CasosDeUsoTests
     }
 
     [Fact]
+    public async Task Restaurar_reactiva_la_tarea_y_la_devuelve_al_listado()
+    {
+        var repo = new FakeTareaRepository();
+        var tarea = Tarea.Crear("A restaurar", "Descripción válida", Hoy.AddDays(2),
+            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+        repo.Sembrar(tarea);
+
+        await new DarDeBajaTareaCommand(repo).EjecutarAsync(tarea.IdPublic);
+
+        var cmd = new RestaurarTareaCommand(repo);
+        await cmd.EjecutarAsync(tarea.IdPublic);
+
+        repo.Tareas[tarea.IdPublic].IsDeleted.Should().BeFalse();
+        (await repo.ObtenerPorIdAsync(tarea.IdPublic)).Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ObtenerTareas_filtra_por_estado_de_baja()
+    {
+        var repo = new FakeTareaRepository();
+        var activa = Tarea.Crear("Activa", "Descripción válida", Hoy.AddDays(1),
+            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+        var dadaDeBaja = Tarea.Crear("Dada de baja", "Descripción válida", Hoy.AddDays(1),
+            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+        repo.Sembrar(activa);
+        repo.Sembrar(dadaDeBaja);
+        await new DarDeBajaTareaCommand(repo).EjecutarAsync(dadaDeBaja.IdPublic);
+
+        var query = new ObtenerTareasQuery(repo);
+
+        var soloBajas = await query.EjecutarAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(EstadoBaja: EstadoBajaFiltro.DadasDeBaja));
+
+        soloBajas.Items.Should().ContainSingle()
+            .Which.IdPublic.Should().Be(dadaDeBaja.IdPublic);
+
+        var todas = await query.EjecutarAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(EstadoBaja: EstadoBajaFiltro.Todas));
+
+        todas.Items.Should().HaveCount(2);
+    }
+
+    [Fact]
     public async Task CambiarCompletada_resuelve_por_id_aunque_no_este_en_la_pagina()
     {
         var repo = new FakeTareaRepository();

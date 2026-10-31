@@ -30,8 +30,14 @@ public sealed class TareaRepository : ITareaRepository
         FiltroTareas filtro,
         CancellationToken ct = default)
     {
-        var query = ExtensionesQueryableTarea.AplicarFiltros(
-            _contexto.Tareas.AsNoTracking(), filtro, _reloj.Hoy);
+        var query = _contexto.Tareas.AsNoTracking();
+
+        if (filtro.EstadoBaja != EstadoBajaFiltro.Activas)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
+        query = ExtensionesQueryableTarea.AplicarFiltros(query, filtro, _reloj.Hoy);
 
         var totalCount = await query.CountAsync(ct);
 
@@ -84,6 +90,21 @@ public sealed class TareaRepository : ITareaRepository
         }
 
         tarea.DarDeBaja();
+        await _contexto.SaveChangesAsync(ct);
+    }
+
+    public async Task RestaurarAsync(Guid id, CancellationToken ct = default)
+    {
+        var tarea = await _contexto.Tareas
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(t => t.IdPublic == id, ct);
+
+        if (tarea is null)
+        {
+            return;
+        }
+
+        tarea.Restaurar();
         await _contexto.SaveChangesAsync(ct);
     }
 
@@ -145,6 +166,13 @@ internal static class ExtensionesQueryableTarea
         FiltroTareas filtro,
         DateOnly hoy)
     {
+        query = filtro.EstadoBaja switch
+        {
+            EstadoBajaFiltro.Activas => query.Where(t => !t.IsDeleted),
+            EstadoBajaFiltro.DadasDeBaja => query.Where(t => t.IsDeleted),
+            _ => query
+        };
+
         if (filtro.Prioridad is { } prioridad)
         {
             query = query.Where(t => t.Prioridad == prioridad);

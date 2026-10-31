@@ -27,6 +27,8 @@ public class TareaDto : IValidatableObject
 
     public bool Completada { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     [Required(ErrorMessage = TareaReglas.FechaVencimientoRequerida)]
     [DataType(DataType.Date)]
     [FutureDate(ErrorMessage = TareaReglas.FechaVencimientoPasada)]
@@ -58,6 +60,7 @@ public class TareaDto : IValidatableObject
         Titulo = tarea.Titulo,
         Descripcion = tarea.Descripcion,
         Completada = tarea.Completada,
+        IsDeleted = tarea.IsDeleted,
         FechaVencimiento = tarea.FechaVencimiento,
         Prioridad = tarea.Prioridad,
         Imagen = tarea.Imagen,

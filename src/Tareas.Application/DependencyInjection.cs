@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<CrearTareaCommand>();
         services.AddScoped<ActualizarTareaCommand>();
         services.AddScoped<DarDeBajaTareaCommand>();
+        services.AddScoped<RestaurarTareaCommand>();
         services.AddScoped<CambiarCompletadaTareaCommand>();
 
         return services;

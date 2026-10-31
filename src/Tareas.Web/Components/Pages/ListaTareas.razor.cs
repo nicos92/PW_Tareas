@@ -22,6 +22,8 @@ public partial class ListaTareas : TareaEstadoComponentBase
 
     private Task OnVencimientoChanged(string valor) => TareaEstado.SetFiltroVencimientoAsync(valor);
 
+    private Task OnBajaChanged(string valor) => TareaEstado.SetFiltroBajaAsync(valor);
+
     private Task OnPageChanged(int page) => TareaEstado.IrAPaginaAsync(page);
 
     private void VerTarea(TareaDto tarea)
@@ -30,6 +32,8 @@ public partial class ListaTareas : TareaEstadoComponentBase
     }
 
     private Task CompletarTarea(TareaDto tarea) => TareaEstado.ToggleAsync(tarea.IdPublic);
+
+    private Task RestaurarTarea(TareaDto tarea) => TareaEstado.RestaurarTareaAsync(tarea.IdPublic);
 
     private void DarDeBajaTarea(TareaDto tarea)
     {
