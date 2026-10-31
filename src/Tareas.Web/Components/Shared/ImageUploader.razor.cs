@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
+using Tareas.Application.Validation;
+
 namespace TareasBlazor.Components.Shared;
 
 public partial class ImageUploader : ComponentBase
@@ -12,20 +14,24 @@ public partial class ImageUploader : ComponentBase
     private IBrowserFile? archivoCargado;
     private string? imagenBase64;
     private bool tamanoExcedido;
+    private bool extensionInvalida;
     private int inputFileKey;
 
-    private string TipoAlerta => tamanoExcedido ? "alert-danger" : "alert-success";
+    private string TipoAlerta => tamanoExcedido || extensionInvalida ? "alert-danger" : "alert-success";
+    private static string FormatosPermitidos => ArchivoImagenAttribute.FormatosPermitidosTexto;
 
     public IBrowserFile? Archivo => archivoCargado;
     public bool TamanoExcedido => tamanoExcedido;
+    public bool ExtensionInvalida => extensionInvalida;
 
     private async Task CargarArchivo(InputFileChangeEventArgs e)
     {
         archivoCargado = e.File;
         tamanoExcedido = archivoCargado.Size > MaxFileSize;
+        extensionInvalida = !ArchivoImagenAttribute.EsExtensionPermitida(archivoCargado.Name);
         imagenBase64 = null;
 
-        if (!tamanoExcedido)
+        if (!tamanoExcedido && !extensionInvalida)
         {
             using var stream = archivoCargado.OpenReadStream(MaxFileSize);
             using var memoryStream = new MemoryStream();
@@ -48,6 +54,7 @@ public partial class ImageUploader : ComponentBase
         archivoCargado = null;
         imagenBase64 = null;
         tamanoExcedido = false;
+        extensionInvalida = false;
         inputFileKey++;
 
         await OnImagenChanged.InvokeAsync(new ImagenChangedEventArgs

@@ -36,7 +36,7 @@ public class TareaDto : IValidatableObject
     [EnumDataType(typeof(Prioridad))]
     public Prioridad Prioridad { get; set; } = Prioridad.Baja;
 
-    [ArchivoImagen(ErrorMessage = "El archivo debe ser una imagen válida (JPG, PNG, GIF).")]
+    [ArchivoImagen(ErrorMessage = ArchivoImagenAttribute.MensajeFormatoInvalido)]
     public string Imagen { get; set; } = string.Empty;
 
     [EnumDataType(typeof(Categoria))]

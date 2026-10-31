@@ -28,12 +28,16 @@ public abstract class TareaFormPageBase : ComponentBase
 
     protected long MaxFileSize => Opciones.MaximoBytes;
 
-    protected bool ImagenInvalida => imageUploader?.TamanoExcedido == true;
+    protected bool ImagenInvalida =>
+        imageUploader?.TamanoExcedido == true || imageUploader?.ExtensionInvalida == true;
 
     protected SubidaArchivo? CrearSubida()
         => imageUploader?.Archivo is { } archivo
             ? SubidaArchivoFactory.Crear(archivo, MaxFileSize)
             : null;
+
+    protected virtual void OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
+        => StateHasChanged();
 
     protected abstract string RutaLista { get; }
 
