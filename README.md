@@ -17,11 +17,11 @@ organizada con **Clean Architecture** por proyectos.
 
 - CRUD completo de tareas con baja lógica (las tareas dadas de baja no se muestran)
 - Carga de imágenes con vista previa en base64
-- Filtros por prioridad (Baja, Media, Alta) y estado (Completadas, Pendientes)
+- Filtros por prioridad (Baja, Media, Alta), estado (Completadas, Pendientes) y búsqueda por título o descripción
 - Dashboard con estadísticas en tiempo real
 - Validación de formulario con DataAnnotations y atributos personalizados
 - Componentes reutilizables: `TareaForm`, `ImageUploader`, `FilterBar`, `ConfirmDialog`
-- Persistencia en SQLite vía EF Core; almacenamiento de imágenes en disco
+- Persistencia en SQLite vía EF Core con `DbContextFactory` y seed idempotente de categorías
 
 ## Requisitos
 
@@ -109,7 +109,7 @@ Los componentes reciben sólo **DTOs** (`TareaDto`); nunca ven entidades de domi
 |---|---|
 | `TareaForm` | Formulario completo de tarea con validación, acepta `ChildContent` para extender |
 | `ImageUploader` | Carga de imagen con preview, validación de tamaño, botón limpiar |
-| `FilterBar` | Filtros de prioridad y estado con contador de resultados |
+| `FilterBar` | Filtros de prioridad, estado y búsqueda textual con contador de resultados |
 | `ConfirmDialog` | Modal de confirmación genérico configurable |
 | `StatsCard` | Tarjeta de estadísticas con título, valor y color |
 | `TareaItem` | Item de lista con checkbox, badges y botones de acción |
@@ -128,6 +128,13 @@ La ruta de la base de datos se resuelve así (en orden):
 → `%LOCALAPPDATA%/PW_Tareas/tareas.db`. Si el directorio resuelto no admite
 escritura (por ejemplo `/app/data` en Cloud Run), se usa `/tmp/PW_Tareas` como
 respaldo y la ruta real se informa en el log al arrancar.
+
+Los repositorios reciben `IDbContextFactory<TareaDbContext>` y crean un contexto
+por operación, evitando contextos de larga vida en los circuitos de Blazor Server.
+
+Al iniciar se ejecuta el seed idempotente `SeedData.InicializarAsync`, que crea
+las categorías por defecto (`Trabajo`, `Personal`, `Estudio`, `Salud`) sólo si no
+existen.
 
 Los adjuntos se guardan en `wwwroot/uploads` (`Storage:UploadsPath`) y se sirven
 en `/uploads/...`. Con `Storage:UploadsPhysicalPath` se puede escribir en otra
