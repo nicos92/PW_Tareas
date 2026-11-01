@@ -10,6 +10,7 @@ namespace Tareas.Application.CasosDeUso.Comandos;
 /// </summary>
 public sealed class CrearTareaCommand(
     ITareaRepository repositorio,
+    ICategoryRepository categorias,
     IArchivoStorage almacenamiento,
     ISystemClock reloj)
 {
@@ -19,9 +20,14 @@ public sealed class CrearTareaCommand(
         CancellationToken ct = default)
     {
         // Validar ANTES de escribir en disco: así un dto inválido no deja archivos huérfanos.
+        if (dto.CategoryId is int categoryId && !await categorias.ExisteAsync(categoryId, ct))
+        {
+            throw new InvalidOperationException($"No existe la categoría {categoryId}.");
+        }
+
         var tarea = Tarea.Crear(
             dto.Titulo, dto.Descripcion, dto.FechaVencimiento,
-            dto.Prioridad, dto.Categoria, imagen: string.Empty, reloj.Hoy);
+            dto.Prioridad, dto.CategoryId, imagen: string.Empty, reloj.Hoy);
 
         if (imagen is not null)
         {

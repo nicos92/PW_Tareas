@@ -50,6 +50,7 @@ public static class DependencyInjection
 
         services.AddScoped<ISystemClock, SystemClock>();
         services.AddScoped<ITareaRepository, TareaRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         return services;
     }

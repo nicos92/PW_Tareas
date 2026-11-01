@@ -11,7 +11,7 @@ public partial class ListaTareas : TareaEstadoComponentBase
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
-    private static readonly string[] _columnasTabla = { "Lista", "Título", "Prioridad", "Acciones" };
+    private static readonly string[] _columnasTabla = { "Lista", "Título", "Categoría", "Prioridad", "Acciones" };
 
     private bool _showBajaModal;
     private TareaDto? _tareaADarDeBaja;

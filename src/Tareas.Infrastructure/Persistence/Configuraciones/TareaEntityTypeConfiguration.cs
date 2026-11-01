@@ -7,9 +7,8 @@ using Tareas.Domain.Reglas;
 namespace Tareas.Infrastructure.Persistence.Configuraciones;
 
 /// <summary>
-/// Mapeo 100% Fluent de <see cref="Tarea"/>. Los tipos de columna se eligen para que el
-/// esquema resultante sea idéntico al actual salvo por <c>Categoria</c> (INTEGER → TEXT),
-/// que pasa a alinearse con <c>Prioridad</c>.
+/// Mapeo 100% Fluent de <see cref="Tarea"/>. La categoría es opcional y se vincula por FK
+/// con <see cref="Category"/>; al eliminar la categoría las tareas quedan sin categoría.
 /// </summary>
 public sealed class TareaEntityTypeConfiguration : IEntityTypeConfiguration<Tarea>
 {
@@ -39,8 +38,12 @@ public sealed class TareaEntityTypeConfiguration : IEntityTypeConfiguration<Tare
         entity.Property(t => t.Prioridad)
             .HasConversion<string>();
 
-        entity.Property(t => t.Categoria)
-            .HasConversion<string>();
+        entity.HasOne(t => t.Category)
+            .WithMany()
+            .HasForeignKey(t => t.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        entity.HasIndex(t => t.CategoryId);
 
         entity.Property(t => t.IsDeleted)
             .IsRequired()

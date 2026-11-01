@@ -20,6 +20,16 @@
         }
     </td>
     <td style="word-break:break-word">
+        @if (!string.IsNullOrWhiteSpace(Tarea.CategoryName))
+        {
+            <span class="badge bg-info text-dark">@Tarea.CategoryName</span>
+        }
+        else
+        {
+            <span class="text-muted small">Sin categoría</span>
+        }
+    </td>
+    <td style="word-break:break-word">
         <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad)">@Tarea.Prioridad</span>
     </td>
     <td class="text-nowrap" style="width:1%">

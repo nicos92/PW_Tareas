@@ -30,7 +30,9 @@ public sealed class TareaRepository : ITareaRepository
         FiltroTareas filtro,
         CancellationToken ct = default)
     {
-        var query = _contexto.Tareas.AsNoTracking();
+        IQueryable<Tarea> query = _contexto.Tareas
+            .AsNoTracking()
+            .Include(t => t.Category);
 
         if (filtro.EstadoBaja != EstadoBajaFiltro.Activas)
         {
@@ -54,6 +56,7 @@ public sealed class TareaRepository : ITareaRepository
     {
         return _contexto.Tareas
             .AsNoTracking()
+            .Include(t => t.Category)
             .FirstOrDefaultAsync(t => t.IdPublic == id, ct);
     }
 
@@ -77,7 +80,8 @@ public sealed class TareaRepository : ITareaRepository
             _contexto.Entry(previa).State = EntityState.Detached;
         }
 
-        _contexto.Tareas.Update(tarea);
+        // Se marca sólo la raíz para no re-adjuntar la navegación Category.
+        _contexto.Entry(tarea).State = EntityState.Modified;
         await _contexto.SaveChangesAsync(ct);
     }
 

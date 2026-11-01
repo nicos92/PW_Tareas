@@ -12,12 +12,18 @@ public static class DependencyInjection
         services.AddScoped<ObtenerTareasQuery>();
         services.AddScoped<ObtenerTareaPorIdQuery>();
         services.AddScoped<ObtenerEstadisticasQuery>();
+        services.AddScoped<GetCategoriesQuery>();
+        services.AddScoped<GetCategoryByIdQuery>();
 
         services.AddScoped<CrearTareaCommand>();
         services.AddScoped<ActualizarTareaCommand>();
         services.AddScoped<DarDeBajaTareaCommand>();
         services.AddScoped<RestaurarTareaCommand>();
         services.AddScoped<CambiarCompletadaTareaCommand>();
+
+        services.AddScoped<CreateCategoryCommand>();
+        services.AddScoped<UpdateCategoryCommand>();
+        services.AddScoped<DeleteCategoryCommand>();
 
         return services;
     }

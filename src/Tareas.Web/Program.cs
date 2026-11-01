@@ -8,6 +8,7 @@ using Tareas.Application.Configuracion;
 using Tareas.Infrastructure;
 using Tareas.Infrastructure.Persistence;
 using TareasBlazor.Components;
+using TareasBlazor.Components.Features.Categorias;
 using TareasBlazor.Components.Features.Tareas;
 using TareasBlazor.Components.Features.Tema;
 using TareasBlazor.Helpers;
@@ -22,6 +23,7 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.We
 
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<TareaEstado>();
+builder.Services.AddScoped<CategoriaEstado>();
 
 var app = builder.Build();
 

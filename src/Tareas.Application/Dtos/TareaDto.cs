@@ -41,8 +41,9 @@ public class TareaDto : IValidatableObject
     [ArchivoImagen(ErrorMessage = ArchivoImagenAttribute.MensajeFormatoInvalido)]
     public string Imagen { get; set; } = string.Empty;
 
-    [EnumDataType(typeof(Categoria))]
-    public Categoria Categoria { get; set; } = Categoria.Ninguna;
+    public int? CategoryId { get; set; }
+
+    public string? CategoryName { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -64,6 +65,7 @@ public class TareaDto : IValidatableObject
         FechaVencimiento = tarea.FechaVencimiento,
         Prioridad = tarea.Prioridad,
         Imagen = tarea.Imagen,
-        Categoria = tarea.Categoria
+        CategoryId = tarea.CategoryId,
+        CategoryName = tarea.Category?.Name
     };
 }
