@@ -116,6 +116,7 @@ internal sealed class FakeTareaRepository : ITareaRepository
 internal sealed class FakeCategoryRepository : ICategoryRepository
 {
     private readonly Dictionary<int, Category> _categorias = new();
+    private readonly HashSet<int> _categoriasConTareas = new();
     private int _proximoId = 1;
 
     public IReadOnlyDictionary<int, Category> Categorias => _categorias;
@@ -135,6 +136,11 @@ internal sealed class FakeCategoryRepository : ICategoryRepository
 
     public Task<bool> ExisteAsync(int id, CancellationToken ct = default)
         => Task.FromResult(_categorias.ContainsKey(id));
+
+    public void MarcarConTareas(int id) => _categoriasConTareas.Add(id);
+
+    public Task<bool> TieneTareasAsync(int id, CancellationToken ct = default)
+        => Task.FromResult(_categoriasConTareas.Contains(id));
 
     public Task<bool> ExisteNombreAsync(string nombre, int? excluirId = null, CancellationToken ct = default)
     {

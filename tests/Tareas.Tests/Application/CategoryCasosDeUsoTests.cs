@@ -65,6 +65,21 @@ public class CategoryCasosDeUsoTests
     }
 
     [Fact]
+    public async Task Eliminar_categoria_con_tareas_asociadas_falla()
+    {
+        var repo = new FakeCategoryRepository();
+        var categoria = Category.Crear("Backend", string.Empty);
+        repo.Sembrar(categoria);
+        repo.MarcarConTareas(categoria.Id);
+
+        var acto = () => new DeleteCategoryCommand(repo).EjecutarAsync(categoria.Id);
+
+        await acto.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*tareas asociadas*");
+        (await new GetCategoriesQuery(repo).EjecutarAsync()).Should().ContainSingle();
+    }
+
+    [Fact]
     public async Task Crear_categoria_rechaza_nombre_duplicado()
     {
         var repo = new FakeCategoryRepository();

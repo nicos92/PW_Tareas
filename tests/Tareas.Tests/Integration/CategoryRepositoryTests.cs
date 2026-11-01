@@ -35,7 +35,7 @@ public class CategoryRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task Eliminar_categoria_deja_las_tareas_sin_categoria()
+    public async Task Eliminar_categoria_con_tareas_falla_por_restriccion_de_fk()
     {
         var categoria = Category.Crear("Backend", "API");
         await _categorias.AgregarAsync(categoria);
@@ -45,11 +45,26 @@ public class CategoryRepositoryTests : IDisposable
             Prioridad.Baja, categoria.Id, string.Empty, Hoy);
         _contexto.Tareas.Add(tarea);
         await _contexto.SaveChangesAsync();
+        _contexto.ChangeTracker.Clear();
+
+        Func<Task> acto = () => _categorias.EliminarAsync(categoria.Id);
+
+        await acto.Should().ThrowAsync<DbUpdateException>();
+
+        _contexto.ChangeTracker.Clear();
+        var persistida = await _contexto.Tareas.AsNoTracking().SingleAsync();
+        persistida.CategoryId.Should().Be(categoria.Id);
+        (await _categorias.ObtenerTodasAsync()).Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task Eliminar_categoria_sin_tareas_la_borra()
+    {
+        var categoria = Category.Crear("Temporal", string.Empty);
+        await _categorias.AgregarAsync(categoria);
 
         await _categorias.EliminarAsync(categoria.Id);
 
-        var persistida = await _contexto.Tareas.AsNoTracking().SingleAsync();
-        persistida.CategoryId.Should().BeNull();
         (await _categorias.ObtenerTodasAsync()).Should().BeEmpty();
     }
 
