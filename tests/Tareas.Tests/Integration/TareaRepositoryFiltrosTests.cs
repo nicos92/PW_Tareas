@@ -48,7 +48,7 @@ public class TareaRepositoryFiltrosTests : IDisposable
 
     private void Sembrar(string titulo, Prioridad prioridad, bool completada, DateOnly fecha)
     {
-        var tarea = Tarea.Crear(titulo, "Descripción válida", fecha, prioridad, Categoria.Backend, string.Empty, BaseCreacion);
+        var tarea = Tarea.Crear(titulo, "Descripción válida", fecha, prioridad, null, string.Empty, BaseCreacion);
         if (completada)
         {
             tarea.CambiarCompletada(true);
@@ -127,16 +127,15 @@ public class TareaRepositoryFiltrosTests : IDisposable
     }
 
     [Fact]
-    public async Task Categoria_se_persiste_como_texto()
+    public async Task Tarea_sin_categoria_persiste_la_fk_como_null()
     {
-        Sembrar("Con categoría", Prioridad.Baja, false, Hoy.AddDays(1));
+        Sembrar("Sin categoría", Prioridad.Baja, false, Hoy.AddDays(1));
         await _contexto.SaveChangesAsync();
 
-        using var comando = _conexion.CreateCommand();
-        comando.CommandText = "SELECT typeof(Categoria) FROM Tareas LIMIT 1;";
-        var tipo = (string?)await comando.ExecuteScalarAsync();
+        var fila = await _contexto.Tareas.AsNoTracking().SingleAsync();
 
-        tipo.Should().Be("text");
+        fila.CategoryId.Should().BeNull();
+        fila.Category.Should().BeNull();
     }
 
     public void Dispose()

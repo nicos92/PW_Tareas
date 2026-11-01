@@ -21,14 +21,14 @@ public class CasosDeUsoTests
         Descripcion = "Descripción válida",
         FechaVencimiento = fecha ?? Hoy.AddDays(3),
         Prioridad = Prioridad.Media,
-        Categoria = Categoria.Backend
+        CategoryId = null
     };
 
     [Fact]
     public async Task CrearTarea_genera_id_y_persiste()
     {
         var repo = new FakeTareaRepository();
-        var cmd = new CrearTareaCommand(repo, new FakeArchivoStorage(), new FakeClock(Hoy));
+        var cmd = new CrearTareaCommand(repo, new FakeCategoryRepository(), new FakeArchivoStorage(), new FakeClock(Hoy));
 
         var id = await cmd.EjecutarAsync(Dto(), imagen: null);
 
@@ -41,7 +41,7 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var almacenamiento = new FakeArchivoStorage();
-        var cmd = new CrearTareaCommand(repo, almacenamiento, new FakeClock(Hoy));
+        var cmd = new CrearTareaCommand(repo, new FakeCategoryRepository(), almacenamiento, new FakeClock(Hoy));
 
         using var contenido = new MemoryStream(new byte[] { 1, 2, 3 });
         var id = await cmd.EjecutarAsync(Dto(), new SubidaArchivo(contenido, "foto.png"));
@@ -55,7 +55,7 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var almacenamiento = new FakeArchivoStorage();
-        var cmd = new CrearTareaCommand(repo, almacenamiento, new FakeClock(Hoy));
+        var cmd = new CrearTareaCommand(repo, new FakeCategoryRepository(), almacenamiento, new FakeClock(Hoy));
 
         var dtoInvalido = Dto(fecha: Hoy.AddDays(-5));
 
@@ -74,7 +74,7 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var tarea = Tarea.Crear("Con imagen", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, "/uploads/vieja.png", Hoy);
+            Prioridad.Baja, null, "/uploads/vieja.png", Hoy);
         repo.Sembrar(tarea);
 
         var cmd = new DarDeBajaTareaCommand(repo);
@@ -90,7 +90,7 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var tarea = Tarea.Crear("Sin imagen", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
         repo.Sembrar(tarea);
 
         var cmd = new DarDeBajaTareaCommand(repo);
@@ -106,7 +106,7 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var tarea = Tarea.Crear("A restaurar", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
         repo.Sembrar(tarea);
 
         await new DarDeBajaTareaCommand(repo).EjecutarAsync(tarea.IdPublic);
@@ -123,9 +123,9 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var activa = Tarea.Crear("Activa", "Descripción válida", Hoy.AddDays(1),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
         var dadaDeBaja = Tarea.Crear("Dada de baja", "Descripción válida", Hoy.AddDays(1),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
         repo.Sembrar(activa);
         repo.Sembrar(dadaDeBaja);
         await new DarDeBajaTareaCommand(repo).EjecutarAsync(dadaDeBaja.IdPublic);
@@ -151,7 +151,7 @@ public class CasosDeUsoTests
     {
         var repo = new FakeTareaRepository();
         var tarea = Tarea.Crear("Fuera de página", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
         repo.Sembrar(tarea);
 
         var cmd = new CambiarCompletadaTareaCommand(repo);
@@ -166,10 +166,10 @@ public class CasosDeUsoTests
         var repo = new FakeTareaRepository();
         var almacenamiento = new FakeArchivoStorage();
         var tarea = Tarea.Crear("Original", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, "/uploads/vieja.png", Hoy);
+            Prioridad.Baja, null, "/uploads/vieja.png", Hoy);
         repo.Sembrar(tarea);
 
-        var cmd = new ActualizarTareaCommand(repo, almacenamiento, new FakeClock(Hoy));
+        var cmd = new ActualizarTareaCommand(repo, new FakeCategoryRepository(), almacenamiento, new FakeClock(Hoy));
         using var contenido = new MemoryStream(new byte[] { 1 });
         await cmd.EjecutarAsync(tarea.IdPublic, Dto(), new SubidaArchivo(contenido, "nueva.png"));
 
@@ -183,10 +183,10 @@ public class CasosDeUsoTests
         var repo = new FakeTareaRepository();
         var almacenamiento = new FakeArchivoStorage();
         var tarea = Tarea.Crear("Original", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, "/uploads/vieja.png", Hoy);
+            Prioridad.Baja, null, "/uploads/vieja.png", Hoy);
         repo.Sembrar(tarea);
 
-        var cmd = new ActualizarTareaCommand(repo, almacenamiento, new FakeClock(Hoy));
+        var cmd = new ActualizarTareaCommand(repo, new FakeCategoryRepository(), almacenamiento, new FakeClock(Hoy));
         var dto = Dto();
         dto.Imagen = string.Empty;
 
@@ -200,7 +200,7 @@ public class CasosDeUsoTests
     public async Task ObtenerTareas_devuelve_dtos_paginados()
     {
         var repo = new FakeTareaRepository();
-        repo.Sembrar(Tarea.Crear("Uno", "Descripción válida", Hoy.AddDays(1), Prioridad.Baja, Categoria.Backend, string.Empty, Hoy));
+        repo.Sembrar(Tarea.Crear("Uno", "Descripción válida", Hoy.AddDays(1), Prioridad.Baja, null, string.Empty, Hoy));
 
         var query = new ObtenerTareasQuery(repo);
         var resultado = await query.EjecutarAsync(new ParametrosPaginacion(), new FiltroTareas());

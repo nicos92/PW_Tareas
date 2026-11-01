@@ -47,7 +47,7 @@ public class TareaRepositoryBajaTests : IDisposable
     private async Task<Guid> SembrarAsync(string titulo)
     {
         var tarea = Tarea.Crear(titulo, "Descripción válida", Hoy.AddDays(5),
-            Prioridad.Baja, Categoria.Backend, string.Empty, BaseCreacion);
+            Prioridad.Baja, null, string.Empty, BaseCreacion);
         _contexto.Tareas.Add(tarea);
         await _contexto.SaveChangesAsync();
         return tarea.IdPublic;

@@ -13,7 +13,7 @@ public class TareaBajaTests
 
     private static Tarea CrearTarea() => Tarea.Crear(
         "Tarea", "Descripción válida", Hoy.AddDays(2),
-        Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+        Prioridad.Baja, null, string.Empty, Hoy);
 
     [Fact]
     public void DarDeBaja_marca_la_tarea_como_eliminada()

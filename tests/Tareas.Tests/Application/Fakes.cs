@@ -112,3 +112,52 @@ internal sealed class FakeTareaRepository : ITareaRepository
     public Task<EstadisticasTareas> ObtenerEstadisticasAsync(CancellationToken ct = default)
         => Task.FromResult(new EstadisticasTareas { Total = _tareas.Values.Count(t => !t.IsDeleted) });
 }
+
+internal sealed class FakeCategoryRepository : ICategoryRepository
+{
+    private readonly Dictionary<int, Category> _categorias = new();
+    private int _proximoId = 1;
+
+    public IReadOnlyDictionary<int, Category> Categorias => _categorias;
+
+    public void Sembrar(Category category)
+    {
+        typeof(Category).GetProperty(nameof(Category.Id))!.SetValue(category, _proximoId++);
+        _categorias[category.Id] = category;
+    }
+
+    public Task<IReadOnlyList<Category>> ObtenerTodasAsync(CancellationToken ct = default)
+        => Task.FromResult<IReadOnlyList<Category>>(
+            _categorias.Values.OrderBy(c => c.Name).ToList().AsReadOnly());
+
+    public Task<Category?> ObtenerPorIdAsync(int id, CancellationToken ct = default)
+        => Task.FromResult(_categorias.TryGetValue(id, out var c) ? c : null);
+
+    public Task<bool> ExisteAsync(int id, CancellationToken ct = default)
+        => Task.FromResult(_categorias.ContainsKey(id));
+
+    public Task<bool> ExisteNombreAsync(string nombre, int? excluirId = null, CancellationToken ct = default)
+    {
+        var normalizado = nombre.Trim().ToUpperInvariant();
+        return Task.FromResult(_categorias.Values.Any(c =>
+            c.Name.ToUpperInvariant() == normalizado && (excluirId is null || c.Id != excluirId)));
+    }
+
+    public Task AgregarAsync(Category category, CancellationToken ct = default)
+    {
+        Sembrar(category);
+        return Task.CompletedTask;
+    }
+
+    public Task ActualizarAsync(Category category, CancellationToken ct = default)
+    {
+        _categorias[category.Id] = category;
+        return Task.CompletedTask;
+    }
+
+    public Task EliminarAsync(int id, CancellationToken ct = default)
+    {
+        _categorias.Remove(id);
+        return Task.CompletedTask;
+    }
+}
