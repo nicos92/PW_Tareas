@@ -1,9 +1,17 @@
 @using System.Linq
 @using Tareas.Application.Filtros
 @using Tareas.Domain.ValueObjects
+@implements IDisposable
 
 <fieldset class="row mb-3" aria-label="@AriaLabel" disabled="@IsLoading">
     <legend>@Legend</legend>
+
+    <div class="col-lg-4">
+        <label class="form-label" for="filter-texto">Buscar:</label>
+        <input id="filter-texto" type="search" class="form-control"
+               placeholder="Título o descripción" value="@TextoSeleccionado"
+               @oninput="OnTextoInput" />
+    </div>
 
     <SelectFilter Id="filter-prioridad" Label="Prioridad" Options="_opcionesPrioridad"
                   Value="@PrioridadSeleccionada" EmptyLabel="Todas" Disabled="@IsLoading"
@@ -29,6 +37,9 @@
 </fieldset>
 
 @code {
+    private const int MilisegundosDebounce = 300;
+    private CancellationTokenSource? _debounce;
+
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public string AriaLabel { get; set; } = "Filtros de tareas";
     [Parameter] public string Legend { get; set; } = "Filtros de tareas";
@@ -36,11 +47,13 @@
     [Parameter] public string EstadoSeleccionado { get; set; } = string.Empty;
     [Parameter] public string VencimientoSeleccionado { get; set; } = string.Empty;
     [Parameter] public string BajaSeleccionada { get; set; } = string.Empty;
+    [Parameter] public string TextoSeleccionado { get; set; } = string.Empty;
     [Parameter] public int TotalTareas { get; set; }
     [Parameter] public EventCallback<string> OnPrioridadChanged { get; set; }
     [Parameter] public EventCallback<string> OnEstadoChanged { get; set; }
     [Parameter] public EventCallback<string> OnVencimientoChanged { get; set; }
     [Parameter] public EventCallback<string> OnBajaChanged { get; set; }
+    [Parameter] public EventCallback<string> OnTextoChanged { get; set; }
 
     private static readonly IReadOnlyList<SelectFilter.OpcionFiltro> _opcionesPrioridad =
         CrearOpciones<Prioridad>();
@@ -57,6 +70,32 @@
         new SelectFilter.OpcionFiltro(nameof(EstadoBajaFiltro.DadasDeBaja), "Dadas de baja"),
         new SelectFilter.OpcionFiltro(nameof(EstadoBajaFiltro.Todas), "Todas")
     };
+
+    private async Task OnTextoInput(ChangeEventArgs e)
+    {
+        var texto = e.Value?.ToString() ?? string.Empty;
+
+        _debounce?.Cancel();
+        _debounce?.Dispose();
+        _debounce = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(MilisegundosDebounce, _debounce.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        await OnTextoChanged.InvokeAsync(texto);
+    }
+
+    public void Dispose()
+    {
+        _debounce?.Cancel();
+        _debounce?.Dispose();
+    }
 
     private static IReadOnlyList<SelectFilter.OpcionFiltro> CrearOpciones<TEnum>(bool excluirPrimero = false)
         where TEnum : struct, Enum

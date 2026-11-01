@@ -24,6 +24,8 @@ public partial class ListaTareas : TareaEstadoComponentBase
 
     private Task OnBajaChanged(string valor) => TareaEstado.SetFiltroBajaAsync(valor);
 
+    private Task OnTextoChanged(string valor) => TareaEstado.SetFiltroTextoAsync(valor);
+
     private Task OnPageChanged(int page) => TareaEstado.IrAPaginaAsync(page);
 
     private void VerTarea(TareaDto tarea)

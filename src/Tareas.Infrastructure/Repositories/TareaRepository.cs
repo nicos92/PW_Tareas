@@ -181,6 +181,13 @@ internal static class ExtensionesQueryableTarea
             _ => query
         };
 
+        if (!string.IsNullOrWhiteSpace(filtro.Texto))
+        {
+            var patron = $"%{filtro.Texto.Trim()}%";
+            query = query.Where(t => EF.Functions.Like(t.Titulo, patron)
+                                  || EF.Functions.Like(t.Descripcion, patron));
+        }
+
         if (filtro.Prioridad is { } prioridad)
         {
             query = query.Where(t => t.Prioridad == prioridad);

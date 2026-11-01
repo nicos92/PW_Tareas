@@ -59,6 +59,14 @@ internal sealed class FakeTareaRepository : ITareaRepository
             _ => query
         };
 
+        if (!string.IsNullOrWhiteSpace(filtro.Texto))
+        {
+            var termino = filtro.Texto.Trim();
+            query = query.Where(t =>
+                t.Titulo.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                t.Descripcion.Contains(termino, StringComparison.OrdinalIgnoreCase));
+        }
+
         var items = query.ToList().AsReadOnly();
         return Task.FromResult(new PaginadoResult<Tarea>(
             items, items.Count, paginacion.Page, paginacion.PageSize));

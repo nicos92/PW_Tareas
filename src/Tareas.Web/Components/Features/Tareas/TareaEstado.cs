@@ -59,6 +59,7 @@ public sealed class TareaEstado
     public string FiltroEstadoTexto => Filtro.Estado.ToString();
     public string FiltroVencimientoTexto => Filtro.Vencimiento.ToString();
     public string FiltroBajaTexto => Filtro.EstadoBaja.ToString();
+    public string FiltroTextoTexto => Filtro.Texto ?? string.Empty;
 
     public async Task Inicializar()
     {
@@ -139,6 +140,16 @@ public sealed class TareaEstado
             EstadoBaja = Enum.TryParse<EstadoBajaFiltro>(estadoBaja, out var b)
                 ? b
                 : EstadoBajaFiltro.Activas
+        };
+
+        return ReiniciarYCargarAsync();
+    }
+
+    public Task SetFiltroTextoAsync(string? texto)
+    {
+        Filtro = Filtro with
+        {
+            Texto = string.IsNullOrWhiteSpace(texto) ? null : texto.Trim()
         };
 
         return ReiniciarYCargarAsync();

@@ -12,9 +12,11 @@
 
         <FilterBar IsLoading="TareaEstado.IsLoading" PrioridadSeleccionada="@TareaEstado.FiltroPrioridadTexto"
                    EstadoSeleccionado="@TareaEstado.FiltroEstadoTexto" VencimientoSeleccionado="@TareaEstado.FiltroVencimientoTexto"
-                   BajaSeleccionada="@TareaEstado.FiltroBajaTexto" TotalTareas="@(TareaEstado.ResultadoPaginado?.TotalCount ?? 0)"
+                   BajaSeleccionada="@TareaEstado.FiltroBajaTexto" TextoSeleccionado="@TareaEstado.FiltroTextoTexto"
+                   TotalTareas="@(TareaEstado.ResultadoPaginado?.TotalCount ?? 0)"
                    OnPrioridadChanged="OnPrioridadChanged" OnEstadoChanged="OnEstadoChanged"
-                   OnVencimientoChanged="OnVencimientoChanged" OnBajaChanged="OnBajaChanged" />
+                   OnVencimientoChanged="OnVencimientoChanged" OnBajaChanged="OnBajaChanged"
+                   OnTextoChanged="OnTextoChanged" />
 
         @if (TareaEstado.IsLoading)
         {

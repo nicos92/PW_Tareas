@@ -11,4 +11,5 @@ public sealed record FiltroTareas(
     Prioridad? Prioridad = null,
     EstadoFiltro Estado = EstadoFiltro.Todas,
     VencimientoFiltro Vencimiento = VencimientoFiltro.Todos,
-    EstadoBajaFiltro EstadoBaja = EstadoBajaFiltro.Activas);
+    EstadoBajaFiltro EstadoBaja = EstadoBajaFiltro.Activas,
+    string? Texto = null);

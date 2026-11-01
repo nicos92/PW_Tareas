@@ -57,6 +57,12 @@ public class TareaRepositoryFiltrosTests : IDisposable
         _contexto.Tareas.Add(tarea);
     }
 
+    private void Sembrar(string titulo, string descripcion, Prioridad prioridad = Prioridad.Baja)
+    {
+        var tarea = Tarea.Crear(titulo, descripcion, BaseCreacion.AddDays(1), prioridad, null, string.Empty, BaseCreacion);
+        _contexto.Tareas.Add(tarea);
+    }
+
     [Fact]
     public async Task Filtro_por_prioridad_se_traduce_a_sql()
     {
@@ -124,6 +130,62 @@ public class TareaRepositoryFiltrosTests : IDisposable
         stats.Vencidas.Should().Be(2);
         stats.VencenHoy.Should().Be(1);
         stats.ATiempo.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Busqueda_por_titulo_ignora_mayusculas()
+    {
+        Sembrar("Revisar informe", "Descripción válida");
+        Sembrar("Comprar pan", "Descripción válida");
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Texto: "INFORME"));
+
+        resultado.Items.Should().ContainSingle().Which.Titulo.Should().Be("Revisar informe");
+    }
+
+    [Fact]
+    public async Task Busqueda_por_descripcion_filtra_el_listado()
+    {
+        Sembrar("Tarea A", "Actualizar documentación del API");
+        Sembrar("Tarea B", "Preparar presentación");
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Texto: "documentación"));
+
+        resultado.Items.Should().ContainSingle().Which.Titulo.Should().Be("Tarea A");
+    }
+
+    [Fact]
+    public async Task Busqueda_sin_coincidencias_devuelve_listado_vacio()
+    {
+        Sembrar("Tarea A", "Descripción válida");
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Texto: "inexistente"));
+
+        resultado.Items.Should().BeEmpty();
+        resultado.TotalCount.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Busqueda_se_combina_con_el_filtro_de_prioridad()
+    {
+        Sembrar("Informe urgente", "Descripción válida", Prioridad.Alta);
+        Sembrar("Informe común", "Descripción válida", Prioridad.Baja);
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Prioridad: Prioridad.Alta, Texto: "informe"));
+
+        resultado.Items.Should().ContainSingle().Which.Titulo.Should().Be("Informe urgente");
     }
 
     [Fact]
