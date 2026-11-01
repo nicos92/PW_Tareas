@@ -47,6 +47,11 @@ public sealed class CategoryRepository : ICategoryRepository
             ct);
     }
 
+    public Task<bool> TieneTareasAsync(int id, CancellationToken ct = default)
+        => _contexto.Tareas
+            .IgnoreQueryFilters()
+            .AnyAsync(t => t.CategoryId == id, ct);
+
     public async Task AgregarAsync(Category category, CancellationToken ct = default)
     {
         await _contexto.Categorias.AddAsync(category, ct);

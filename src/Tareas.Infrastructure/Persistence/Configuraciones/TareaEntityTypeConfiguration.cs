@@ -41,7 +41,7 @@ public sealed class TareaEntityTypeConfiguration : IEntityTypeConfiguration<Tare
         entity.HasOne(t => t.Category)
             .WithMany()
             .HasForeignKey(t => t.CategoryId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         entity.HasIndex(t => t.CategoryId);
 

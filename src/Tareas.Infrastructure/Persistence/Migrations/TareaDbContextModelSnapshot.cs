@@ -98,7 +98,7 @@ namespace Tareas.Infrastructure.Persistence.Migrations
                     b.HasOne("Tareas.Domain.Entidades.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
                 });

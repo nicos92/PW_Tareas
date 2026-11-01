@@ -16,6 +16,8 @@ public interface ICategoryRepository
 
     Task<bool> ExisteNombreAsync(string nombre, int? excluirId = null, CancellationToken ct = default);
 
+    Task<bool> TieneTareasAsync(int id, CancellationToken ct = default);
+
     Task AgregarAsync(Category category, CancellationToken ct = default);
 
     Task ActualizarAsync(Category category, CancellationToken ct = default);

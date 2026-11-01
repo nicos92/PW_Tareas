@@ -3,11 +3,19 @@ using Tareas.Application.Abstractions;
 namespace Tareas.Application.CasosDeUso.Comandos;
 
 /// <summary>
-/// Elimina una categoría. La FK de tareas es opcional y está configurada con
-/// <c>ON DELETE SET NULL</c>, por lo que las tareas asociadas quedan sin categoría.
+/// Elimina una categoría sólo si no tiene tareas asociadas. La restricción también está
+/// reforzada en la base con <c>ON DELETE RESTRICT</c>.
 /// </summary>
 public sealed class DeleteCategoryCommand(ICategoryRepository repositorio)
 {
-    public Task EjecutarAsync(int id, CancellationToken ct = default)
-        => repositorio.EliminarAsync(id, ct);
+    public async Task EjecutarAsync(int id, CancellationToken ct = default)
+    {
+        if (await repositorio.TieneTareasAsync(id, ct))
+        {
+            throw new InvalidOperationException(
+                "No se puede eliminar la categoría porque tiene tareas asociadas.");
+        }
+
+        await repositorio.EliminarAsync(id, ct);
+    }
 }
