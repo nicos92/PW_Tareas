@@ -36,7 +36,7 @@ public class TareaRepositoryBajaTests : IDisposable
         _contexto = new TareaDbContext(opciones);
         _contexto.Database.EnsureCreated();
 
-        _repo = new TareaRepository(_contexto, new RelojFijo(Hoy));
+        _repo = new TareaRepository(new TestDbContextFactory(opciones), new RelojFijo(Hoy));
     }
 
     private sealed class RelojFijo(DateOnly hoy) : ISystemClock
@@ -70,7 +70,7 @@ public class TareaRepositoryBajaTests : IDisposable
         var estadisticas = await _repo.ObtenerEstadisticasAsync();
         estadisticas.Total.Should().Be(1);
 
-        var filas = await _contexto.Tareas.IgnoreQueryFilters().ToListAsync();
+        var filas = await _contexto.Tareas.IgnoreQueryFilters().AsNoTracking().ToListAsync();
         filas.Should().HaveCount(2);
         filas.Single(t => t.IdPublic == id).IsDeleted.Should().BeTrue();
     }
@@ -85,7 +85,7 @@ public class TareaRepositoryBajaTests : IDisposable
 
         await acto.Should().NotThrowAsync();
 
-        var fila = await _contexto.Tareas.IgnoreQueryFilters().SingleAsync(t => t.IdPublic == id);
+        var fila = await _contexto.Tareas.IgnoreQueryFilters().AsNoTracking().SingleAsync(t => t.IdPublic == id);
         fila.IsDeleted.Should().BeTrue();
     }
 

@@ -31,7 +31,7 @@ public class CategoryRepositoryTests : IDisposable
 
         _contexto = new TareaDbContext(opciones);
         _contexto.Database.EnsureCreated();
-        _categorias = new CategoryRepository(_contexto);
+        _categorias = new CategoryRepository(new TestDbContextFactory(opciones));
     }
 
     [Fact]

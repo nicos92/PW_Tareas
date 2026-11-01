@@ -11,74 +11,88 @@ namespace Tareas.Infrastructure.Repositories;
 /// </summary>
 public sealed class CategoryRepository : ICategoryRepository
 {
-    private readonly TareaDbContext _contexto;
+    private readonly IDbContextFactory<TareaDbContext> _fabrica;
 
-    public CategoryRepository(TareaDbContext contexto)
+    public CategoryRepository(IDbContextFactory<TareaDbContext> fabrica)
     {
-        _contexto = contexto;
+        _fabrica = fabrica;
     }
 
     public async Task<IReadOnlyList<Category>> ObtenerTodasAsync(CancellationToken ct = default)
     {
-        return await _contexto.Categorias
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        return await contexto.Categorias
             .AsNoTracking()
             .OrderBy(c => c.Name)
             .ToListAsync(ct);
     }
 
-    public Task<Category?> ObtenerPorIdAsync(int id, CancellationToken ct = default)
+    public async Task<Category?> ObtenerPorIdAsync(int id, CancellationToken ct = default)
     {
-        return _contexto.Categorias
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        return await contexto.Categorias
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
-    public Task<bool> ExisteAsync(int id, CancellationToken ct = default)
-        => _contexto.Categorias.AnyAsync(c => c.Id == id, ct);
+    public async Task<bool> ExisteAsync(int id, CancellationToken ct = default)
+    {
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
 
-    public Task<bool> ExisteNombreAsync(
+        return await contexto.Categorias.AnyAsync(c => c.Id == id, ct);
+    }
+
+    public async Task<bool> ExisteNombreAsync(
         string nombre,
         int? excluirId = null,
         CancellationToken ct = default)
     {
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
         var normalizado = nombre.Trim().ToUpper();
-        return _contexto.Categorias.AnyAsync(
+        return await contexto.Categorias.AnyAsync(
             c => c.Name.ToUpper() == normalizado && (excluirId == null || c.Id != excluirId),
             ct);
     }
 
-    public Task<bool> TieneTareasAsync(int id, CancellationToken ct = default)
-        => _contexto.Tareas
+    public async Task<bool> TieneTareasAsync(int id, CancellationToken ct = default)
+    {
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        return await contexto.Tareas
             .IgnoreQueryFilters()
             .AnyAsync(t => t.CategoryId == id, ct);
+    }
 
     public async Task AgregarAsync(Category category, CancellationToken ct = default)
     {
-        await _contexto.Categorias.AddAsync(category, ct);
-        await _contexto.SaveChangesAsync(ct);
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        await contexto.Categorias.AddAsync(category, ct);
+        await contexto.SaveChangesAsync(ct);
     }
 
     public async Task ActualizarAsync(Category category, CancellationToken ct = default)
     {
-        var previa = _contexto.Categorias.Local.FirstOrDefault(c => c.Id == category.Id);
-        if (previa is not null)
-        {
-            _contexto.Entry(previa).State = EntityState.Detached;
-        }
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
 
-        _contexto.Entry(category).State = EntityState.Modified;
-        await _contexto.SaveChangesAsync(ct);
+        contexto.Entry(category).State = EntityState.Modified;
+        await contexto.SaveChangesAsync(ct);
     }
 
     public async Task EliminarAsync(int id, CancellationToken ct = default)
     {
-        var category = await _contexto.Categorias.FirstOrDefaultAsync(c => c.Id == id, ct);
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        var category = await contexto.Categorias.FirstOrDefaultAsync(c => c.Id == id, ct);
         if (category is null)
         {
             return;
         }
 
-        _contexto.Categorias.Remove(category);
-        await _contexto.SaveChangesAsync(ct);
+        contexto.Categorias.Remove(category);
+        await contexto.SaveChangesAsync(ct);
     }
 }

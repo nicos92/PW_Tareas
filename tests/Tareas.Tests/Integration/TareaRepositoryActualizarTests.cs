@@ -14,9 +14,9 @@ using Xunit;
 namespace Tareas.Tests.Integration;
 
 /// <summary>
-/// Cubre el conflicto de tracking de EF Core que rompía el guardado: el DbContext es
-/// <c>scoped</c> (uno por circuito en Blazor Server) y <c>ActualizarAsync</c> adjuntaba una
-/// instancia desconectada de una fila que el contexto ya trackeaba por una operación anterior.
+/// Regresión del guardado sobre contextos de corta vida: cada operación del repositorio usa
+/// un <c>TareaDbContext</c> nuevo creado por <see cref="IDbContextFactory{TContext}"/>, por lo
+/// que adjuntar una instancia desconectada de una fila ya guardada no debe lanzar conflictos.
 /// </summary>
 public class TareaRepositoryActualizarTests : IDisposable
 {
@@ -39,7 +39,7 @@ public class TareaRepositoryActualizarTests : IDisposable
         _contexto = new TareaDbContext(opciones);
         _contexto.Database.EnsureCreated();
 
-        _repo = new TareaRepository(_contexto, new RelojFijo(Hoy));
+        _repo = new TareaRepository(new TestDbContextFactory(opciones), new RelojFijo(Hoy));
     }
 
     private sealed class RelojFijo(DateOnly hoy) : ISystemClock

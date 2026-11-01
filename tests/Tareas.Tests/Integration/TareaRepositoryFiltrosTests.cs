@@ -38,7 +38,7 @@ public class TareaRepositoryFiltrosTests : IDisposable
         _contexto = new TareaDbContext(opciones);
         _contexto.Database.EnsureCreated();
 
-        _repo = new TareaRepository(_contexto, new RelojFijo(Hoy));
+        _repo = new TareaRepository(new TestDbContextFactory(opciones), new RelojFijo(Hoy));
     }
 
     private sealed class RelojFijo(DateOnly hoy) : ISystemClock

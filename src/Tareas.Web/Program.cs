@@ -60,8 +60,11 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<TareaDbContext>();
-        db.Database.Migrate();
+        var fabrica = scope.ServiceProvider.GetRequiredService<IDbContextFactory<TareaDbContext>>();
+        await using var db = await fabrica.CreateDbContextAsync();
+        await db.Database.MigrateAsync();
+
+        await SeedData.InicializarAsync(db);
 
         var ruta = db.Database.GetDbConnection().DataSource;
         logger.LogInformation("Base de datos SQLite en {Ruta}", ruta);

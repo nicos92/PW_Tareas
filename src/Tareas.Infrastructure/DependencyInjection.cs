@@ -27,7 +27,7 @@ public static class DependencyInjection
             configuration.GetConnectionString("Tareas"),
             Environment.GetEnvironmentVariable("DATA_DIR"));
 
-        services.AddDbContext<TareaDbContext>(options => options.UseSqlite(cadena));
+        services.AddDbContextFactory<TareaDbContext>(options => options.UseSqlite(cadena));
 
         var rutaUploads = configuration["Storage:UploadsPath"];
         var rutaFisicaUploads = configuration["Storage:UploadsPhysicalPath"];
