@@ -52,6 +52,18 @@ app.UseArchivosEstaticos(
     builder.Configuration["Storage:UploadsPath"] ?? OpcionesAlmacenamiento.RutaUploadsPorDefecto);
 app.UseAntiforgery();
 
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+
+app.MapGet("/health/ready", async (IDbContextFactory<TareaDbContext> fabrica) =>
+{
+    await using var db = await fabrica.CreateDbContextAsync();
+    return await db.Database.CanConnectAsync()
+        ? Results.Ok(new { status = "ok" })
+        : Results.Json(
+            new { status = "unavailable" },
+            statusCode: StatusCodes.Status503ServiceUnavailable);
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
