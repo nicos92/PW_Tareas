@@ -93,15 +93,40 @@ ejecuta automáticamente; hay que lanzarlo a mano y configurar previamente:
 
 | Tipo | Nombre | Valor |
 |---|---|---|
-| Secreto | `GCP_SA_KEY` | JSON de la cuenta de servicio |
 | Variable | `GCP_PROJECT_ID` | ID del proyecto de GCP |
+| Variable | `GCP_WORKLOAD_IDENTITY_PROVIDER` | Nombre completo del proveedor WIF |
+| Variable | `GCP_SERVICE_ACCOUNT` | Email de la cuenta de servicio |
 | Variable | `GCP_REGION` | `us-central1` (o la región elegida) |
 | Variable | `CLOUD_RUN_SERVICE` | `tareas-blazor` (opcional) |
 | Variable | `DOCKERHUB_USERNAME` | `nicos92` |
 
-La cuenta de servicio necesita `roles/run.admin` y
-`roles/iam.serviceAccountUser`. Mientras no exista `GCP_PROJECT_ID`, el job se
-omite.
+El workflow se autentica con **Workload Identity Federation** (OIDC), sin claves
+JSON. Antes de ejecutarlo hay que:
+
+1. Habilitar las APIs `iam.googleapis.com`, `iamcredentials.googleapis.com`,
+   `sts.googleapis.com` y `run.googleapis.com`.
+2. Crear un pool y un proveedor OIDC para GitHub Actions con issuer
+   `https://token.actions.githubusercontent.com` y los mapeos
+   `google.subject=assertion.sub`, `attribute.repository=assertion.repository` y
+   `attribute.repository_owner=assertion.repository_owner`.
+3. Restringir el proveedor con una condición como
+   `assertion.repository == 'nicos92/PW_Tareas'`.
+4. Otorgar `roles/iam.workloadIdentityUser` al principal set del repositorio
+   sobre la cuenta de servicio.
+5. Dar a la cuenta de servicio los roles `roles/run.admin` y
+   `roles/iam.serviceAccountUser`.
+
+Ejemplo de valores para este repositorio:
+
+| Variable | Valor |
+|---|---|
+| `GCP_PROJECT_ID` | `project-f8477ab4-3866-4a40-82c` |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/907898926068/locations/global/workloadIdentityPools/github-pool/providers/github` |
+| `GCP_SERVICE_ACCOUNT` | `gh-deployer@project-f8477ab4-3866-4a40-82c.iam.gserviceaccount.com` |
+
+Mientras falte alguna de las variables `GCP_PROJECT_ID`,
+`GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT` o
+`DOCKERHUB_USERNAME`, el job se omite.
 
 Comando equivalente al que ejecuta el workflow:
 

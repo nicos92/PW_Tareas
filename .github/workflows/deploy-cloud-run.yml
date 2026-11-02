@@ -20,12 +20,17 @@ jobs:
   deploy:
     name: deploy-cloud-run
     runs-on: ubuntu-latest
-    if: ${{ vars.GCP_PROJECT_ID != '' && vars.DOCKERHUB_USERNAME != '' }}
+    if: >-
+      vars.GCP_PROJECT_ID != '' &&
+      vars.DOCKERHUB_USERNAME != '' &&
+      vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' &&
+      vars.GCP_SERVICE_ACCOUNT != ''
     environment: production
     steps:
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
           project_id: ${{ vars.GCP_PROJECT_ID }}
 
       - uses: google-github-actions/setup-gcloud@v2
