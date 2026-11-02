@@ -12,7 +12,7 @@
 else
 {
     <CardSection Title="Editar tarea" HeaderId="editar-heading" AriaLabel="Formulario de edición de tarea">
-        <TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+        <TareaForm Model="tareaModel" Categorias="Categorias" OnValidSubmit="ValidSubmit" @ref="tareaForm">
             <ImageUploader CurrentImagen="@tareaModel.Imagen" OnImagenChanged="OnImagenChanged" MaxFileSize="MaxFileSize"
                            @ref="imageUploader" />
 

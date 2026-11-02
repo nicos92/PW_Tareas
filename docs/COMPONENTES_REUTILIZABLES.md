@@ -36,7 +36,7 @@ Helpers/
 | `Pagination` | Paginación prev/siguiente | `CurrentPage`, `TotalPages`, `HasPrevious`, `HasNext`, `OnPageChanged` | Ninguna |
 | `StatsCard` | Tarjeta de estadística título+valor | `Title`, `Value`, `BackgroundClass`, `ValueCssClass` | Ninguna |
 | `TareaForm` | Formulario EditForm de tarea con validación | `Model` (`TareaDto`), `OnValidSubmit`, `ChildContent`; expone `HasValidationErrors` | `TareaDto`, enums `Prioridad`/`Categoria` |
-| `TareaItem` | Fila de tabla de tarea (checkbox + acciones) | `Tarea`, `OnVer`, `OnCompletar`, `OnEliminar`, `OnEditar` | `TareaDto`, `PrioridadHelper` |
+| `TareaItem` | Fila de tabla de tarea (checkbox + acciones) | `Tarea`, `OnVer`, `OnCompletar`, `OnDarDeBaja`, `OnEditar` | `TareaDto`, `PrioridadHelper` |
 | `TareaCard` | Tarjeta de detalle de tarea | `Tarea` | `TareaDto`, `PrioridadHelper`, `EstadoTareaHelper` |
 | `ImageUploader` | Subida + preview de imagen con límite de tamaño | `CurrentImagen`, `OnImagenChanged`, `MaxFileSize`; expone `Archivo`, `TamanoExcedido` | Ninguna (adaptador `SubidaArchivoFactory` hacia Application) |
 | `Breadcrum` | Breadcrumb derivado de la URL | `SegmentNameResolver` (`Func<string, Task<string?>>?`) | Ninguna — la resolución de GUID→título la aporta la página |

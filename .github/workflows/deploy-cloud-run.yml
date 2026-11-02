@@ -1,0 +1,72 @@
+name: deploy-cloud-run
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Tag de la imagen en Docker Hub (latest o sha-<commit>)"
+        required: true
+        default: latest
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-cloud-run
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: deploy-cloud-run
+    runs-on: ubuntu-latest
+    if: ${{ vars.GCP_PROJECT_ID != '' && vars.DOCKERHUB_USERNAME != '' }}
+    environment: production
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Despliega en Cloud Run
+        id: deploy
+        env:
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+          SERVICE: ${{ vars.CLOUD_RUN_SERVICE || 'tareas-blazor' }}
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          IMAGE="docker.io/${DOCKERHUB_USERNAME}/tareas-blazor:${IMAGE_TAG}"
+          gcloud run deploy "$SERVICE" \
+            --image="$IMAGE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --platform=managed \
+            --port=8080 \
+            --allow-unauthenticated \
+            --set-env-vars "ASPNETCORE_ENVIRONMENT=Production,DATA_DIR=/tmp/data,Storage__UploadsPhysicalPath=/tmp/uploads" \
+            --cpu=1 \
+            --memory=512Mi \
+            --concurrency=80 \
+            --min-instances=0 \
+            --max-instances=1 \
+            --timeout=3600 \
+            --quiet
+
+          URL=$(gcloud run services describe "$SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --format='value(status.url)')
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Cloud Run desplegado en $URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verifica la salud del servicio
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          curl --fail --silent --show-error \
+            --retry 20 --retry-delay 6 --retry-all-errors \
+            "$URL/health"

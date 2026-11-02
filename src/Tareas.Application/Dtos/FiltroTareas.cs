@@ -10,4 +10,6 @@ namespace Tareas.Application.Dtos;
 public sealed record FiltroTareas(
     Prioridad? Prioridad = null,
     EstadoFiltro Estado = EstadoFiltro.Todas,
-    VencimientoFiltro Vencimiento = VencimientoFiltro.Todos);
+    VencimientoFiltro Vencimiento = VencimientoFiltro.Todos,
+    EstadoBajaFiltro EstadoBaja = EstadoBajaFiltro.Activas,
+    string? Texto = null);

@@ -24,14 +24,16 @@ public sealed class Tarea
     public DateOnly FechaVencimiento { get; private set; }
     public Prioridad Prioridad { get; private set; }
     public string Imagen { get; private set; } = string.Empty;
-    public Categoria Categoria { get; private set; }
+    public int? CategoryId { get; private set; }
+    public Category? Category { get; private set; }
+    public bool IsDeleted { get; private set; }
 
     public static Tarea Crear(
         string titulo,
         string descripcion,
         DateOnly? fechaVencimiento,
         Prioridad prioridad,
-        Categoria categoria,
+        int? categoryId,
         string imagen,
         DateOnly hoy)
     {
@@ -46,7 +48,7 @@ public sealed class Tarea
             FechaVencimiento = fechaVencimiento!.Value,
             Prioridad = prioridad,
             Imagen = imagen,
-            Categoria = categoria
+            CategoryId = categoryId
         };
     }
 
@@ -55,7 +57,7 @@ public sealed class Tarea
         string descripcion,
         DateOnly? fechaVencimiento,
         Prioridad prioridad,
-        Categoria categoria,
+        int? categoryId,
         string imagen,
         bool completada,
         DateOnly hoy)
@@ -66,7 +68,9 @@ public sealed class Tarea
         Descripcion = descripcion;
         FechaVencimiento = fechaVencimiento!.Value;
         Prioridad = prioridad;
-        Categoria = categoria;
+        CategoryId = categoryId;
+        // La navegación se limpia: la relación se persiste por la FK y se recarga al consultar.
+        Category = null;
         Imagen = imagen;
         Completada = completada;
     }
@@ -74,6 +78,26 @@ public sealed class Tarea
     public void AsignarImagen(string rutaImagen) => Imagen = rutaImagen ?? string.Empty;
 
     public void CambiarCompletada(bool completada) => Completada = completada;
+
+    public void DarDeBaja()
+    {
+        if (IsDeleted)
+        {
+            return;
+        }
+
+        IsDeleted = true;
+    }
+
+    public void Restaurar()
+    {
+        if (!IsDeleted)
+        {
+            return;
+        }
+
+        IsDeleted = false;
+    }
 
     private static void Validar(
         string titulo,

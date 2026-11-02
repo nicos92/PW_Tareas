@@ -18,7 +18,8 @@ public sealed class TareaEstado
     private readonly ObtenerEstadisticasQuery _obtenerEstadisticas;
     private readonly CrearTareaCommand _crearTarea;
     private readonly ActualizarTareaCommand _actualizarTarea;
-    private readonly EliminarTareaCommand _eliminarTarea;
+    private readonly DarDeBajaTareaCommand _darDeBajaTarea;
+    private readonly RestaurarTareaCommand _restaurarTarea;
     private readonly CambiarCompletadaTareaCommand _cambiarCompletada;
 
     private readonly SemaphoreSlim _initLock = new(1, 1);
@@ -30,16 +31,18 @@ public sealed class TareaEstado
         ObtenerEstadisticasQuery obtenerEstadisticas,
         CrearTareaCommand crearTarea,
         ActualizarTareaCommand actualizarTarea,
-        EliminarTareaCommand eliminarTarea,
-        CambiarCompletadaTareaCommand cambiarCompletada)
+        DarDeBajaTareaCommand darDeBajaTarea,
+        CambiarCompletadaTareaCommand cambiarCompletada,
+        RestaurarTareaCommand restaurarTarea)
     {
         _obtenerTareas = obtenerTareas;
         _obtenerPorId = obtenerPorId;
         _obtenerEstadisticas = obtenerEstadisticas;
         _crearTarea = crearTarea;
         _actualizarTarea = actualizarTarea;
-        _eliminarTarea = eliminarTarea;
+        _darDeBajaTarea = darDeBajaTarea;
         _cambiarCompletada = cambiarCompletada;
+        _restaurarTarea = restaurarTarea;
     }
 
     public PaginadoResult<TareaDto>? ResultadoPaginado { get; private set; }
@@ -55,6 +58,8 @@ public sealed class TareaEstado
         Filtro.Prioridad?.ToString() ?? string.Empty;
     public string FiltroEstadoTexto => Filtro.Estado.ToString();
     public string FiltroVencimientoTexto => Filtro.Vencimiento.ToString();
+    public string FiltroBajaTexto => Filtro.EstadoBaja.ToString();
+    public string FiltroTextoTexto => Filtro.Texto ?? string.Empty;
 
     public async Task Inicializar()
     {
@@ -128,6 +133,28 @@ public sealed class TareaEstado
         return ReiniciarYCargarAsync();
     }
 
+    public Task SetFiltroBajaAsync(string? estadoBaja)
+    {
+        Filtro = Filtro with
+        {
+            EstadoBaja = Enum.TryParse<EstadoBajaFiltro>(estadoBaja, out var b)
+                ? b
+                : EstadoBajaFiltro.Activas
+        };
+
+        return ReiniciarYCargarAsync();
+    }
+
+    public Task SetFiltroTextoAsync(string? texto)
+    {
+        Filtro = Filtro with
+        {
+            Texto = string.IsNullOrWhiteSpace(texto) ? null : texto.Trim()
+        };
+
+        return ReiniciarYCargarAsync();
+    }
+
     private Task ReiniciarYCargarAsync()
     {
         PaginacionActual.Page = 1;
@@ -153,10 +180,20 @@ public sealed class TareaEstado
         await CargarPaginaAsync();
     }
 
-    public async Task EliminarTareaAsync(Guid id)
+    public async Task DarDeBajaTareaAsync(Guid id)
     {
-        await _eliminarTarea.EjecutarAsync(id);
+        await _darDeBajaTarea.EjecutarAsync(id);
+        await RecargarAjustandoPaginaAsync();
+    }
 
+    public async Task RestaurarTareaAsync(Guid id)
+    {
+        await _restaurarTarea.EjecutarAsync(id);
+        await RecargarAjustandoPaginaAsync();
+    }
+
+    private async Task RecargarAjustandoPaginaAsync()
+    {
         if (ResultadoPaginado is not null && ResultadoPaginado.Items.Count == 1 && PaginacionActual.Page > 1)
         {
             PaginacionActual.Page--;

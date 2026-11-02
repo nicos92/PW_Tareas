@@ -1,8 +1,9 @@
 @using TareasBlazor.Helpers
 
-<tr class="@(Tarea.Completada ? "table-active" : "")">
+<tr class="@(Tarea.IsDeleted ? "table-warning" : Tarea.Completada ? "table-active" : "")">
     <td class="text-nowrap" style="width:1%">
-        <input id="@Tarea.IdPublic" type="checkbox" class="form-check-input" checked="@Tarea.Completada"
+        <input id="@Tarea.IdPublic" type="checkbox" class="form-check-input"
+               checked="@Tarea.Completada" disabled="@Tarea.IsDeleted"
                @onchange="Completar"
                aria-label="Marcar tarea '@Tarea.Titulo' como @(Tarea.Completada ? "pendiente" : "completada")" />
         <label class="form-check-label" for="@Tarea.IdPublic">
@@ -10,27 +11,51 @@
         </label>
     </td>
     <td style="word-break:break-word">
-        <span class="@(Tarea.Completada ? "text-decoration-line-through text-muted" : "")">
+        <span class="@(Tarea.IsDeleted ? "text-muted" : Tarea.Completada ? "text-decoration-line-through text-muted" : "")">
             @Tarea.Titulo
         </span>
+        @if (Tarea.IsDeleted)
+        {
+            <span class="badge bg-secondary ms-2">Dada de baja</span>
+        }
+    </td>
+    <td style="word-break:break-word">
+        @if (!string.IsNullOrWhiteSpace(Tarea.CategoryName))
+        {
+            <span class="badge bg-info text-dark">@Tarea.CategoryName</span>
+        }
+        else
+        {
+            <span class="text-muted small">Sin categoría</span>
+        }
     </td>
     <td style="word-break:break-word">
         <span class="badge @PrioridadHelper.GetClase(Tarea.Prioridad)">@Tarea.Prioridad</span>
     </td>
     <td class="text-nowrap" style="width:1%">
         <div class="d-flex gap-1">
-            <button type="button" class="btn btn-secondary btn-sm" @onclick="Ver"
-                    aria-label="Ver detalle de '@Tarea.Titulo'">
-                <i class="bi bi-eye" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" @onclick="Editar"
-                    aria-label="Editar tarea '@Tarea.Titulo'">
-                <i class="bi bi-pencil" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm" @onclick="Eliminar"
-                    aria-label="Eliminar tarea '@Tarea.Titulo'">
-                <i class="bi bi-trash" aria-hidden="true"></i>
-            </button>
+            @if (Tarea.IsDeleted)
+            {
+                <button type="button" class="btn btn-outline-success btn-sm" @onclick="Restaurar"
+                        aria-label="Restaurar la tarea '@Tarea.Titulo'">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary btn-sm" @onclick="Ver"
+                        aria-label="Ver detalle de '@Tarea.Titulo'">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" @onclick="Editar"
+                        aria-label="Editar tarea '@Tarea.Titulo'">
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="DarDeBaja"
+                        aria-label="Dar de baja la tarea '@Tarea.Titulo'">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+            }
         </div>
     </td>
 </tr>
@@ -46,14 +71,19 @@
     public EventCallback<TareaDto> OnCompletar { get; set; }
 
     [Parameter]
-    public EventCallback<TareaDto> OnEliminar { get; set; }
+    public EventCallback<TareaDto> OnDarDeBaja { get; set; }
+
+    [Parameter]
+    public EventCallback<TareaDto> OnRestaurar { get; set; }
 
     [Parameter]
     public EventCallback<string> OnEditar { get; set; }
 
     private Task Completar() => OnCompletar.InvokeAsync(Tarea);
 
-    private Task Eliminar() => OnEliminar.InvokeAsync(Tarea);
+    private Task DarDeBaja() => OnDarDeBaja.InvokeAsync(Tarea);
+
+    private Task Restaurar() => OnRestaurar.InvokeAsync(Tarea);
 
     private Task Editar() => OnEditar.InvokeAsync(Tarea.IdPublic.ToString());
 

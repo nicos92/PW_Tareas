@@ -1,0 +1,103 @@
+@page "/categorias"
+@implements IDisposable
+<PageTitle>Gestión de Categorías</PageTitle>
+<Breadcrum />
+<h1>Gestión de Categorías</h1>
+
+@if (!string.IsNullOrWhiteSpace(_mensajeError))
+{
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> @_mensajeError
+    </div>
+}
+
+<CardSection Title="Categorías" CssClass="col-12 mb-3" AriaLabel="Listado y administración de categorías">
+    <button class="btn btn-primary btn-lg my-2" @onclick="Nueva" aria-label="Crear nueva categoría">
+        <i class="bi bi-plus-circle" aria-hidden="true"></i>
+        Nueva categoría
+    </button>
+
+    @if (_mostrarFormulario)
+    {
+        <div class="card surface-low mb-3">
+            <div class="card-body">
+                <h5 class="card-title">@(_esEdicion ? "Editar categoría" : "Nueva categoría")</h5>
+                <EditForm Model="_formModel" OnValidSubmit="Guardar" @ref="_editForm" aria-label="Formulario de categoría">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary aria-live="polite" />
+
+                    <div class="mb-3">
+                        <label for="categoria-nombre" class="form-label">Nombre:</label>
+                        <InputText id="categoria-nombre" @bind-Value="_formModel.Name" class="form-control"
+                                   maxlength="100" placeholder="Ej. Backend" />
+                        <ValidationMessage For="() => _formModel.Name" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoria-descripcion" class="form-label">Descripción:</label>
+                        <InputTextArea id="categoria-descripcion" @bind-Value="_formModel.Description"
+                                       class="form-control" rows="3" maxlength="250"
+                                       placeholder="Descripción opcional de la categoría" />
+                        <ValidationMessage For="() => _formModel.Description" />
+                    </div>
+
+                    <FormActions SubmitText="@(_esEdicion ? "Actualizar" : "Guardar")"
+                                 OnCancel="Cancelar" />
+                </EditForm>
+            </div>
+        </div>
+    }
+
+    @if (CategoriaEstado.IsLoading)
+    {
+        <LoadingSpinner Mensaje="Cargando categorías..." />
+    }
+    else if (!CategoriaEstado.Categorias.Any())
+    {
+        <EmptyState Mensaje="No hay categorías. Crea la primera con el botón de arriba." />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-nowrap">Nombre</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col" class="text-nowrap" style="width:1%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var categoria in CategoriaEstado.Categorias)
+                    {
+                        <tr @key="categoria.Id">
+                            <td class="fw-semibold">@categoria.Name</td>
+                            <td class="text-muted">
+                                @(string.IsNullOrWhiteSpace(categoria.Description) ? "—" : categoria.Description)
+                            </td>
+                            <td class="text-nowrap" style="width:1%">
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                            @onclick="() => Editar(categoria)"
+                                            aria-label="Editar categoría '@categoria.Name'">
+                                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                            @onclick="() => PedirEliminar(categoria)"
+                                            aria-label="Eliminar categoría '@categoria.Name'">
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</CardSection>
+
+<ConfirmDialog IsVisible="_mostrarConfirmacion" Title="Confirmar eliminación"
+               Message="¿Estás seguro de que deseas eliminar la categoría"
+               ConfirmText="Eliminar" TargetName="@_categoriaAEliminar?.Name"
+               OnConfirm="ConfirmarEliminar" OnCancel="CancelarEliminar" />

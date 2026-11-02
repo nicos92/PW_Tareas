@@ -22,7 +22,7 @@
             <i class="bi bi-hash" aria-hidden="true"></i> ID: <code>@Tarea.IdPublic</code>
         </p>
         <p class="text-on-surface-variant small mb-3">
-            <i class="bi bi-stack" aria-hidden="true"></i> categoria: <code>@Tarea.Categoria</code>
+            <i class="bi bi-stack" aria-hidden="true"></i> categoría: <code>@(Tarea.CategoryName ?? "Sin categoría")</code>
         </p>
 
         @if (!string.IsNullOrWhiteSpace(Tarea.Descripcion))

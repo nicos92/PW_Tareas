@@ -8,6 +8,7 @@ using Tareas.Application.Configuracion;
 using Tareas.Infrastructure;
 using Tareas.Infrastructure.Persistence;
 using TareasBlazor.Components;
+using TareasBlazor.Components.Features.Categorias;
 using TareasBlazor.Components.Features.Tareas;
 using TareasBlazor.Components.Features.Tema;
 using TareasBlazor.Helpers;
@@ -22,6 +23,7 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.We
 
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<TareaEstado>();
+builder.Services.AddScoped<CategoriaEstado>();
 
 var app = builder.Build();
 
@@ -50,6 +52,18 @@ app.UseArchivosEstaticos(
     builder.Configuration["Storage:UploadsPath"] ?? OpcionesAlmacenamiento.RutaUploadsPorDefecto);
 app.UseAntiforgery();
 
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+
+app.MapGet("/health/ready", async (IDbContextFactory<TareaDbContext> fabrica) =>
+{
+    await using var db = await fabrica.CreateDbContextAsync();
+    return await db.Database.CanConnectAsync()
+        ? Results.Ok(new { status = "ok" })
+        : Results.Json(
+            new { status = "unavailable" },
+            statusCode: StatusCodes.Status503ServiceUnavailable);
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
@@ -58,8 +72,11 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<TareaDbContext>();
-        db.Database.Migrate();
+        var fabrica = scope.ServiceProvider.GetRequiredService<IDbContextFactory<TareaDbContext>>();
+        await using var db = await fabrica.CreateDbContextAsync();
+        await db.Database.MigrateAsync();
+
+        await SeedData.InicializarAsync(db);
 
         var ruta = db.Database.GetDbConnection().DataSource;
         logger.LogInformation("Base de datos SQLite en {Ruta}", ruta);

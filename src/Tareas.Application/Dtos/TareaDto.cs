@@ -27,6 +27,8 @@ public class TareaDto : IValidatableObject
 
     public bool Completada { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     [Required(ErrorMessage = TareaReglas.FechaVencimientoRequerida)]
     [DataType(DataType.Date)]
     [FutureDate(ErrorMessage = TareaReglas.FechaVencimientoPasada)]
@@ -36,11 +38,12 @@ public class TareaDto : IValidatableObject
     [EnumDataType(typeof(Prioridad))]
     public Prioridad Prioridad { get; set; } = Prioridad.Baja;
 
-    [ArchivoImagen(ErrorMessage = "El archivo debe ser una imagen válida (JPG, PNG, GIF).")]
+    [ArchivoImagen(ErrorMessage = ArchivoImagenAttribute.MensajeFormatoInvalido)]
     public string Imagen { get; set; } = string.Empty;
 
-    [EnumDataType(typeof(Categoria))]
-    public Categoria Categoria { get; set; } = Categoria.Ninguna;
+    public int? CategoryId { get; set; }
+
+    public string? CategoryName { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -58,9 +61,11 @@ public class TareaDto : IValidatableObject
         Titulo = tarea.Titulo,
         Descripcion = tarea.Descripcion,
         Completada = tarea.Completada,
+        IsDeleted = tarea.IsDeleted,
         FechaVencimiento = tarea.FechaVencimiento,
         Prioridad = tarea.Prioridad,
         Imagen = tarea.Imagen,
-        Categoria = tarea.Categoria
+        CategoryId = tarea.CategoryId,
+        CategoryName = tarea.Category?.Name
     };
 }

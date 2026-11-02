@@ -38,7 +38,7 @@ public class TareaRepositoryFiltrosTests : IDisposable
         _contexto = new TareaDbContext(opciones);
         _contexto.Database.EnsureCreated();
 
-        _repo = new TareaRepository(_contexto, new RelojFijo(Hoy));
+        _repo = new TareaRepository(new TestDbContextFactory(opciones), new RelojFijo(Hoy));
     }
 
     private sealed class RelojFijo(DateOnly hoy) : ISystemClock
@@ -48,12 +48,18 @@ public class TareaRepositoryFiltrosTests : IDisposable
 
     private void Sembrar(string titulo, Prioridad prioridad, bool completada, DateOnly fecha)
     {
-        var tarea = Tarea.Crear(titulo, "Descripción válida", fecha, prioridad, Categoria.Backend, string.Empty, BaseCreacion);
+        var tarea = Tarea.Crear(titulo, "Descripción válida", fecha, prioridad, null, string.Empty, BaseCreacion);
         if (completada)
         {
             tarea.CambiarCompletada(true);
         }
 
+        _contexto.Tareas.Add(tarea);
+    }
+
+    private void Sembrar(string titulo, string descripcion, Prioridad prioridad = Prioridad.Baja)
+    {
+        var tarea = Tarea.Crear(titulo, descripcion, BaseCreacion.AddDays(1), prioridad, null, string.Empty, BaseCreacion);
         _contexto.Tareas.Add(tarea);
     }
 
@@ -127,16 +133,71 @@ public class TareaRepositoryFiltrosTests : IDisposable
     }
 
     [Fact]
-    public async Task Categoria_se_persiste_como_texto()
+    public async Task Busqueda_por_titulo_ignora_mayusculas()
     {
-        Sembrar("Con categoría", Prioridad.Baja, false, Hoy.AddDays(1));
+        Sembrar("Revisar informe", "Descripción válida");
+        Sembrar("Comprar pan", "Descripción válida");
         await _contexto.SaveChangesAsync();
 
-        using var comando = _conexion.CreateCommand();
-        comando.CommandText = "SELECT typeof(Categoria) FROM Tareas LIMIT 1;";
-        var tipo = (string?)await comando.ExecuteScalarAsync();
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Texto: "INFORME"));
 
-        tipo.Should().Be("text");
+        resultado.Items.Should().ContainSingle().Which.Titulo.Should().Be("Revisar informe");
+    }
+
+    [Fact]
+    public async Task Busqueda_por_descripcion_filtra_el_listado()
+    {
+        Sembrar("Tarea A", "Actualizar documentación del API");
+        Sembrar("Tarea B", "Preparar presentación");
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Texto: "documentación"));
+
+        resultado.Items.Should().ContainSingle().Which.Titulo.Should().Be("Tarea A");
+    }
+
+    [Fact]
+    public async Task Busqueda_sin_coincidencias_devuelve_listado_vacio()
+    {
+        Sembrar("Tarea A", "Descripción válida");
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Texto: "inexistente"));
+
+        resultado.Items.Should().BeEmpty();
+        resultado.TotalCount.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Busqueda_se_combina_con_el_filtro_de_prioridad()
+    {
+        Sembrar("Informe urgente", "Descripción válida", Prioridad.Alta);
+        Sembrar("Informe común", "Descripción válida", Prioridad.Baja);
+        await _contexto.SaveChangesAsync();
+
+        var resultado = await _repo.ObtenerPaginadoAsync(
+            new ParametrosPaginacion(),
+            new FiltroTareas(Prioridad: Prioridad.Alta, Texto: "informe"));
+
+        resultado.Items.Should().ContainSingle().Which.Titulo.Should().Be("Informe urgente");
+    }
+
+    [Fact]
+    public async Task Tarea_sin_categoria_persiste_la_fk_como_null()
+    {
+        Sembrar("Sin categoría", Prioridad.Baja, false, Hoy.AddDays(1));
+        await _contexto.SaveChangesAsync();
+
+        var fila = await _contexto.Tareas.AsNoTracking().SingleAsync();
+
+        fila.CategoryId.Should().BeNull();
+        fila.Category.Should().BeNull();
     }
 
     public void Dispose()

@@ -11,6 +11,7 @@ namespace Tareas.Infrastructure.Persistence;
 public class TareaDbContext : DbContext
 {
     public DbSet<Tarea> Tareas => Set<Tarea>();
+    public DbSet<Category> Categorias => Set<Category>();
 
     public TareaDbContext(DbContextOptions<TareaDbContext> options) : base(options)
     {

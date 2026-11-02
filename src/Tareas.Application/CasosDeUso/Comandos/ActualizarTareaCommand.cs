@@ -12,6 +12,7 @@ namespace Tareas.Application.CasosDeUso.Comandos;
 /// </summary>
 public sealed class ActualizarTareaCommand(
     ITareaRepository repositorio,
+    ICategoryRepository categorias,
     IArchivoStorage almacenamiento,
     ISystemClock reloj)
 {
@@ -24,6 +25,11 @@ public sealed class ActualizarTareaCommand(
         var tarea = await repositorio.ObtenerPorIdAsync(id, ct)
             ?? throw new KeyNotFoundException($"No existe la tarea {id}.");
 
+        if (dto.CategoryId is int categoryId && !await categorias.ExisteAsync(categoryId, ct))
+        {
+            throw new InvalidOperationException($"No existe la categoría {categoryId}.");
+        }
+
         var imagenAnterior = tarea.Imagen;
 
         // Sin imagen nueva se conserva la ruta que trae el dto (permite limpiarla).
@@ -32,7 +38,7 @@ public sealed class ActualizarTareaCommand(
         // Valida las invariantes ANTES de escribir nada en disco.
         tarea.Actualizar(
             dto.Titulo, dto.Descripcion, dto.FechaVencimiento,
-            dto.Prioridad, dto.Categoria, imagenFinal, dto.Completada, reloj.Hoy);
+            dto.Prioridad, dto.CategoryId, imagenFinal, dto.Completada, reloj.Hoy);
 
         if (imagen is not null)
         {

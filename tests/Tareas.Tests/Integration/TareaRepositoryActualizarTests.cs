@@ -14,9 +14,9 @@ using Xunit;
 namespace Tareas.Tests.Integration;
 
 /// <summary>
-/// Cubre el conflicto de tracking de EF Core que rompía el guardado: el DbContext es
-/// <c>scoped</c> (uno por circuito en Blazor Server) y <c>ActualizarAsync</c> adjuntaba una
-/// instancia desconectada de una fila que el contexto ya trackeaba por una operación anterior.
+/// Regresión del guardado sobre contextos de corta vida: cada operación del repositorio usa
+/// un <c>TareaDbContext</c> nuevo creado por <see cref="IDbContextFactory{TContext}"/>, por lo
+/// que adjuntar una instancia desconectada de una fila ya guardada no debe lanzar conflictos.
 /// </summary>
 public class TareaRepositoryActualizarTests : IDisposable
 {
@@ -39,7 +39,7 @@ public class TareaRepositoryActualizarTests : IDisposable
         _contexto = new TareaDbContext(opciones);
         _contexto.Database.EnsureCreated();
 
-        _repo = new TareaRepository(_contexto, new RelojFijo(Hoy));
+        _repo = new TareaRepository(new TestDbContextFactory(opciones), new RelojFijo(Hoy));
     }
 
     private sealed class RelojFijo(DateOnly hoy) : ISystemClock
@@ -53,7 +53,7 @@ public class TareaRepositoryActualizarTests : IDisposable
     /// </summary>
     private async Task<Guid> SembrarAsync(string titulo, DateOnly fecha)
     {
-        var tarea = Tarea.Crear(titulo, "Descripción válida", fecha, Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+        var tarea = Tarea.Crear(titulo, "Descripción válida", fecha, Prioridad.Baja, null, string.Empty, Hoy);
         _contexto.Tareas.Add(tarea);
         await _contexto.SaveChangesAsync();
         _contexto.Entry(tarea).State = EntityState.Detached;
@@ -66,11 +66,11 @@ public class TareaRepositoryActualizarTests : IDisposable
         var id = await SembrarAsync("Tarea a editar", Hoy.AddDays(5));
 
         var primera = await _repo.ObtenerPorIdAsync(id);
-        primera!.Actualizar("Tarea a editar", "Descripción válida", Hoy.AddDays(6), Prioridad.Baja, Categoria.Backend, string.Empty, false, Hoy);
+        primera!.Actualizar("Tarea a editar", "Descripción válida", Hoy.AddDays(6), Prioridad.Baja, null, string.Empty, false, Hoy);
         await _repo.ActualizarAsync(primera);
 
         var segunda = await _repo.ObtenerPorIdAsync(id);
-        segunda!.Actualizar("Tarea a editar", "Descripción válida", Hoy.AddDays(7), Prioridad.Baja, Categoria.Backend, string.Empty, false, Hoy);
+        segunda!.Actualizar("Tarea a editar", "Descripción válida", Hoy.AddDays(7), Prioridad.Baja, null, string.Empty, false, Hoy);
 
         Func<Task> accion = () => _repo.ActualizarAsync(segunda);
         await accion.Should().NotThrowAsync("el segundo guardado reutiliza el contexto del circuito");
@@ -86,7 +86,7 @@ public class TareaRepositoryActualizarTests : IDisposable
         await _repo.CambiarCompletadaAsync(id, true);
 
         var tarea = await _repo.ObtenerPorIdAsync(id);
-        tarea!.Actualizar("Tarea con toggle", "Descripción válida", Hoy.AddDays(6), Prioridad.Baja, Categoria.Backend, string.Empty, true, Hoy);
+        tarea!.Actualizar("Tarea con toggle", "Descripción válida", Hoy.AddDays(6), Prioridad.Baja, null, string.Empty, true, Hoy);
 
         Func<Task> accion = () => _repo.ActualizarAsync(tarea);
         await accion.Should().NotThrowAsync("el toggle deja la entidad trackeada en el contexto del circuito");
@@ -99,11 +99,11 @@ public class TareaRepositoryActualizarTests : IDisposable
     [Fact]
     public async Task Actualizar_tras_AgregarAsync_no_lanza_conflicto()
     {
-        var creada = Tarea.Crear("Tarea creada", "Descripción válida", Hoy.AddDays(5), Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+        var creada = Tarea.Crear("Tarea creada", "Descripción válida", Hoy.AddDays(5), Prioridad.Baja, null, string.Empty, Hoy);
         await _repo.AgregarAsync(creada);
 
         var cargada = await _repo.ObtenerPorIdAsync(creada.IdPublic);
-        cargada!.Actualizar("Tarea creada", "Descripción válida", Hoy.AddDays(6), Prioridad.Baja, Categoria.Backend, string.Empty, false, Hoy);
+        cargada!.Actualizar("Tarea creada", "Descripción válida", Hoy.AddDays(6), Prioridad.Baja, null, string.Empty, false, Hoy);
 
         Func<Task> accion = () => _repo.ActualizarAsync(cargada);
         await accion.Should().NotThrowAsync("crear deja la entidad trackeada y editarla adjunta otra instancia");

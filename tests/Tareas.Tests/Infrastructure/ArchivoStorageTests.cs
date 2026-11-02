@@ -56,12 +56,14 @@ public class ArchivoStorageTests : IDisposable
         Directory.Exists(Path.Combine(webRoot, "uploads")).Should().BeFalse();
     }
 
-    [Fact]
-    public async Task GuardarAsync_RechazaExtensionesNoPermitidas()
+    [Theory]
+    [InlineData(".exe")]
+    [InlineData(".svg")]
+    public async Task GuardarAsync_RechazaExtensionesNoPermitidas(string extension)
     {
         var storage = new ArchivoStorage(Path.Combine(_raiz, "wwwroot"), new OpcionesAlmacenamiento());
 
-        var act = async () => await storage.GuardarAsync(Contenido(), ".exe");
+        var act = async () => await storage.GuardarAsync(Contenido(), extension);
 
         await act.Should().ThrowAsync<ArgumentException>();
     }

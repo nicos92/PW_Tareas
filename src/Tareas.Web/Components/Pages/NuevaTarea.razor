@@ -5,8 +5,8 @@
 <Breadcrum />
 <h3>Nueva Tarea</h3>
 <CardSection Title="Nueva tarea" HeaderId="nueva-tarea-heading" AriaLabel="Formulario de nueva tarea">
-    <TareaForm Model="tareaModel" OnValidSubmit="ValidSubmit" @ref="tareaForm">
-        <ImageUploader MaxFileSize="MaxFileSize" @ref="imageUploader" />
+    <TareaForm Model="tareaModel" Categorias="Categorias" OnValidSubmit="ValidSubmit" @ref="tareaForm">
+        <ImageUploader MaxFileSize="MaxFileSize" OnImagenChanged="OnImagenChanged" @ref="imageUploader" />
 
         <FormActions IsSubmitDisabled="@(tareaForm?.HasValidationErrors == true || ImagenInvalida)"
                      SubmitCssClass="fill-primary" CancelCssClass="fill-tertiary"

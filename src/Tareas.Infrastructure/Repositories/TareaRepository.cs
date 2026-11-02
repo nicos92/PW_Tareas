@@ -16,12 +16,12 @@ namespace Tareas.Infrastructure.Repositories;
 /// </summary>
 public sealed class TareaRepository : ITareaRepository
 {
-    private readonly TareaDbContext _contexto;
+    private readonly IDbContextFactory<TareaDbContext> _fabrica;
     private readonly ISystemClock _reloj;
 
-    public TareaRepository(TareaDbContext contexto, ISystemClock reloj)
+    public TareaRepository(IDbContextFactory<TareaDbContext> fabrica, ISystemClock reloj)
     {
-        _contexto = contexto;
+        _fabrica = fabrica;
         _reloj = reloj;
     }
 
@@ -30,8 +30,18 @@ public sealed class TareaRepository : ITareaRepository
         FiltroTareas filtro,
         CancellationToken ct = default)
     {
-        var query = ExtensionesQueryableTarea.AplicarFiltros(
-            _contexto.Tareas.AsNoTracking(), filtro, _reloj.Hoy);
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        IQueryable<Tarea> query = contexto.Tareas
+            .AsNoTracking()
+            .Include(t => t.Category);
+
+        if (filtro.EstadoBaja != EstadoBajaFiltro.Activas)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
+        query = ExtensionesQueryableTarea.AplicarFiltros(query, filtro, _reloj.Hoy);
 
         var totalCount = await query.CountAsync(ct);
 
@@ -44,64 +54,85 @@ public sealed class TareaRepository : ITareaRepository
         return new PaginadoResult<Tarea>(items.AsReadOnly(), totalCount, paginacion.Page, paginacion.PageSize);
     }
 
-    public Task<Tarea?> ObtenerPorIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Tarea?> ObtenerPorIdAsync(Guid id, CancellationToken ct = default)
     {
-        return _contexto.Tareas
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        return await contexto.Tareas
             .AsNoTracking()
+            .Include(t => t.Category)
             .FirstOrDefaultAsync(t => t.IdPublic == id, ct);
     }
 
     public async Task AgregarAsync(Tarea tarea, CancellationToken ct = default)
     {
-        await _contexto.Tareas.AddAsync(tarea, ct);
-        await _contexto.SaveChangesAsync(ct);
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        await contexto.Tareas.AddAsync(tarea, ct);
+        await contexto.SaveChangesAsync(ct);
     }
 
     public async Task ActualizarAsync(Tarea tarea, CancellationToken ct = default)
     {
-        // El DbContext es scoped: en Blazor Server vive todo el circuito, y una operación
-        // anterior (un guardado, un toggle, una creación) puede dejar trackeada otra
-        // instancia de la misma fila. Adjuntar la nueva sin más lanzaría
-        // ThrowIdentityConflict, así que se desengancha la instancia previa.
-        var previa = tarea.Id != 0
-            ? _contexto.Tareas.Local.FirstOrDefault(t => t.Id == tarea.Id)
-            : null;
-        if (previa is not null)
-        {
-            _contexto.Entry(previa).State = EntityState.Detached;
-        }
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
 
-        _contexto.Tareas.Update(tarea);
-        await _contexto.SaveChangesAsync(ct);
+        // Se marca sólo la raíz para no re-adjuntar la navegación Category.
+        contexto.Entry(tarea).State = EntityState.Modified;
+        await contexto.SaveChangesAsync(ct);
     }
 
-    public async Task EliminarAsync(Guid id, CancellationToken ct = default)
+    public async Task DarDeBajaAsync(Guid id, CancellationToken ct = default)
     {
-        var tarea = await _contexto.Tareas.FirstOrDefaultAsync(t => t.IdPublic == id, ct);
-        if (tarea is not null)
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        var tarea = await contexto.Tareas.FirstOrDefaultAsync(t => t.IdPublic == id, ct);
+        if (tarea is null)
         {
-            _contexto.Tareas.Remove(tarea);
-            await _contexto.SaveChangesAsync(ct);
+            return;
         }
+
+        tarea.DarDeBaja();
+        await contexto.SaveChangesAsync(ct);
+    }
+
+    public async Task RestaurarAsync(Guid id, CancellationToken ct = default)
+    {
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        var tarea = await contexto.Tareas
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(t => t.IdPublic == id, ct);
+
+        if (tarea is null)
+        {
+            return;
+        }
+
+        tarea.Restaurar();
+        await contexto.SaveChangesAsync(ct);
     }
 
     public async Task CambiarCompletadaAsync(Guid id, bool completada, CancellationToken ct = default)
     {
-        var tarea = await _contexto.Tareas.FirstOrDefaultAsync(t => t.IdPublic == id, ct);
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
+        var tarea = await contexto.Tareas.FirstOrDefaultAsync(t => t.IdPublic == id, ct);
         if (tarea is null)
         {
             return;
         }
 
         tarea.CambiarCompletada(completada);
-        await _contexto.SaveChangesAsync(ct);
+        await contexto.SaveChangesAsync(ct);
     }
 
     public async Task<EstadisticasTareas> ObtenerEstadisticasAsync(CancellationToken ct = default)
     {
+        await using var contexto = await _fabrica.CreateDbContextAsync(ct);
+
         var hoy = _reloj.Hoy;
 
-        var agregado = await _contexto.Tareas
+        var agregado = await contexto.Tareas
             .AsNoTracking()
             .GroupBy(_ => 1)
             .Select(g => new
@@ -134,12 +165,6 @@ public sealed class TareaRepository : ITareaRepository
             ATiempo = agregado.ATiempo
         };
     }
-
-    public async Task EliminarTodasAsync(CancellationToken ct = default)
-    {
-        _contexto.Tareas.RemoveRange(_contexto.Tareas);
-        await _contexto.SaveChangesAsync(ct);
-    }
 }
 
 internal static class ExtensionesQueryableTarea
@@ -149,6 +174,20 @@ internal static class ExtensionesQueryableTarea
         FiltroTareas filtro,
         DateOnly hoy)
     {
+        query = filtro.EstadoBaja switch
+        {
+            EstadoBajaFiltro.Activas => query.Where(t => !t.IsDeleted),
+            EstadoBajaFiltro.DadasDeBaja => query.Where(t => t.IsDeleted),
+            _ => query
+        };
+
+        if (!string.IsNullOrWhiteSpace(filtro.Texto))
+        {
+            var patron = $"%{filtro.Texto.Trim()}%";
+            query = query.Where(t => EF.Functions.Like(t.Titulo, patron)
+                                  || EF.Functions.Like(t.Descripcion, patron));
+        }
+
         if (filtro.Prioridad is { } prioridad)
         {
             query = query.Where(t => t.Prioridad == prioridad);

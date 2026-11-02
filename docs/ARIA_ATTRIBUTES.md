@@ -278,7 +278,7 @@ Este documento explica cada atributo ARIA y etiqueta semántica aplicada a los c
 |---|---|---|
 | `alt` | `"Imagen actual de la tarea"` | Describe que es la imagen existente de la tarea, no una nueva previsualización. |
 
-### `<span id="file-help-text" class="visually-hidden">Formatos de imagen aceptados. Tamaño máximo @FormatoTamano(MaxFileSize).</span>`
+### `<span id="file-help-text" class="visually-hidden">Formatos aceptados: @FormatosPermitidos. Tamaño máximo @FormatoTamano(MaxFileSize).</span>`
 
 | Atributo | Valor | Razón |
 |---|---|---|
@@ -409,11 +409,11 @@ Este documento explica cada atributo ARIA y etiqueta semántica aplicada a los c
 |---|---|---|
 | `aria-label` | `"Editar tarea '{titulo}'"` | El botón de editar contiene solo un icono (pencil). El `aria-label` describe la acción e incluye el título de la tarea para contexto. |
 
-### `<button type="button" ... aria-label="Eliminar tarea '@Tarea.Titulo'">`
+### `<button type="button" ... aria-label="Dar de baja la tarea '@Tarea.Titulo'">`
 
 | Atributo | Valor | Razón |
 |---|---|---|
-| `aria-label` | `"Eliminar tarea '{titulo}'"` | El botón de eliminar contiene solo un icono (trash). El `aria-label` es crítico para que usuarios de lectores de pantalla sepan qué tarea van a eliminar, especialmente importante dado que esta acción es destructiva. |
+| `aria-label` | `"Dar de baja la tarea '{titulo}'"` | El botón de baja contiene solo un icono (trash). El `aria-label` es crítico para que usuarios de lectores de pantalla sepan qué tarea van a dar de baja, especialmente importante dado que la tarea deja de mostrarse en la aplicación. |
 
 ---
 

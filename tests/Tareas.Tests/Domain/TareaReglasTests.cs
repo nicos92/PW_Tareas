@@ -17,7 +17,7 @@ public class TareaReglasTests
     public void Crear_con_datos_validos_construye_la_entidad()
     {
         var tarea = Tarea.Crear("Comprar pan", "Ir a la panadería", Hoy.AddDays(3),
-            Prioridad.Media, Categoria.Ninguna, string.Empty, Hoy);
+            Prioridad.Media, null, string.Empty, Hoy);
 
         tarea.IdPublic.Should().NotBe(Guid.Empty);
         tarea.Titulo.Should().Be("Comprar pan");
@@ -30,7 +30,7 @@ public class TareaReglasTests
     public void Crear_prioridad_alta_acepta_hasta_siete_dias(int dias)
     {
         var acto = () => Tarea.Crear("Tarea", "Descripción válida", Hoy.AddDays(dias),
-            Prioridad.Alta, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Alta, null, string.Empty, Hoy);
 
         acto.Should().NotThrow();
     }
@@ -39,7 +39,7 @@ public class TareaReglasTests
     public void Crear_prioridad_alta_rechaza_mas_de_siete_dias()
     {
         var acto = () => Tarea.Crear("Tarea", "Descripción válida", Hoy.AddDays(8),
-            Prioridad.Alta, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Alta, null, string.Empty, Hoy);
 
         acto.Should().Throw<ViolacionReglaException>()
             .Which.Violaciones.Select(v => v.Mensaje)
@@ -50,7 +50,7 @@ public class TareaReglasTests
     public void Crear_rechaza_fecha_no_futura()
     {
         var acto = () => Tarea.Crear("Tarea", "Descripción válida", Hoy.AddDays(-1),
-            Prioridad.Media, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Media, null, string.Empty, Hoy);
 
         acto.Should().Throw<ViolacionReglaException>()
             .Which.Violaciones.Select(v => v.Mensaje)
@@ -63,7 +63,7 @@ public class TareaReglasTests
     public void Crear_rechaza_longitud_de_titulo_invalida(string titulo)
     {
         var acto = () => Tarea.Crear(titulo, "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
 
         acto.Should().Throw<ViolacionReglaException>();
     }
@@ -74,7 +74,7 @@ public class TareaReglasTests
         var descripcion = new string('x', TareaReglas.LongitudDescripcionMaxima + 1);
 
         var acto = () => Tarea.Crear("Tarea", descripcion, Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
 
         acto.Should().Throw<ViolacionReglaException>()
             .Which.Violaciones.Select(v => v.Mensaje)
@@ -85,14 +85,14 @@ public class TareaReglasTests
     public void Actualizar_valida_y_cambia_los_campos()
     {
         var tarea = Tarea.Crear("Original", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
 
         tarea.Actualizar("Nueva", "Otra descripción", Hoy.AddDays(4),
-            Prioridad.Media, Categoria.Frontend, "/uploads/x.png", true, Hoy);
+            Prioridad.Media, 3, "/uploads/x.png", true, Hoy);
 
         tarea.Titulo.Should().Be("Nueva");
         tarea.Completada.Should().BeTrue();
-        tarea.Categoria.Should().Be(Categoria.Frontend);
+        tarea.CategoryId.Should().Be(3);
         tarea.Imagen.Should().Be("/uploads/x.png");
     }
 
@@ -100,7 +100,7 @@ public class TareaReglasTests
     public void CambiarCompletada_alterna_el_estado()
     {
         var tarea = Tarea.Crear("Original", "Descripción válida", Hoy.AddDays(2),
-            Prioridad.Baja, Categoria.Backend, string.Empty, Hoy);
+            Prioridad.Baja, null, string.Empty, Hoy);
 
         tarea.CambiarCompletada(true);
 

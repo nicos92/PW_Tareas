@@ -11,16 +11,20 @@ public partial class ListaTareas : TareaEstadoComponentBase
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
-    private static readonly string[] _columnasTabla = { "Lista", "Título", "Prioridad", "Acciones" };
+    private static readonly string[] _columnasTabla = { "Lista", "Título", "Categoría", "Prioridad", "Acciones" };
 
-    private bool _showDeleteModal;
-    private TareaDto? _tareaAEliminar;
+    private bool _showBajaModal;
+    private TareaDto? _tareaADarDeBaja;
 
     private Task OnPrioridadChanged(string valor) => TareaEstado.SetFiltroPrioridadAsync(valor);
 
     private Task OnEstadoChanged(string valor) => TareaEstado.SetFiltroEstadoAsync(valor);
 
     private Task OnVencimientoChanged(string valor) => TareaEstado.SetFiltroVencimientoAsync(valor);
+
+    private Task OnBajaChanged(string valor) => TareaEstado.SetFiltroBajaAsync(valor);
+
+    private Task OnTextoChanged(string valor) => TareaEstado.SetFiltroTextoAsync(valor);
 
     private Task OnPageChanged(int page) => TareaEstado.IrAPaginaAsync(page);
 
@@ -31,27 +35,29 @@ public partial class ListaTareas : TareaEstadoComponentBase
 
     private Task CompletarTarea(TareaDto tarea) => TareaEstado.ToggleAsync(tarea.IdPublic);
 
-    private void EliminarTarea(TareaDto tarea)
+    private Task RestaurarTarea(TareaDto tarea) => TareaEstado.RestaurarTareaAsync(tarea.IdPublic);
+
+    private void DarDeBajaTarea(TareaDto tarea)
     {
-        _tareaAEliminar = tarea;
-        _showDeleteModal = true;
+        _tareaADarDeBaja = tarea;
+        _showBajaModal = true;
     }
 
-    private async Task ConfirmarEliminar()
+    private async Task ConfirmarBaja()
     {
-        if (_tareaAEliminar is not null)
+        if (_tareaADarDeBaja is not null)
         {
-            await TareaEstado.EliminarTareaAsync(_tareaAEliminar.IdPublic);
-            _tareaAEliminar = null;
+            await TareaEstado.DarDeBajaTareaAsync(_tareaADarDeBaja.IdPublic);
+            _tareaADarDeBaja = null;
         }
 
-        _showDeleteModal = false;
+        _showBajaModal = false;
     }
 
-    private void CancelarEliminar()
+    private void CancelarBaja()
     {
-        _tareaAEliminar = null;
-        _showDeleteModal = false;
+        _tareaADarDeBaja = null;
+        _showBajaModal = false;
     }
 
     private void IniciarEdicion(string id)

@@ -1,5 +1,6 @@
 using Tareas.Application.Abstractions;
 using Tareas.Application.Dtos;
+using Tareas.Application.Filtros;
 using Tareas.Domain.Entidades;
 
 namespace Tareas.Tests.Application;
@@ -49,13 +50,30 @@ internal sealed class FakeTareaRepository : ITareaRepository
     public Task<PaginadoResult<Tarea>> ObtenerPaginadoAsync(
         ParametrosPaginacion paginacion, FiltroTareas filtro, CancellationToken ct = default)
     {
-        var items = _tareas.Values.ToList().AsReadOnly();
+        IEnumerable<Tarea> query = _tareas.Values;
+
+        query = filtro.EstadoBaja switch
+        {
+            EstadoBajaFiltro.Activas => query.Where(t => !t.IsDeleted),
+            EstadoBajaFiltro.DadasDeBaja => query.Where(t => t.IsDeleted),
+            _ => query
+        };
+
+        if (!string.IsNullOrWhiteSpace(filtro.Texto))
+        {
+            var termino = filtro.Texto.Trim();
+            query = query.Where(t =>
+                t.Titulo.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                t.Descripcion.Contains(termino, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var items = query.ToList().AsReadOnly();
         return Task.FromResult(new PaginadoResult<Tarea>(
             items, items.Count, paginacion.Page, paginacion.PageSize));
     }
 
     public Task<Tarea?> ObtenerPorIdAsync(Guid id, CancellationToken ct = default)
-        => Task.FromResult(_tareas.TryGetValue(id, out var t) ? t : null);
+        => Task.FromResult(_tareas.TryGetValue(id, out var t) && !t.IsDeleted ? t : null);
 
     public Task AgregarAsync(Tarea tarea, CancellationToken ct = default)
     {
@@ -69,9 +87,23 @@ internal sealed class FakeTareaRepository : ITareaRepository
         return Task.CompletedTask;
     }
 
-    public Task EliminarAsync(Guid id, CancellationToken ct = default)
+    public Task DarDeBajaAsync(Guid id, CancellationToken ct = default)
     {
-        _tareas.Remove(id);
+        if (_tareas.TryGetValue(id, out var tarea))
+        {
+            tarea.DarDeBaja();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task RestaurarAsync(Guid id, CancellationToken ct = default)
+    {
+        if (_tareas.TryGetValue(id, out var tarea))
+        {
+            tarea.Restaurar();
+        }
+
         return Task.CompletedTask;
     }
 
@@ -86,11 +118,60 @@ internal sealed class FakeTareaRepository : ITareaRepository
     }
 
     public Task<EstadisticasTareas> ObtenerEstadisticasAsync(CancellationToken ct = default)
-        => Task.FromResult(new EstadisticasTareas { Total = _tareas.Count });
+        => Task.FromResult(new EstadisticasTareas { Total = _tareas.Values.Count(t => !t.IsDeleted) });
+}
 
-    public Task EliminarTodasAsync(CancellationToken ct = default)
+internal sealed class FakeCategoryRepository : ICategoryRepository
+{
+    private readonly Dictionary<int, Category> _categorias = new();
+    private readonly HashSet<int> _categoriasConTareas = new();
+    private int _proximoId = 1;
+
+    public IReadOnlyDictionary<int, Category> Categorias => _categorias;
+
+    public void Sembrar(Category category)
     {
-        _tareas.Clear();
+        typeof(Category).GetProperty(nameof(Category.Id))!.SetValue(category, _proximoId++);
+        _categorias[category.Id] = category;
+    }
+
+    public Task<IReadOnlyList<Category>> ObtenerTodasAsync(CancellationToken ct = default)
+        => Task.FromResult<IReadOnlyList<Category>>(
+            _categorias.Values.OrderBy(c => c.Name).ToList().AsReadOnly());
+
+    public Task<Category?> ObtenerPorIdAsync(int id, CancellationToken ct = default)
+        => Task.FromResult(_categorias.TryGetValue(id, out var c) ? c : null);
+
+    public Task<bool> ExisteAsync(int id, CancellationToken ct = default)
+        => Task.FromResult(_categorias.ContainsKey(id));
+
+    public void MarcarConTareas(int id) => _categoriasConTareas.Add(id);
+
+    public Task<bool> TieneTareasAsync(int id, CancellationToken ct = default)
+        => Task.FromResult(_categoriasConTareas.Contains(id));
+
+    public Task<bool> ExisteNombreAsync(string nombre, int? excluirId = null, CancellationToken ct = default)
+    {
+        var normalizado = nombre.Trim().ToUpperInvariant();
+        return Task.FromResult(_categorias.Values.Any(c =>
+            c.Name.ToUpperInvariant() == normalizado && (excluirId is null || c.Id != excluirId)));
+    }
+
+    public Task AgregarAsync(Category category, CancellationToken ct = default)
+    {
+        Sembrar(category);
+        return Task.CompletedTask;
+    }
+
+    public Task ActualizarAsync(Category category, CancellationToken ct = default)
+    {
+        _categorias[category.Id] = category;
+        return Task.CompletedTask;
+    }
+
+    public Task EliminarAsync(int id, CancellationToken ct = default)
+    {
+        _categorias.Remove(id);
         return Task.CompletedTask;
     }
 }

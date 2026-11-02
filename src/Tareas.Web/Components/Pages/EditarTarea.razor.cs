@@ -24,12 +24,14 @@ public partial class EditarTarea
         }
     }
 
-    private void OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
+    protected override void OnImagenChanged(ImageUploader.ImagenChangedEventArgs args)
     {
         if (args.LimpiarImagenExistente && tareaModel is not null)
         {
             tareaModel.Imagen = string.Empty;
         }
+
+        base.OnImagenChanged(args);
     }
 
     private async Task<string?> ResolverTituloTarea(string segmento)

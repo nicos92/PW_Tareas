@@ -1,6 +1,8 @@
 <div class="mb-3" aria-label="Sección para subir imagen">
     <label class="form-label" for="file-upload">Suba una imagen:</label>
-    <InputFile id="file-upload" OnChange="CargarArchivo" accept="image/*" class="form-control" @key="inputFileKey" aria-describedby="file-help-text" />
+    <InputFile id="file-upload" OnChange="CargarArchivo"
+               accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp"
+               class="form-control" @key="inputFileKey" aria-describedby="file-help-text" />
     @if (archivoCargado is not null)
     {
         <div class="alert @TipoAlerta mt-2" role="status" aria-live="polite">
@@ -8,7 +10,11 @@
             {
                 <p>El archivo de imagen tiene que pesar menos de @FormatoTamano(MaxFileSize)</p>
             }
-            @if (!tamanoExcedido)
+            @if (extensionInvalida)
+            {
+                <p>El archivo debe ser una imagen válida (@FormatosPermitidos).</p>
+            }
+            @if (!tamanoExcedido && !extensionInvalida)
             {
                 <div class="container-fluid">
                     <div class="">
@@ -30,5 +36,5 @@
             </div>
         </div>
     }
-    <span id="file-help-text" class="visually-hidden">Formatos de imagen aceptados. Tamaño máximo @FormatoTamano(MaxFileSize).</span>
+    <span id="file-help-text" class="visually-hidden">Formatos aceptados: @FormatosPermitidos. Tamaño máximo @FormatoTamano(MaxFileSize).</span>
 </div>
