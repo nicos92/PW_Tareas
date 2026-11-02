@@ -19,6 +19,12 @@ opencode.json
 cliff.toml
 dotnet-tools.json
 .editorconfig
+LICENSE
+package.json
+package-lock.json
+commitlint.config.mjs
+node_modules/
+.husky/
 
 # Docker
 Dockerfile
