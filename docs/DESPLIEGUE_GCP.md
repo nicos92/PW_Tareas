@@ -1,24 +1,28 @@
-# Despliegue en Google Cloud (Cloud Run + Artifact Registry)
+# Despliegue en Google Cloud (Cloud Run)
 
 Esta aplicación Blazor Server se dockeriza con el `Dockerfile` de la raíz del
-proyecto y sirve en el **puerto 8080**. Para publicarla en Google Cloud el
-flujo es de tres pasos:
+proyecto y sirve en el **puerto 8080**.
+
+El flujo principal de este repositorio usa una imagen pública de Docker Hub y
+un despliegue desde la consola de Cloud Run:
 
 ```
-Dockerfile  ──docker build──►  imagen local  ──docker push──►  Artifact Registry
-                                                                    │
-                                                            gcloud run deploy
-                                                                    ▼
-                                                          Cloud Run (URL https)
+GitHub Actions / podman  ──►  docker.io/nicos92/tareas-blazor  ──►  Cloud Run (URL https)
 ```
 
 | Pieza | Qué es |
 |---|---|
-| **Artifact Registry** | Repositorio privado de imágenes Docker dentro del proyecto de GCP. Reemplaza a Docker Hub. |
+| **Docker Hub** | Registro público donde se publican los tags `latest` y `sha-<commit>` de la imagen. |
 | **Cloud Run** | Runtime serverless: ejecuta el contenedor, escala a cero y expone una URL HTTPS sin administrar servidores. |
-| **Cloud Build** *(opcional)* | Compila y publica la imagen automáticamente, sin Docker en la máquina local. |
+| **Artifact Registry** | Alternativa privada a Docker Hub; el resto de este documento explica ese flujo alternativo. |
+| **Cloud Build** *(opcional)* | Compila y publica la imagen en Artifact Registry sin Docker local. |
 
-> **Resumen del flujo completo**
+> **Ruta actual:** publicar la imagen en Docker Hub y desplegarla desde la
+> consola de Cloud Run. El detalle de los workflows y de los secretos está en
+> [CI_CD.md](CI_CD.md). Las secciones siguientes describen la alternativa con
+> Artifact Registry.
+
+> **Resumen de la alternativa con Artifact Registry**
 > 1. Crear el repositorio de imágenes en Artifact Registry.
 > 2. `docker build` + `docker push` de la imagen.
 > 3. `gcloud run deploy` de esa imagen en un servicio público de Cloud Run.

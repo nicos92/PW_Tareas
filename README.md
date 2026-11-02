@@ -6,9 +6,13 @@ colorTo: indigo
 sdk: docker
 app_port: 8080
 pinned: false
+license: gpl-3.0
 ---
 
 # TareasBlazor
+
+[![CI](https://github.com/nicos92/PW_Tareas/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nicos92/PW_Tareas/actions/workflows/ci.yml)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 Aplicación de gestión de tareas (TODO) desarrollada con Blazor Server (.NET 8) y
 organizada con **Clean Architecture** por proyectos.
@@ -27,6 +31,13 @@ organizada con **Clean Architecture** por proyectos.
 
 - .NET 8 SDK
 - Un navegador moderno
+- Node.js 22 (sólo para el hook de validación de commits; opcional para ejecutar la aplicación)
+
+Para habilitar la validación local de mensajes de commit:
+
+```bash
+npm install
+```
 
 ## Ejecución
 
@@ -36,11 +47,20 @@ dotnet run --project src/Tareas.Web
 
 La aplicación estará disponible en `https://localhost:7245` o `http://localhost:5017`.
 
-## Ejecución con Docker
+## Ejecución con Docker o Podman
+
+Con Docker:
 
 ```bash
 docker build -t tareas-blazor .
 docker run --rm -p 8080:8080 tareas-blazor
+```
+
+Con Podman:
+
+```bash
+podman build -t tareas-blazor .
+podman run --rm -p 8080:8080 tareas-blazor
 ```
 
 La aplicación estará disponible en `http://localhost:8080`.
@@ -60,13 +80,42 @@ Ver [docs/DESPLIEGUE_HF.md](docs/DESPLIEGUE_HF.md). El README ya incluye el
 front matter necesario (`sdk: docker`, `app_port: 8080`), así que basta con
 hacer push del repositorio a un Space con SDK Docker.
 
-## Despliegue en Google Cloud (Cloud Run)
+## Despliegue en Google Cloud (Cloud Run desde Docker Hub)
 
-Ver [docs/DESPLIEGUE_GCP.md](docs/DESPLIEGUE_GCP.md). El flujo es publicar la
-imagen en **Artifact Registry** y desplegarla con `gcloud run deploy`. En Cloud
-Run hay que setear `DATA_DIR=/tmp/data` y `Storage__UploadsPhysicalPath=/tmp/uploads`
-(carpetas escribibles y efímeras) y usar `--max-instances=1` para que todas las
-peticiones peguen a la misma base SQLite (ver el documento para el detalle).
+La imagen se publica en Docker Hub como `docker.io/nicos92/tareas-blazor`
+(tags `latest` y `sha-<commit>`). El despliegue se hace desde la consola de
+Cloud Run:
+
+1. Crear o editar el servicio `tareas-blazor`.
+2. Elegir **Imagen de contenedor** y usar
+   `docker.io/nicos92/tareas-blazor:latest` o un tag inmutable
+   `docker.io/nicos92/tareas-blazor:sha-<commit>`.
+3. Configurar el puerto `8080` y permitir invocaciones sin autenticar.
+4. Definir las variables `DATA_DIR=/tmp/data` y
+   `Storage__UploadsPhysicalPath=/tmp/uploads`, y limitar `max-instances=1`
+   para que todas las peticiones usen la misma base SQLite.
+
+El detalle y la alternativa con Artifact Registry están en
+[docs/DESPLIEGUE_GCP.md](docs/DESPLIEGUE_GCP.md).
+
+## Integración y entrega continua
+
+Los workflows viven en `.github/workflows/`:
+
+- `ci.yml`: valida los mensajes de commit, compila la solución y ejecuta las
+  pruebas en cada push y pull request.
+- `docker-publish.yml`: publica la imagen en Docker Hub al hacer push a `main`
+  o al crear un tag `v*`.
+- `deploy-cloud-run.yml`: despliegue opcional y manual desde GitHub Actions.
+
+El detalle de secretos, variables y del despliegue manual está en
+[docs/CI_CD.md](docs/CI_CD.md).
+
+## Salud del servicio
+
+- `GET /health`: verificación de vida, responde `200` con `{"status":"ok"}`.
+- `GET /health/ready`: verifica que SQLite responda; devuelve `503` si no está
+  disponible.
 
 ## Arquitectura
 
@@ -185,3 +234,14 @@ dotnet test
 | Regla de negocio | Tareas de alta prioridad deben vencer en ≤ 7 días |
 
 Los textos de error provienen de `Tareas.Domain.Reglas.TareaReglas` (fuente única).
+
+## Licencia
+
+Copyright (C) 2026 nicos92.
+
+Este programa es software libre: podés redistribuirlo y/o modificarlo bajo los
+términos de la **GNU General Public License versión 3** publicada por la Free
+Software Foundation. Se distribuye con la esperanza de que sea útil, pero
+**sin ninguna garantía**, ni siquiera la garantía implícita de comerciabilidad
+o aptitud para un propósito particular. Ver [LICENSE](LICENSE) para el texto
+completo.
