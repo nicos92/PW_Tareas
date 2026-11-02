@@ -64,18 +64,18 @@
   - **`docker-publish.yml`:**
     - Disparadores: push a `main`, tags `v*` y ejecución manual (Líneas 3-8).
     - Construye y publica `docker.io/<usuario>/tareas-blazor:latest` y `:sha-<commit>` con caché de GitHub Actions (Líneas 32-45).
-    - El job se omite si no existe la variable `DOCKERHUB_USERNAME` (Línea 20); la única ejecución registrada quedó en `skipped`, por lo que la imagen no se está publicando todavía.
+    - El job se omite si no existe la variable `DOCKERHUB_USERNAME` (Línea 20). Tras configurarla, la ejecución del `2026-11-02` publicó `latest` y `sha-<commit>` en Docker Hub correctamente.
   - **`deploy-cloud-run.yml`:**
-    - Sólo se dispara manualmente con `workflow_dispatch` (Líneas 3-8) y requiere `GCP_PROJECT_ID`, `DOCKERHUB_USERNAME` y el secreto `GCP_SA_KEY` (Líneas 23-30).
-    - Usa `google-github-actions/auth`, `gcloud run deploy` con `--allow-unauthenticated`, variables de entorno, `max-instances=1` y verificación final de `GET /health` con reintentos (Líneas 42-72).
+    - Sólo se dispara manualmente con `workflow_dispatch` (Líneas 3-8) y requiere `GCP_PROJECT_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT` y `DOCKERHUB_USERNAME` (Líneas 23-35); se autentica con **Workload Identity Federation**, sin clave JSON.
+    - Usa `google-github-actions/auth`, `gcloud run deploy` con `--allow-unauthenticated`, variables de entorno, `max-instances=1` y verificación final de `GET /health` con reintentos (Líneas 48-77).
     - **No registra ninguna ejecución**: `GET /actions/workflows/deploy-cloud-run.yml/runs` → `total_count: 0`.
-  - **Verificación remota (GitHub API):** `GET /actions/workflows` → `total_count: 3`; `GET /actions/runs` → `total_count: 5` (CI en `main`, `develop` y PR, todas `success`); `GET /deployments` → `[]`; `GET /environments` → `total_count: 0`.
-  - **Documentación:** `docs/CI_CD.md` (132 líneas) describe workflows, validación de commits, publicación en Docker Hub y despliegue; `README.md` (Líneas 101-113) resume los tres workflows.
-  - **Qué falta:** el build y los tests están automatizados y verdes, pero el **deploy no es automático**: `deploy-cloud-run.yml` es manual, nunca se ejecutó y no hay deployments ni environments registrados. La publicación de la imagen tampoco ocurre porque falta configurar la variable/secreto de Docker Hub.
+  - **Verificación remota (GitHub API):** `GET /actions/workflows` → `total_count: 3`; `GET /actions/runs` → `total_count: 9` (CI en `main`, `develop` y PR, todas `success`; `docker-publish` con `success` en `main` y una ejecución previa `skipped`); `GET /deployments` → `[]`; `GET /environments` → `total_count: 0`.
+  - **Documentación:** `docs/CI_CD.md` (157 líneas) describe workflows, validación de commits, publicación en Docker Hub, Workload Identity Federation y despliegue; `README.md` (Líneas 101-113) resume los tres workflows.
+  - **Qué falta:** el build, los tests y la publicación de la imagen están automatizados y verdes, pero el **deploy no es automático**: `deploy-cloud-run.yml` es manual, nunca se ejecutó y no hay deployments ni environments registrados.
   - **Recomendación técnica:**
-    1. Configurar `DOCKERHUB_USERNAME` (variable) y `DOCKERHUB_TOKEN` (secreto) para que `docker-publish.yml` publique la imagen.
-    2. Configurar `GCP_PROJECT_ID`, `GCP_REGION`, `CLOUD_RUN_SERVICE` (variables) y `GCP_SA_KEY` (secreto), ejecutar `deploy-cloud-run.yml` y registrar la URL resultante.
-    3. Opcional: encadenar el deploy a un tag `v*` o a `workflow_run` después de una publicación exitosa, y proteger el environment `production`.
+    1. Ejecutar `deploy-cloud-run.yml` con las variables de Workload Identity Federation configuradas y registrar la URL resultante.
+    2. Añadir la URL al `README.md` y al campo `homepage` del repositorio; proteger el environment `production` si se agregan reglas de aprobación.
+    3. Opcional: encadenar el deploy a un tag `v*` o a `workflow_run` después de una publicación exitosa.
 
 ---
 
@@ -115,7 +115,7 @@
     - `deploy-cloud-run.yml` puede desplegar y autoverificar `/health`, pero **nunca se ejecutó**.
     - Health checks implementados en `src/Tareas.Web/Program.cs` (Líneas 55-57) y documentados en `README.md` (Líneas 114-119).
   - **Recomendación técnica:**
-    1. Ejecutar `deploy-cloud-run.yml` (configurando `GCP_SA_KEY`, `GCP_PROJECT_ID`, etc.) o desplegar manualmente en Cloud Run/Hugging Face Spaces usando el `Dockerfile` existente.
+    1. Ejecutar `deploy-cloud-run.yml` (configurando `GCP_PROJECT_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT`) o desplegar manualmente en Cloud Run/Hugging Face Spaces usando el `Dockerfile` existente.
     2. Verificar accesibilidad (`curl -sI https://<url> | head -1` → `200`) y rutas clave (`/`, `/listaDeTareas`, `/categorias`, `/health`).
     3. Añadir la URL en la cabecera del `README.md` y en `homepage` del repositorio; agregar badge de estado.
     4. Opcional: automatizar el deploy al crear un tag `v*` para que la URL se mantenga actualizada (ver punto 2).
@@ -125,6 +125,6 @@
 ## Conclusión
 
 - **1 — Cumple parcialmente.** La convención ya está instalada y validada de forma automática (`commitlint`, `husky`, `ci.yml`, `CONTRIBUTING.md`), pero el 77,1 % del historial (74 de 96 commits no-merge) es legado sin prefijo y no se reescribe.
-- **2 — Cumple parcialmente.** Existen tres workflows activos y el CI de build/test/commitlint está verde en `main`, `develop` y PR. Sin embargo, la publicación de la imagen se omite por falta de configuración y el deploy a Cloud Run es manual y no se ejecutó (0 runs, 0 deployments).
+- **2 — Cumple parcialmente.** Existen tres workflows activos y el CI de build/test/commitlint está verde en `main`, `develop` y PR; `docker-publish` ya publica la imagen en Docker Hub. Sin embargo, el deploy a Cloud Run es manual y no se ejecutó (0 runs, 0 deployments).
 - **3 — Cumple.** `README.md` (247 líneas) es profesional y cubre descripción, requisitos, ejecución local, Docker, variables de entorno, despliegue, CI/CD, health checks, arquitectura, migraciones, publicación, tests y licencia.
 - **4 — No cumple.** No hay URL pública real ni evidencia de despliegue; sólo plantillas (`TU_USUARIO`, `xxxxx`, `MI_IP`) y guías. El repositorio está listo para desplegarse, pero falta ejecutar el despliegue y documentar la URL.
