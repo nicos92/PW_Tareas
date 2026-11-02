@@ -1,6 +1,8 @@
 # Auditoría de Código y DevOps — UNIDAD 4: Prácticas Profesionales
 
-**Repositorio:** `nicos92/PW_Tareas` (`https://github.com/nicos92/PW_Tareas`) · **Rama auditada:** `develop` (`1237b04`) · **Rama por defecto:** `main` · **Visibilidad:** pública · **Fecha de auditoría:** 2026-11-01.
+**Repositorio:** `nicos92/PW_Tareas` (`https://github.com/nicos92/PW_Tareas`) · **Rama auditada:** `develop` (`684f88d`) · **Rama por defecto:** `main` · **Visibilidad:** pública · **Fecha de auditoría:** 2026-11-02.
+
+> **Nota de actualización:** esta versión reemplaza la auditoría anterior (basada en `1237b04`) y refleja el estado posterior al commit `684f88d ci: incorpora validacion de commits y pipeline de despliegue (#17)`, que agregó `commitlint`, `husky`, los workflows de GitHub Actions, `CONTRIBUTING.md` y `LICENSE`.
 
 ---
 
@@ -8,108 +10,121 @@
 
 | # | Requisito | Estado |
 |---|-----------|--------|
-| 1 | Historial con Conventional Commits | **NO CUMPLE (parcial)** — 30/111 commits conformes; 75 sin prefijo |
-| 2 | CI/CD con GitHub Actions (build + deploy) | **NO CUMPLE** — no existe `.github/workflows/` |
+| 1 | Historial con Conventional Commits | **CUMPLE (parcial)** — validación local y en CI; 22/96 commits no-merge conformes y 74 de legado sin prefijo |
+| 2 | CI/CD con GitHub Actions (build + deploy) | **CUMPLE (parcial)** — `ci.yml` verde (build + test + commitlint); `docker-publish` y `deploy-cloud-run` definidos, pero el deploy es manual y no se ejecutó |
 | 3 | README.md profesional con instalación/requisitos/ejecución | **CUMPLE** |
-| 4 | Aplicación desplegada en URL pública | **NO CUMPLE** — sólo placeholders, sin URL real |
+| 4 | Aplicación desplegada en URL pública | **NO CUMPLE** — no hay URL real; `homepage: null` y sin deployments |
 
 ---
 
 ### 1. Repositorio GitHub con historial limpio (Conventional Commits)
-- **Estado: NO CUMPLE (parcial)**
+- **Estado: CUMPLE (parcial)**
 - **Evidencia / Ausencia:**
-  - **Repositorio:** remoto `origin` → `https://github.com/nicos92/PW_Tareas.git`; repo público, 3 ramas remotas principales (`main`, `develop`, `criterios`) y varias de trabajo (`u2`, `u2-md3`, `u2-migration`, `u2-nginx`).
-  - **Estructura de commits:** se observan prefijos válidos en la etapa reciente:
-    - `1237b04 test: cubre restriccion de borrado de categorias`
-    - `04e03d8 fix: impide eliminar categorias con tareas asociadas`
-    - `190c353 feat: agrega gestion de categorias y relacion opcional con tareas`
-    - `b67f0fa feat: agrega filtro y restauracion de tareas dadas de baja`
-    - `6e743f0 refactor!: migra el proyecto a Clean Architecture por capas` (breaking change correctamente marcado con `!`)
-    - Tipos usados: `fix` (9), `docs` (8), `feat` (6), `test` (4), `refactor` (2), `chore` (1) → **30 commits conformes**.
-  - **Historial global:** 111 commits totales; **75 no siguen Conventional Commits** (≈68 %), por ejemplo:
+  - **Repositorio:** remoto `origin` → `https://github.com/nicos92/PW_Tareas.git`; repo público. Ramas remotas: `main` y `develop`. Ramas locales adicionales de trabajo: `criterios`, `u2`, `u2-editorconfig`, `u2-md3`, `u2-nginx`.
+  - **Estado actual:** `develop` = `origin/develop` = `684f88d` (`2026-11-01`); la rama por defecto es `main`.
+  - **Commits recientes que cumplen el formato:**
+    - `684f88d ci: incorpora validacion de commits y pipeline de despliegue (#17)`
+    - `6c50150 docs: documenta las variables de entorno y el despliegue en GCP`
+    - `acb60a8 docs: agrega la guia de despliegue en Google Cloud Run`
+    - `696e55d chore: habilita el procesamiento de forwarded headers en el contenedor`
+    - `5a969f0 test: agrega regresiones de la ruta de base y del almacenamiento de adjuntos`
+    - `6abcac2 fix: cae a una carpeta temporal cuando la ruta de la base no admite escritura`
+    - `b2e32fd feat: agrega la ruta fisica de adjuntos separada de la carpeta publica`
+  - **Historial actual:** 103 commits totales (**96 no-merge** + 7 merge commits). De los no-merge, **22 cumplen Conventional Commits** (22,9 %): `fix` (7), `docs` (6), `feat` (3), `test` (2), `refactor` (2), `ci` (1), `chore` (1). Los **74 restantes (77,1 %)** son historial legado sin prefijo, por ejemplo:
     - `agrega documentacion para el despligue en hugging face spaces`
     - `actualiza readme`, `agrega docker file`, `agrega docker ignore`
-    - `arregla responsive en lista de tareas`
-    - `agrega mcp de drawio para opencode`
     - `agrega configrraciones para github`
-  - Además hay **6 merge commits** (`Merge branch ...`, `Merge pull request ...`) y una rama con commits de prueba (`7fde3c7 agrega comentario para simulacion`).
-  - **Fortalezas:** existen `cliff.toml` (Líneas 1-16) y `CHANGELOG.md` (Líneas 1-24) que evidencian intención de automatizar el changelog por tipo de commit, y tags semánticos `v0.1.0`, `v1.0.0`, `v1.0.1`.
-  - **Qué falta:** no hay validación automática del formato (no existe `commitlint`, `husky`, hook `commit-msg` ni workflow de lint de PR). El historial antiguo no es reescribible sin riesgo porque las ramas ya están publicadas y compartidas.
+    - `agrega comentario para simulacion`
+    - `agrega mcp de drawio para opencode`
+  - **Fortalezas incorporadas:**
+    - `package.json` con `@commitlint/cli`, `@commitlint/config-conventional` y `husky`; script `prepare` para instalar hooks.
+    - `commitlint.config.mjs` (Líneas 1-14): extiende la configuración convencional, ignora `Merge ...`/`Revert ...` y fija `header-max-length` en 100.
+    - `.husky/commit-msg` (Línea 1): ejecuta `npx --no -- commitlint --edit "$1"` en cada commit local.
+    - Workflow `ci.yml` (Líneas 22-54): job `commitlint` que valida el título del PR y el rango de commits del push/PR.
+    - `CONTRIBUTING.md` (Líneas 1-72): documenta formato, tipos permitidos y ejemplos.
+    - `.github/pull_request_template.md`: checklist que exige título y commits conformes.
+    - `cliff.toml` (Líneas 1-16) y `CHANGELOG.md` (Líneas 1-25) para generar el changelog; tags semánticos `v0.1.0`, `v1.0.0`, `v1.0.1`.
+  - **Qué falta:** el historial anterior al commit `684f88d` sigue sin cumplir (77,1 %). No se reescribe de forma deliberada porque las ramas ya están publicadas. Tampoco es verificable desde la API que la protección de rama exija los checks `commitlint`/`build-test` como obligatorios.
   - **Recomendación técnica:**
-    1. Agregar `commitlint` + `husky` (`.husky/commit-msg` → `npx commitlint --edit $1`) con `@commitlint/config-conventional`, o un workflow que valide el título del PR.
-    2. Habilitar en GitHub la opción *Squash and merge* con título de PR en formato Conventional Commits y *Require status checks*.
-    3. Documentar la convención en `CONTRIBUTING.md`; para el historial existente, opcionalmente reescribir sólo ramas no compartidas con `git rebase -i` (nunca `main`/`develop` sin coordinación).
+    1. Activar *branch protection* en `main` y `develop` con *Require status checks* (`commitlint`, `build-test`) y *Require pull request*.
+    2. Habilitar *Squash and merge* con título de PR en formato Conventional Commits.
+    3. Mantener `commitlint` + `husky`; para el historial legado, reescribir sólo ramas no compartidas con `git rebase -i` (nunca `main`/`develop` sin coordinación).
 
 ---
 
 ### 2. CI/CD con GitHub Actions: build y deploy automático
-- **Estado: NO CUMPLE**
+- **Estado: CUMPLE (parcial)**
 - **Evidencia / Ausencia:**
-  - **Archivo de workflow:** **no existe** `.github/workflows/` (ni `.yaml`/`.yml` de Actions) en ninguna rama. `git log --all -- .github/workflows` no devuelve resultados.
-  - Contenido actual de `.github/`: sólo `CODEOWNERS` (Líneas 1-9), `ISSUE_TEMPLATE/user_story.md` y `pull_request_template.md`. No hay pipelines.
-  - Verificación remota (GitHub API): `GET /repos/nicos92/PW_Tareas/actions/workflows` → `total_count: 0`; `GET /actions/runs` → `total_count: 0`; `GET /deployments` → `[]`; `GET /environments` → `total_count: 0`.
-  - Lo que sí existe es **build y despliegue manual**:
-    - `Dockerfile` (Líneas 1-44) con build multi-stage y runtime, pero se ejecuta a mano con `docker build`.
-    - `docs/DESPLIEGUE_GCP.md` (Líneas 138-181) **propone** un `cloudbuild.yaml` y un trigger de Cloud Build, pero ese archivo **no está commiteado** en la raíz (`ls cloudbuild.yaml` → no existe).
-    - `docs/DESPLIEGUE_HF.md` (Líneas 48-58) depende del build automático de Hugging Face al hacer push, no de GitHub Actions.
-  - **Recomendación técnica:** crear `.github/workflows/ci.yml` (en `push`/`pull_request` a `main`/`develop`) con:
-    ```yaml
-    name: ci
-    on:
-      push: { branches: [main, develop] }
-      pull_request: { branches: [main, develop] }
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-          - uses: actions/setup-dotnet@v4
-            with: { dotnet-version: '8.0.x' }
-          - run: dotnet restore
-          - run: dotnet build --no-restore -c Release
-          - run: dotnet test --no-build -c Release
-    ```
-    y un `deploy.yml` (o un job `deploy` condicionado a `main`) con `google-github-actions/auth`, `docker build/push` a Artifact Registry y `google-github-actions/deploy-cloudrun`, o bien push al Space de Hugging Face con `huggingface_hub`. Añadir `concurrency`, caché de NuGet y *environments* con secretos (`GCP_SA_KEY`, `HF_TOKEN`).
+  - **Workflows existentes:** `.github/workflows/` contiene `ci.yml` (86 líneas), `docker-publish.yml` (45 líneas) y `deploy-cloud-run.yml` (72 líneas). La API de GitHub reporta los **3 workflows activos**.
+  - **`ci.yml` (build + test + validación):**
+    - Disparadores: `push` y `pull_request` a `main`/`develop`, más `workflow_dispatch` (Líneas 3-9).
+    - `permissions: contents: read`, `concurrency` con cancelación y variables `DOTNET_*` (Líneas 11-19).
+    - Job `commitlint` (Líneas 22-54): instala Node 22 con caché npm, valida el título del PR y el rango de commits.
+    - Job `build-test` (Líneas 56-86): .NET 8 con caché de NuGet, `dotnet restore`, `dotnet build -c Release`, `dotnet test -c Release` y publicación del artefacto TRX.
+  - **`docker-publish.yml`:**
+    - Disparadores: push a `main`, tags `v*` y ejecución manual (Líneas 3-8).
+    - Construye y publica `docker.io/<usuario>/tareas-blazor:latest` y `:sha-<commit>` con caché de GitHub Actions (Líneas 32-45).
+    - El job se omite si no existe la variable `DOCKERHUB_USERNAME` (Línea 20); la única ejecución registrada quedó en `skipped`, por lo que la imagen no se está publicando todavía.
+  - **`deploy-cloud-run.yml`:**
+    - Sólo se dispara manualmente con `workflow_dispatch` (Líneas 3-8) y requiere `GCP_PROJECT_ID`, `DOCKERHUB_USERNAME` y el secreto `GCP_SA_KEY` (Líneas 23-30).
+    - Usa `google-github-actions/auth`, `gcloud run deploy` con `--allow-unauthenticated`, variables de entorno, `max-instances=1` y verificación final de `GET /health` con reintentos (Líneas 42-72).
+    - **No registra ninguna ejecución**: `GET /actions/workflows/deploy-cloud-run.yml/runs` → `total_count: 0`.
+  - **Verificación remota (GitHub API):** `GET /actions/workflows` → `total_count: 3`; `GET /actions/runs` → `total_count: 5` (CI en `main`, `develop` y PR, todas `success`); `GET /deployments` → `[]`; `GET /environments` → `total_count: 0`.
+  - **Documentación:** `docs/CI_CD.md` (132 líneas) describe workflows, validación de commits, publicación en Docker Hub y despliegue; `README.md` (Líneas 101-113) resume los tres workflows.
+  - **Qué falta:** el build y los tests están automatizados y verdes, pero el **deploy no es automático**: `deploy-cloud-run.yml` es manual, nunca se ejecutó y no hay deployments ni environments registrados. La publicación de la imagen tampoco ocurre porque falta configurar la variable/secreto de Docker Hub.
+  - **Recomendación técnica:**
+    1. Configurar `DOCKERHUB_USERNAME` (variable) y `DOCKERHUB_TOKEN` (secreto) para que `docker-publish.yml` publique la imagen.
+    2. Configurar `GCP_PROJECT_ID`, `GCP_REGION`, `CLOUD_RUN_SERVICE` (variables) y `GCP_SA_KEY` (secreto), ejecutar `deploy-cloud-run.yml` y registrar la URL resultante.
+    3. Opcional: encadenar el deploy a un tag `v*` o a `workflow_run` después de una publicación exitosa, y proteger el environment `production`.
 
 ---
 
 ### 3. README.md profesional con instrucciones de instalación
 - **Estado: CUMPLE**
 - **Evidencia / Ausencia:**
-  - **Ubicación:** `README.md` (180 líneas). Secciones evaluadas:
-    - **Descripción:** Líneas 11-14 (propósito, stack Blazor Server .NET 8, Clean Architecture) y Líneas 16-24 (características).
-    - **Requisitos previos:** Líneas 26-29 (`.NET 8 SDK`, navegador moderno).
-    - **Instalación / ejecución:** Líneas 31-37 (`dotnet run --project src/Tareas.Web` y URLs locales), Líneas 39-46 (Docker `build`/`run`), Líneas 48-55 (variables de entorno del contenedor).
-    - **Despliegue:** Líneas 57-69 con enlaces a `docs/DESPLIEGUE_HF.md` y `docs/DESPLIEGUE_GCP.md`.
-    - **Arquitectura y estructura:** Líneas 71-104 (regla de dependencia y árbol de carpetas).
-    - **Persistencia y migraciones:** Líneas 118-144 (ruta de SQLite, EF Core y comandos `dotnet ef`).
-    - **Publicación y tests:** Líneas 146-152 (`dotnet publish`) y Líneas 163-167 (`dotnet test`).
-    - **Validaciones:** Líneas 169-180 (tabla de reglas de negocio).
-  - **Observaciones menores:** el README incluye front matter de Hugging Face (Líneas 1-9), pero no muestra una URL pública, un badge de CI ni una licencia. No impide el cumplimiento del requisito (instalación, requisitos y ejecución están claros), pero conviene añadir esos elementos cuando exista despliegue.
+  - **Ubicación:** `README.md` (247 líneas). Secciones evaluadas:
+    - **Descripción y badges:** Líneas 1-18 (front matter de Hugging Face, badge de CI, badge de licencia GPL-3.0, stack Blazor Server .NET 8 y Clean Architecture).
+    - **Características:** Líneas 20-28.
+    - **Requisitos previos:** Líneas 30-40 (`.NET 8 SDK`, navegador, Node.js 22 para el hook de commits y `npm install`).
+    - **Ejecución local:** Líneas 42-49 (`dotnet run --project src/Tareas.Web` y URLs locales).
+    - **Docker/Podman:** Líneas 50-76 (`build`/`run` y tabla de variables de entorno).
+    - **Despliegue:** Líneas 77-100 (Hugging Face Spaces y Cloud Run desde Docker Hub).
+    - **CI/CD:** Líneas 101-113 (los tres workflows y enlace a `docs/CI_CD.md`).
+    - **Salud del servicio:** Líneas 114-119 (`/health` y `/health/ready`).
+    - **Arquitectura y estructura:** Líneas 120-154 (regla de dependencia, árbol y front end) y Líneas 155-166 (componentes reutilizables).
+    - **Persistencia y migraciones:** Líneas 167-201 (SQLite, EF Core y comandos `dotnet ef`).
+    - **Publicación y paquetes:** Líneas 202-218.
+    - **Tests y validaciones:** Líneas 219-237.
+    - **Licencia:** Líneas 238-247 (GPL-3.0, con `LICENSE` en la raíz).
+  - **Observaciones menores:** el README ya incluye badge de CI, badge de licencia y health checks. **Sigue sin mostrar una URL pública de la aplicación**; cuando exista despliegue conviene añadirla en la cabecera y en el campo `homepage` del repositorio.
+  - **Cumplimiento:** cubre descripción, requisitos, instalación, ejecución local, Docker, variables de entorno, despliegue, arquitectura, persistencia, publicación y tests.
 
 ---
 
 ### 4. Aplicación desplegada y accesible en URL pública
 - **Estado: NO CUMPLE**
 - **Evidencia / Ausencia:**
-  - **URL pública:** **no declarada**. El `README.md` no contiene ningún enlace de aplicación desplegada; sólo URLs locales (`http://localhost:8080`, Líneas 37 y 46).
+  - **URL pública:** **no declarada**. El `README.md` sólo contiene URLs locales (`https://localhost:7245`, `http://localhost:5017` en Línea 48; `http://localhost:8080` en Línea 66) y enlaces a GitHub/Licencia; no hay enlace a una instancia desplegada.
   - **Documentación con placeholders, no URLs reales:**
-    - `docs/DESPLIEGUE_HF.md` (Líneas 54-56) → `https://huggingface.co/spaces/TU_USUARIO/pw-tareas` (plantilla).
-    - `docs/DESPLIEGUE_GCP.md` (Líneas 236-240 y 306-315) → `https://tareas-blazor-xxxxx-uc.a.run.app` (ejemplo).
-    - `docs/NGINX_GUIDE.md` (Líneas 102-103, 317-319) → `http://MI_IP:8081` (ejemplo didáctico).
-  - **Verificación remota:** GitHub API del repo → `"homepage": null`, `"has_pages": false`; no hay deployments ni environments. API de Hugging Face (`/api/spaces?author=nicos92`) → `[]` (sin Spaces públicos). Búsqueda de URLs reales (`*.run.app`, `*.github.io`, `huggingface.co/spaces/<usuario>`, `*.azurewebsites.net`, `*.vercel.app`) en todo el historial → sin resultados distintos de placeholders.
-  - **Qué falta:** un artefacto desplegado y su enlace verificable (HTTP 200) documentado en el README. Existe Dockerfile y guías de despliegue, lo que demuestra preparación, pero no despliegue activo.
+    - `docs/DESPLIEGUE_HF.md` (Líneas 34, 45 y 55) → `https://huggingface.co/spaces/TU_USUARIO/pw-tareas` (plantilla).
+    - `docs/DESPLIEGUE_GCP.md` (Líneas 179, 243 y 315) → `TU_USUARIO_GITHUB` y `https://tareas-blazor-xxxxx-uc.a.run.app` (ejemplos).
+    - `docs/NGINX_GUIDE.md` (Líneas 102-103) → `http://MI_IP:8081` / `http://MI_IP:8082` (ejemplo didáctico).
+  - **Verificación remota:** GitHub API del repo → `"homepage": null`, `"has_pages": false`; `GET /deployments` → `[]`; `GET /environments` → `total_count: 0`. API de Hugging Face (`/api/spaces?author=nicos92`) → `[]` (sin Spaces públicos).
+  - **Qué falta:** un artefacto desplegado y su enlace verificable (HTTP 200) documentado en el README. El repositorio ya está preparado:
+    - `Dockerfile` (44 líneas) multi-stage listo para Cloud Run/Hugging Face.
+    - `deploy-cloud-run.yml` puede desplegar y autoverificar `/health`, pero **nunca se ejecutó**.
+    - Health checks implementados en `src/Tareas.Web/Program.cs` (Líneas 55-57) y documentados en `README.md` (Líneas 114-119).
   - **Recomendación técnica:**
-    1. Desplegar en Cloud Run (`gcloud run deploy ... --allow-unauthenticated`), Hugging Face Spaces (SDK Docker) o Azure App Service usando el `Dockerfile` existente.
-    2. Verificar accesibilidad (`curl -sI https://<url> | head -1` → `200`) y rutas clave (`/`, `/listaDeTareas`, `/categorias`, `/configuracion`).
-    3. Añadir la URL en la cabecera del `README.md` y en `homepage` del repositorio; agregar badge de estado y un health check (`/health` o equivalente) para monitoreo.
-    4. Integrar el deploy en el workflow de GitHub Actions para que la URL se mantenga actualizada (ver punto 2).
+    1. Ejecutar `deploy-cloud-run.yml` (configurando `GCP_SA_KEY`, `GCP_PROJECT_ID`, etc.) o desplegar manualmente en Cloud Run/Hugging Face Spaces usando el `Dockerfile` existente.
+    2. Verificar accesibilidad (`curl -sI https://<url> | head -1` → `200`) y rutas clave (`/`, `/listaDeTareas`, `/categorias`, `/health`).
+    3. Añadir la URL en la cabecera del `README.md` y en `homepage` del repositorio; agregar badge de estado.
+    4. Opcional: automatizar el deploy al crear un tag `v*` para que la URL se mantenga actualizada (ver punto 2).
 
 ---
 
 ## Conclusión
 
-- **1 — Parcial.** La práctica de Conventional Commits está instalada en la etapa reciente y respaldada por `cliff.toml`/`CHANGELOG.md`, pero el 68 % del historial (75 de 111 commits) no cumple el formato y no hay validación automatizada.
-- **2 — No cumple.** No existe ningún workflow de GitHub Actions ni ejecución registrada; el build/deploy es manual (Docker/`gcloud`) o delegado a Hugging Face, con `cloudbuild.yaml` sólo como ejemplo documentado.
-- **3 — Cumple.** `README.md` es profesional y cubre descripción, requisitos (.NET 8), ejecución local, Docker, variables de entorno, arquitectura, migraciones, publicación y tests.
-- **4 — No cumple.** No hay URL pública real ni evidencia de despliegue; sólo plantillas (`TU_USUARIO`, `xxxxx`) y guías de despliegue. El repositorio está listo para desplegarse (Dockerfile + documentación), pero el requisito exige una instancia accesible.
+- **1 — Cumple parcialmente.** La convención ya está instalada y validada de forma automática (`commitlint`, `husky`, `ci.yml`, `CONTRIBUTING.md`), pero el 77,1 % del historial (74 de 96 commits no-merge) es legado sin prefijo y no se reescribe.
+- **2 — Cumple parcialmente.** Existen tres workflows activos y el CI de build/test/commitlint está verde en `main`, `develop` y PR. Sin embargo, la publicación de la imagen se omite por falta de configuración y el deploy a Cloud Run es manual y no se ejecutó (0 runs, 0 deployments).
+- **3 — Cumple.** `README.md` (247 líneas) es profesional y cubre descripción, requisitos, ejecución local, Docker, variables de entorno, despliegue, CI/CD, health checks, arquitectura, migraciones, publicación, tests y licencia.
+- **4 — No cumple.** No hay URL pública real ni evidencia de despliegue; sólo plantillas (`TU_USUARIO`, `xxxxx`, `MI_IP`) y guías. El repositorio está listo para desplegarse, pero falta ejecutar el despliegue y documentar la URL.
