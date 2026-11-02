@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: "Tag de la imagen en Docker Hub (latest o sha-<commit>)"
-        required: true
-        default: latest
+        description: "Tag de la imagen en Docker Hub (vacío = sha-<commit>; evitá latest por la caché de Docker Hub)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -44,7 +44,12 @@ jobs:
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
+          if [ -z "$IMAGE_TAG" ]; then
+            IMAGE_TAG="sha-${GITHUB_SHA}"
+          fi
+
           IMAGE="docker.io/${DOCKERHUB_USERNAME}/tareas-blazor:${IMAGE_TAG}"
+          echo "Imagen: $IMAGE" >> "$GITHUB_STEP_SUMMARY"
           gcloud run deploy "$SERVICE" \
             --image="$IMAGE" \
             --project="$PROJECT_ID" \

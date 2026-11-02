@@ -61,8 +61,10 @@ El despliegue habitual se hace desde el navegador:
 
 1. Abrir Cloud Run en Google Cloud Console.
 2. Crear un servicio o editar `tareas-blazor`.
-3. Elegir **Imagen de contenedor** y usar
-   `docker.io/nicos92/tareas-blazor:latest` o el tag `sha-<commit>`.
+3. Elegir **Imagen de contenedor** y usar el tag inmutable
+   `docker.io/nicos92/tareas-blazor:sha-<commit>`. Evitá `latest`: Cloud Run
+   cachea las imágenes públicas de Docker Hub hasta una hora y puede desplegar
+   una versión anterior.
 4. Configurar:
    - puerto `8080`;
    - invocaciones sin autenticar (`--allow-unauthenticated`);
@@ -89,7 +91,10 @@ datos, usar `/health/ready`.
 ## Despliegue automático opcional
 
 El workflow `deploy-cloud-run.yml` permite desplegar desde GitHub Actions. No se
-ejecuta automáticamente; hay que lanzarlo a mano y configurar previamente:
+ejecuta automáticamente; hay que lanzarlo a mano y configurar previamente. Por
+defecto usa el tag inmutable `sha-<commit>` del commit que ejecuta el workflow;
+evitá `latest` porque Cloud Run cachea las imágenes públicas de Docker Hub hasta
+una hora y puede desplegar una versión anterior.
 
 | Tipo | Nombre | Valor |
 |---|---|---|
@@ -132,7 +137,7 @@ Comando equivalente al que ejecuta el workflow:
 
 ```bash
 gcloud run deploy tareas-blazor \
-  --image=docker.io/nicos92/tareas-blazor:latest \
+  --image=docker.io/nicos92/tareas-blazor:sha-<commit> \
   --region=us-central1 \
   --platform=managed \
   --port=8080 \
