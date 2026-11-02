@@ -1,0 +1,86 @@
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  commitlint:
+    name: commitlint
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' &&
+      github.event.before != '0000000000000000000000000000000000000000')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Instala commitlint
+        run: npm ci
+        env:
+          HUSKY: "0"
+
+      - name: Valida el título del pull request
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | npx --no -- commitlint
+
+      - name: Valida los commits del rango
+        env:
+          FROM_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          TO_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
+        run: npx --no -- commitlint --from "$FROM_SHA" --to "$TO_SHA" --verbose
+
+  build-test:
+    name: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+
+      - name: Restaura paquetes
+        run: dotnet restore PW_Tareas.sln
+
+      - name: Compila en Release
+        run: dotnet build PW_Tareas.sln -c Release --no-restore
+
+      - name: Ejecuta las pruebas
+        run: >-
+          dotnet test PW_Tareas.sln -c Release --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+
+      - name: Publica los resultados de las pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/
+          if-no-files-found: ignore
