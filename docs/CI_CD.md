@@ -94,8 +94,7 @@ El workflow `deploy-cloud-run.yml` permite desplegar desde GitHub Actions. No se
 ejecuta automáticamente; hay que lanzarlo a mano y configurar previamente. Por
 defecto usa el tag inmutable `sha-<commit>` del commit que ejecuta el workflow;
 evitá `latest` porque Cloud Run cachea las imágenes públicas de Docker Hub hasta
-una hora y puede desplegar una versión anterior. El workflow espera hasta 5
-minutos a que el mirror de Cloud Run sincronice el tag antes de desplegar.
+una hora y puede desplegar una versión anterior.
 
 | Tipo | Nombre | Valor |
 |---|---|---|
